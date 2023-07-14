@@ -1,0 +1,25 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% block title %}Store info | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+  <h1>Store information and usage</h1>
+<nav>
+  <a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_store' %}">
+  Update store metadata
+  </a>
+</nav>
+
+<section>
+  <h2>Resource Usage</h2>
+  <table class="dashboard-statistics">
+      <tr>
+	<th></th>
+	<td></td>
+      </tr>
+      
+    </table>
+  
+</section>
+
+{% endblock %}

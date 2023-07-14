@@ -1,0 +1,41 @@
+{% extends "tenants/base.html" %}
+
+{% block title %}MWS{% endblock %}
+
+{% block content %}
+<div class="homepage-container">
+  <section class="intro-section">
+    <h1>
+      Multi-tenancy service
+      <br>store provider
+    </h1>
+
+    <ul>
+      <li><a class="main-ref" href="{% url 'tenants:registration' %}">Get started</a></li>
+      <li><a class="secondary-ref" href="{% url 'tenants:view_plans' %}">View plans</a></li>
+    </ul>
+  </section>
+
+  <section class="available-stores">
+    <h2>Available stores</h2>
+
+    {% if stores %}
+    <ul>
+      {% for store in stores %}
+      <li>
+	<h3>
+	  <a href="http://{{ store.subdomain_prefix}}.mws.local:8000/store/">
+	    {{ store.name }}
+	  </a>
+	</h3>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no available stores at this moment.</p>
+    {% endif %}
+    
+  </section>
+  
+</div>
+{% endblock %}

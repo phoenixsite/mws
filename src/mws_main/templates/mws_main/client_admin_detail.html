@@ -1,0 +1,18 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% block title %}Clients | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<section>
+  <h1>View client</h1>
+  <h2>{{ object.get_full_name }}</h2>
+
+  <ul>
+    <li>Username: {{ object.get_username }}</li>
+    <li>Last login: {{ object.last_login }}</li>
+    <li>Email address: {{ object.email }}</li>
+    <li>Is active? {% if object.is_active %}Yes{% else %}No{% endif %}</li>
+    <li>Date joined: {{ object.date_joined }} </li>
+  </ul>
+</section>
+{% endblock %}

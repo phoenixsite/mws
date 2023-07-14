@@ -1,0 +1,8 @@
+Django
+Pillow
+pyaxmlparser
+biplist
+markdown
+names
+psycopg
+python-dotenv

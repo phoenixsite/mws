@@ -1,0 +1,33 @@
+{% extends 'mws_main/profile_base.html' %}
+
+{% load static %}
+
+{% block specific_content %}
+
+<section class="profile-section profile-services">
+  <nav>
+    <h2>Acquired software</h2>
+  </nav>
+  
+  {% if object.has_services %}
+  <ul class="service-listing profile-services-listing">
+    {% for service in object.get_services %}
+    <li class="service-item">
+      <a class="service-header small-entry" href="{% url 'mws_main:service_detail' service.pk %}">
+	  {% if service.icon %}
+	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	  {% endif %}
+	  <div class="service-info">
+	    <p class="service-name">{{ service.name }}</p>
+	  </div>
+	</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>
+    No software has been acquired yet. Start using the <a href="{% url 'mws_main:store_home' %}">store</a>!
+  </p>
+  {% endif %}
+</section>
+{% endblock %}

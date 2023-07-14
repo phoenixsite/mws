@@ -1,0 +1,56 @@
+[
+
+    {
+	"model": "auth.Group",
+	"pk": 1,
+	"fields": {
+	    "name": "clients",
+	    "permissions": [
+		["view_service", "mws_main", "service"],
+		["view_client", "mws_main", "client"],
+		["change_client", "mws_main", "client"]
+	    ]
+	}
+    },
+    {
+	"model": "auth.Group",
+	"pk": 2,
+	"fields": {
+	    "name": "developers",
+	    "permissions": [
+		["view_client", "mws_main", "client"],
+		["view_service", "mws_main", "service"],
+		["view_admin_service", "mws_main", "service"],
+		["add_service", "mws_main", "service"],
+		["change_service", "mws_main", "service"],
+		["view_developer", "mws_main", "developer"],
+		["change_developer", "mws_main", "developer"]
+	    ]
+	}
+    },
+    {
+	"model": "auth.Group",
+	"pk": 3,
+	"fields": {
+	    "name": "admins",
+	    "permissions": [
+		["add_service", "mws_main", "service"],
+		["view_service", "mws_main", "service"],
+		["view_admin_service", "mws_main", "service"],
+		["change_service", "mws_main", "service"],
+		["delete_service", "mws_main", "service"],
+		["view_developer", "mws_main", "developer"],
+		["view_admin_developer", "mws_main", "developer"],
+		["add_developer", "mws_main", "developer"],
+		["change_developer", "mws_main", "developer"],
+		["delete_developer", "mws_main", "developer"],
+		["view_client", "mws_main", "client"],
+		["view_admin_client", "mws_main", "client"],
+		["change_client", "mws_main", "client"],
+		["delete_client", "mws_main", "client"],
+		["view_metadata", "mws_main", "metadata"],
+		["change_metadata", "mws_main", "metadata"]
+	    ]
+	}
+    }
+]

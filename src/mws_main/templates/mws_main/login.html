@@ -1,0 +1,20 @@
+{% extends "mws_main/auth_base.html" %}
+{% load static %}
+
+{% block actions %}
+<section class="actions-section">
+  <a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:signup' %}">Sign up as client</a>
+</section>
+{% endblock %}
+
+{% block content %}
+
+<section class="login-section">
+  <form class="login-form" method="post" action="{% url 'mws_main:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+    <h1>Log in</h1>
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input class="main-button {{ metadata.main_theme_color }}-background {{ metadata.main_theme_color }}-hover" type="submit" value="Login">
+  </form>
+</section>
+{% endblock %}

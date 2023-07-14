@@ -1,0 +1,74 @@
+{% extends "mws_main/store_base.html" %}
+
+{% load static %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <section class="software-catalog">
+    <h2 class="software-header">Offered software</h2>
+
+    {% if services %}
+    <ul class="service-listing">
+      {% for service in services %}
+      <li class="service-item">
+	<a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
+	  {% if service.icon %}
+	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	  {% endif %}
+	  <div class="service-info">
+	    <h3 class="service-name">{{ service.name }}</h3>
+	    <h4 class="service-description">{{ service.brief_descrp | truncatewords:20 }}</h4>
+	  </div>
+	</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no offered services at this moment.</p>
+    {% endif %}
+  </section>
+
+  <aside class="subcontent-home">
+    <section class="sidebar-widget">
+      <h3 class="software-header">Last uploaded services</h3>
+      <ul class="service-listing">
+	{% for service in last_uploaded_services %}
+	<li class="service-item">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
+	    {% if service.icon %}
+	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	    {% endif %}
+	    <div class="service-info">
+	      <h4 class="service-name">{{ service.name }}</h3>
+	    </div>
+	  </a>
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+
+    <section class="sidebar-widget">
+      <h3 class="software-header">Last updated services</h3>
+      <ul class="service-listing">
+	{% for service in last_updated_services %}
+	<li class="service-item">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
+	    {% if service.icon %}
+	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	    {% endif %}
+	    <div class="service-info">
+	      <h4 class="service-name">{{ service.name }}</h3>
+	    </div>
+	  </a>
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+    
+  </aside>
+</div>
+
+{% endblock %}

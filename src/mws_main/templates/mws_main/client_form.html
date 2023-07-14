@@ -1,0 +1,23 @@
+{% extends "mws_main/auth_base.html" %}
+
+{% block title %}Sign up | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<h1 class="signup-header">Sign up</h1>
+
+<section class="signup-section">
+
+  <p>
+    As a client, you can acquire the services provided
+    in this repository. But it is necessary that
+    some basic information and credentials should be
+    provided.
+  </p>
+  
+  <form class="signup-form" method="post" action="{% url 'mws_main:signup' %}">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Sign up">
+  </form>
+</section>
+{% endblock %}

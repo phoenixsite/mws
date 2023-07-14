@@ -1,0 +1,23 @@
+{% extends 'mws_main/service_base.html' %}
+
+{% load static %}
+
+{% block title %}Update package | {{ tenant.name }}{% endblock %}
+
+{% block specific_content %}
+
+<section class="profile-section profile-details">
+
+  <h2>Updating package {{ package.n_package | add:1 }}</h2>
+  <p>
+    The information about the operative system supported by the package,
+    the software version, etc will be extracted from the file itself.
+  </p>
+  <form enctype="multipart/form-data" method="post" action="{% url 'mws_main:update_package' service.pk package.pk %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Save">
+  </form>
+</section>
+
+{% endblock %}

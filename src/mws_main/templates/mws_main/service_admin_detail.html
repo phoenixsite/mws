@@ -1,0 +1,95 @@
+{% extends 'mws_main/service_base.html' %}
+
+{% load static %}
+{% load mws_main_extras %}
+
+{% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
+
+{% block service-actions %}
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_service' service.pk %}">Update service</a>
+{% endblock %}
+
+{% block specific_content %}
+
+<section class="secondary-info">
+  <ul class="stats">
+    <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT" }}</li>
+    <li>{{ service.n_downloads }} download{{ service.n_downloads | pluralize }}</li>
+  </ul>
+
+  <div class="dev-assigned-panel">
+    <h3>Assigned developers</h3>
+    <ul>
+      {% for developer in service.developer_set.all %}
+      <li>
+	{{ developer.get_full_name }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<div class="detail-wrapper">
+
+  <section class="detail-part">
+
+    {% if service.descrp != "" %}
+    {{ service.descrp | to_markdown | safe }}
+    {% else %}
+    <p>A description wasn't provided.</p>
+    {% endif %}
+    
+    <section class="service-packages {{ metadata.main_theme_color }}-highlight-background">
+      <p class="packages-info">There are {{ service.package_set.all | length }} package{{ service.package_set.all | length | pluralize }}.</p>
+      <ul class="packages-listing">
+	{% for package in service.package_set.all %}
+	<li class="package-entry {{ metadata.main_theme_color }}-with-separator">
+	  <nav class="package-header">
+	    <h5 class="package-name">
+	      Package<!-- {{ package.n_package | add:1 }}-->
+	    </h5>
+	    <a class="update-button {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_package' service.pk package.pk %}">Update</a>
+	    <a class="download-admin-button" href="{% url 'mws_main:download_service' service.pk package.pk %}">Download</a>
+	  </nav>
+	  
+	  {% if package.descrp %}
+	  <p>
+	    {{ package.descrp | to_markdown | safe }}
+	  </p>
+	  {% endif %}
+	  <dl>
+	    <dt>Last version</dt>
+	    <dd>{{ package.last_version }}</dd>
+	    
+	    <dt>Size</dt>
+	    <dd>{{ package.size | filesizeformat }}</dd>
+	    
+	    <dt>Operative system</dt>
+	    <dd>{{ package.os_name }}</dd>
+	  </dl>
+
+	  {% if package.versionentry_set.all %}
+	  <section class="version-history {{ metadata.main_theme_color }}-over-highlight">
+	    <h5 class="version-history-title">Version history</h5>
+
+	    <ul class="version-listing">
+	      {% for version_entry in package.versionentry_set.all %}
+	      <li class="version-entry">
+		<h6 class="version-title">{{ version_entry.update_date }}</h6>
+		<p>Version {{ version_entry.version }}</p>
+		<p>{{ version_entry.changes | to_markdown | safe }}</p>
+	      </li>
+	      {% endfor %}
+	    </ul>
+	    
+	  </section>
+	  {% endif %}
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+  </section>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "mws_main/store_base.html" %}
+
+{% load static %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+
+<!-- CHANGE THIS-->
+{% block actions %}
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:store_info' %}">
+  View store data
+</a>
+{% endblock %}
+
+{% block content %}
+<h1>Administrator dashboard</h1>
+
+<div class="panel-board">
+  
+  <section class="panel software-panel">
+    <nav>
+      <h2>Uploaded services</h2>
+      <a class="panel-action" href="{% url 'mws_main:add_service' %}"><i class="plus"></i>Add service</a>
+    </nav>
+
+    {% if services %}
+    <ul class="panel-listing">
+      {% for service in services %}
+      <li>
+	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' service.pk %}">
+	  {% if service.icon %}
+	  <img src="{{ service.icon.url }}" alt="Service icon" width="40" height="40">
+	  {% endif %}
+	  <p class="entry-name">{{ service.name }}</p>
+	</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no offered services at this moment.</p>
+    {% endif %}
+  </section>
+
+  
+  <section class="panel dev-panel">
+    <nav>
+      <h2>Registered developers</h2>
+      <a class="panel-action" href="{% url 'mws_main:add_developer' %}"><i class="plus"></i>Add developer</a>
+    </nav>
+    
+    {% if developers %}
+    <ul class="panel-listing">
+      {% for dev in developers %}
+      <li>
+	<a class="entry-detail" href="{% url 'mws_main:developer_detail' dev.pk %}">
+	  <p class="entry-name">{{ dev.get_full_name }}</p>
+	  <p class="entry-info">Last login: {% if dev.last_login %}{{ dev.last_login|date:"D d M Y" }} {{ dev.last_login|date:"H:i" }}{% else %}Didn't log in yet.{% endif %}</p>
+	</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no registered developers at this moment.</p>
+    {% endif %}
+    
+  </section>
+
+  <section class="panel client-panel">
+
+    <nav>
+      <h2>Statistics</h2>
+    </nav>
+
+    <table class="dashboard-statistics">
+      <tr>
+	<th>Registered clients this month</th>
+	<td>{{ monthly_reg_clients }}</td>
+      </tr>
+      <tr>
+	<th>Registered clients</th>
+	<td>{{ reg_clients }}</td>
+      </tr>
+      <tr>
+	<th>Total acquisitions</th>
+	<td>{{ acquisitions }}</td>
+      </tr>
+      <tr>
+	<th>Updates this month</th>
+	<td>{{ monthly_updates }}</td>
+      </tr>
+      <tr>
+	<th>Total updates</th>
+	<td>{{ updates }}</td>
+      </tr>
+    </table>
+    
+  </section>
+  
+</div>
+{% endblock %}

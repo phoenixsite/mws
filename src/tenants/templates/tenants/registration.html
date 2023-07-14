@@ -1,0 +1,32 @@
+{% extends "tenants/base.html" %}
+{% load static %}
+
+{% block title %}Registration | MWS{% endblock %}
+
+{% block content %}
+<h1 class="registration-header">Registration process</h1>
+
+<section class="form-section">
+  <form class="registration-form" action="{% url 'tenants:registration' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+      <p>
+	A Web Store let you upload different software
+	services and offer them to your clients. So
+	a store name and a URL for it must be
+	provided. We recommend that, at least, the
+	address should be easy to remember and write.
+      </p>
+      <legend>Basic information</legend>
+      {{ tenant_form.as_ul }}
+    </fieldset>
+    {% if reg_error %}
+    <p class="errorlist">
+      {{ reg_error }}
+    </p>
+    {% endif %}
+
+    <input type="submit" value="Submit">
+  </form>
+</section>
+{% endblock %}

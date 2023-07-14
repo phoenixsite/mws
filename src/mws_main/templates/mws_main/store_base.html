@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="icon" type="image/png" href="{% static 'mws_main/favicon.png' %}"/>
+    <link rel="stylesheet" href="{% static 'mws_main/style.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{% block title %}{% endblock %}</title>
+    {% block js_scripts %}{% endblock %}
+  </head>
+
+  <body>
+    <header class="site-header {{ metadata.main_theme_color}}-background">
+      <a class="site-title" href="{% url 'mws_main:store_home' %}">{{ tenant.name }}</a>
+
+      <section class="actions-section">
+
+	<a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:view_profile' %}">View profile</a>
+	
+	<form class="action-form" method="post" action="{% url 'mws_main:logout' %}">
+	  {% csrf_token %}
+	  <input class="action {{ metadata.main_theme_color }}-action" type="submit" value="Log out">
+	</form>
+	
+	{% block actions %}{% endblock %}
+	
+      </section>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+
+      <section class="site-footer-logo-col">
+	<a class="footer-logo" href="{% url 'mws_main:store_home' %}">{{ tenant.name }}</a>
+
+	{% if metadata.has_social_links %}
+	<ul class="social-icons">
+	  <li>
+	    <a class="icon" href="https://github.com/phoenixsite/mws" target="_blank">
+	      <i class="fa fa-github" aria-hidden="true"></i>Github
+	    </a>
+	  </li>
+	</ul>
+	{% endif %}
+	
+      </section>
+
+      {% if metadata.footer %}
+      {% for col in metadata.footer %}
+      <section class="site-footer-nav{{ forloop.counter }}-col-1">
+	<h2>{{ col.title }}</h2>
+	<ul>
+	  {% for row in col.rows %}
+	  <li>
+	    <a href="{{ row.url }}">{{ row.text }}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+      {% endfor %}
+      {% endif %}
+      
+    </footer>
+
+  </body>
+
+  {% block final_js_scripts %}{% endblock %}
+</html>

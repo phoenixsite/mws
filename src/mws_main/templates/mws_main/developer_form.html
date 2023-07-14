@@ -1,0 +1,26 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% load static %}
+
+{% block title %}Add developer | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<section class="form-section">
+
+  <h1>Add developer</h1>
+  <p>
+    A developer is a user who can create services, modify a
+    service data, upload new versions and view the statistics
+    of the assigned services.
+    As an administrator, you initially assign the services
+    the developer can access.
+  </p>
+
+  <form class="registration-form" method="post" action="{% url 'mws_main:add_developer' %}">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background " type="submit" value="Save">
+  </form>
+
+</section>
+{% endblock %}

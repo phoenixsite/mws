@@ -1,0 +1,50 @@
+{
+	"main_theme_color": ,
+	"footer": [
+		{
+			"title": "Title1",
+			"rows": [
+				{
+					"text": "This is row1",
+					"url": ,
+				},
+				{
+					"text": "This is row2",
+					"url": ,
+				},
+				...
+			]
+		},
+		{
+			"title": "Title1",
+			"rows": [
+				{
+					"text": "This is row1",
+					"url": ,
+				},
+				{
+					"text": "This is row2",
+					"url": ,
+				},
+				...
+			]
+		},
+		...
+		{
+			"title": "Title1",
+			"rows": [
+				{
+					"text": "This is row1",
+					"url": ,
+				},
+				{
+					"text": "This is row2",
+					"url": ,
+				},
+				...
+			]
+
+		}
+			
+	]
+}

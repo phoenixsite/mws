@@ -1,0 +1,23 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% block title %}Update profile | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<h1>Update user </h1>
+
+<div class="profile-wrapper">
+
+  <section class="profile-section profile-basic">
+    <nav>
+      <h2>Basic information</h2>
+    </nav>
+
+    <form method="post" action="{% url 'mws_main:update_profile' %}">
+      {% csrf_token %}
+      {{ form.as_ul }}
+      <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Save">
+    </form>
+  </section>
+</div>
+
+{% endblock %}

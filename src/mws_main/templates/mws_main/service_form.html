@@ -1,0 +1,21 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% block title %}Add service | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<section class="form-section">
+
+  <h1>Add a service</h1>
+  
+  <form class="registration-form" method="post" action="{% url 'mws_main:add_service'  %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ basic_form.as_ul }}
+
+    <h2>Platform-specific packages</h2>
+    <p>You can upload up to 5 packages for specific platforms.</p>
+    {{ platform_formset.as_ul }}
+    
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Save">
+  </form>
+</section>
+{% endblock %}

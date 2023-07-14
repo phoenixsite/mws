@@ -1,0 +1,66 @@
+{% extends "mws_main/store_base.html" %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+
+{% block actions %}
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:add_service' %}">
+  Add service
+</a>
+{% endblock %}
+
+{% block content %}
+<h1>Developer dashboard</h1>
+<p>
+  Welcome to the store {{ tenant.name }}. Here you will find
+  your services and the tools to manage them!
+</p>
+
+<div class="panel-board">
+  <section class="panel software-panel">
+    <nav>
+      <h2>Available services</h2>
+      <a class="panel-action" href="{% url 'mws_main:add_service' %}"><i class="plus"></i>Add service</a>
+    </nav>
+    <p>
+      In this section you are presented the services you can access.
+    </p>
+    
+    {% if services %}
+    <ul class="panel-listing">
+      {% for service in services %}
+      <li>
+	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' service.pk %}">
+	  {% if service.icon %}
+	  <img src="{{ service.icon.url }}" alt="Service icon" width="40" height="40">
+	  {% endif %}
+	  <p class="entry-name">{{ service.name }}</p>
+	</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no offered services at this moment.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel client-panel">
+
+    <nav>
+      <h2>Statistics</h2>
+    </nav>
+
+    <table class="dashboard-statistics">
+      <tr>
+	<th>Updates this month</th>
+	<td>{{ monthly_updates }}</td>
+      </tr>
+      <tr>
+	<th>Total updates</th>
+	<td>{{ updates }}</td>
+      </tr>
+    </table>
+    
+  </section>
+</div>
+
+{% endblock %}

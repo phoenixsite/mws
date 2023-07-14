@@ -1,0 +1,300 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% block title %}Update store | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<h1>Update store metadata</h1>
+<section>
+  <p>
+    The MWS platform let you and your team display a personalized store. This
+    personalization is made by certain elements from styling properties to pure
+    HTML elements, like the footer columns. Even the main colors of the store can be
+    changed to other predefined themes.
+  </p>
+</section>
+
+<form class="footer-form" method="post" action="{% url 'mws_main:update_store' %}">
+  {% csrf_token %}
+  <input class="main-button {{ metadata.main_theme_color }}-background {{ metadata.main_theme_color }}-hover" type="submit" value="Save changes">
+
+  <div>
+    {{ form.main_theme_color.errors }}
+    <label for="{{ form.main_theme_color.id_for_label }}">Color theme: </label>
+    {{ form.main_theme_color }}
+  </div>
+
+  <fieldset>
+    <legend><h2>Footer information</h2></legend>
+    <p>
+      Here you can personalize the text and the urls that appear at the end of the
+      page, right in the footer.
+    </p>
+
+    <div class="column-fieldsets-wrapper">
+      
+      <fieldset class="column-fields">
+	<legend>Column 1</legend>
+
+	<li>
+	  <label for="{{ form.footer_col1_title.id_for_label }}">Title: </label>
+	  {{ form.footer_col1_title }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row1_text.id_for_label }}">Text for row 1: </label>
+	  {{ form.footer_col1_row1_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row1_url.id_for_label }}">URL for row 1: </label>
+	  {{ form.footer_col1_row1_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row2_text.id_for_label }}">Text for row 2: </label>
+	  {{ form.footer_col1_row2_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row2_url.id_for_label }}">URL for row 2: </label>
+	  {{ form.footer_col1_row2_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row3_text.id_for_label }}">Text for row 3: </label>
+	  {{ form.footer_col1_row3_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row3_url.id_for_label }}">URL for row 3: </label>
+	  {{ form.footer_col1_row3_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row4_text.id_for_label }}">Text for row 4: </label>
+	  {{ form.footer_col1_row4_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row4_url.id_for_label }}">URL for row 4: </label>
+	  {{ form.footer_col1_row4_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row5_text.id_for_label }}">Text for row 5: </label>
+	  {{ form.footer_col1_row5_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col1_row5_url.id_for_label }}">URL for row 5: </label>
+	  {{ form.footer_col1_row5_url }}
+	</li>
+      </fieldset>
+
+      <fieldset class="column-fields">
+	<legend>Column 2</legend>
+
+	<li>
+	  <label for="{{ form.footer_col2_title.id_for_label }}">Title: </label>
+	  {{ form.footer_col2_title }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row1_text.id_for_label }}">Text for row 1: </label>
+	  {{ form.footer_col2_row1_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row1_url.id_for_label }}">URL for row 1: </label>
+	  {{ form.footer_col2_row1_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row2_text.id_for_label }}">Text for row 2: </label>
+	  {{ form.footer_col2_row2_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row2_url.id_for_label }}">URL for row 2: </label>
+	  {{ form.footer_col2_row2_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row3_text.id_for_label }}">Text for row 3: </label>
+	  {{ form.footer_col2_row3_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row3_url.id_for_label }}">URL for row 3: </label>
+	  {{ form.footer_col2_row3_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row4_text.id_for_label }}">Text for row 4: </label>
+	  {{ form.footer_col2_row4_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row4_url.id_for_label }}">URL for row 4: </label>
+	  {{ form.footer_col2_row4_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row5_text.id_for_label }}">Text for row 5: </label>
+	  {{ form.footer_col2_row5_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col2_row5_url.id_for_label }}">URL for row 5: </label>
+	  {{ form.footer_col2_row5_url }}
+	</li>
+      </fieldset>
+
+      <fieldset class="column-fields">
+	<legend>Column 3</legend>
+
+	<li>
+	  <label for="{{ form.footer_col3_title.id_for_label }}">Title: </label>
+	  {{ form.footer_col3_title }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row1_text.id_for_label }}">Text for row 1: </label>
+	  {{ form.footer_col3_row1_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row1_url.id_for_label }}">URL for row 1: </label>
+	  {{ form.footer_col3_row1_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row2_text.id_for_label }}">Text for row 2: </label>
+	  {{ form.footer_col3_row2_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row2_url.id_for_label }}">URL for row 2: </label>
+	  {{ form.footer_col3_row2_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row3_text.id_for_label }}">Text for row 3: </label>
+	  {{ form.footer_col3_row3_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row3_url.id_for_label }}">URL for row 3: </label>
+	  {{ form.footer_col3_row3_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row4_text.id_for_label }}">Text for row 4: </label>
+	  {{ form.footer_col3_row4_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row4_url.id_for_label }}">URL for row 4: </label>
+	  {{ form.footer_col3_row4_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row5_text.id_for_label }}">Text for row 5: </label>
+	  {{ form.footer_col3_row5_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col3_row5_url.id_for_label }}">URL for row 5: </label>
+	  {{ form.footer_col3_row5_url }}
+	</li>
+      </fieldset>
+
+      <fieldset class="column-fields">
+	<legend>Column 4</legend>
+
+	<li>
+	  <label for="{{ form.footer_col4_title.id_for_label }}">Title: </label>
+	  {{ form.footer_col4_title }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row1_text.id_for_label }}">Text for row 1: </label>
+	  {{ form.footer_col4_row1_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row1_url.id_for_label }}">URL for row 1: </label>
+	  {{ form.footer_col4_row1_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row2_text.id_for_label }}">Text for row 2: </label>
+	  {{ form.footer_col4_row2_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row2_url.id_for_label }}">URL for row 2: </label>
+	  {{ form.footer_col4_row2_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row3_text.id_for_label }}">Text for row 3: </label>
+	  {{ form.footer_col4_row3_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row3_url.id_for_label }}">URL for row 3: </label>
+	  {{ form.footer_col4_row3_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row4_text.id_for_label }}">Text for row 4: </label>
+	  {{ form.footer_col4_row4_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row4_url.id_for_label }}">URL for row 4: </label>
+	  {{ form.footer_col4_row4_url }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row5_text.id_for_label }}">Text for row 5: </label>
+	  {{ form.footer_col4_row5_text }}
+	</li>
+
+	<li>
+	  <label for="{{ form.footer_col4_row5_url.id_for_label }}">URL for row 5: </label>
+	  {{ form.footer_col4_row5_url }}
+	</li>
+      </fieldset>
+    </li>
+    
+  </fieldset>
+</form>
+{% endblock %}
+
+{% block final_js_scripts %}
+<script type="text/javascript">
+  var oldvalue = ""
+  document.getElementById("id_main_theme_color").addEventListener("focus", function() {
+      console.log("old value: " + this.value)
+      oldvalue = this.value;
+  })
+
+  document.getElementById("id_main_theme_color").addEventListener("change", function() {
+
+      const suffixes = ["-background", "-action", "-hover"]
+
+      for (let i = 0; i < suffixes.length; i++) {
+
+	  const collection = document.getElementsByClassName(oldvalue.concat(suffixes[i]));
+	  while(collection.length > 0) {
+	      collection[0].classList.replace(oldvalue.concat(suffixes[i]), this.value.concat(suffixes[i]));
+	  }
+      }
+      
+      oldvalue = this.value
+      console.log("New old value: " + oldvalue)
+  })
+</script>
+{% endblock %}

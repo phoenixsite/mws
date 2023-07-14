@@ -1,0 +1,56 @@
+{% extends 'tenants/base.html' %}
+
+{% load static %}
+
+{% block title %}Plans | MWS{% endblock %}
+
+{% block content %}
+<section class="intro-plans">
+  <h1>Subscription plans</h1>
+  <p>
+    The MWS provides in the cloud an easy-to-use software
+    services store. Like most of the SaaS, we offer
+    different subscription plans based on the pay-per-use
+    charging model.
+  </p>
+</section>
+
+<section class="plans-section">
+
+  {% if plans %}
+  <ul class="plans-list">
+    {% for plan in plans %}
+    <li class="plan-container">
+      <h2>{{ plan.name }}</h2>
+      <p class="duration-field">Duration: {{ plan.duration }}</p>
+      <ul>
+	{% for res_plan in plan.plans %}
+	<li class="resplan-container">
+	  <h3>Resource plans</h3>
+	  <dl>
+	    <dt>Resource</dt>
+	    <dd>{{ res_plan.get_res_name_display }}</dd>
+
+	    <dt>Limit</dt>
+	    <dd>{{ res_plan.limit }}</dd>
+
+	    <dt>Charge per unit</dt>
+	    <dd>{{ res_plan.charge_per_unit }}</dd>
+	  </dl>
+	</li>
+	{% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% else %}
+  <p>
+    We are sorry, we have not established any subscription
+    plan yet.
+  </p>
+
+  {% endif %}
+  
+</section>
+{% endblock %}

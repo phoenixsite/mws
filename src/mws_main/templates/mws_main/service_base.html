@@ -1,0 +1,27 @@
+{% extends 'mws_main/store_base.html' %}
+
+{% load static %}
+{% load mws_main_extras %}
+
+{% block content %}
+
+<div class="service-detail">
+
+  <section class="main-detail">
+    {% if service.icon %}
+    <img src="{{ service.icon.url }}" alt="{{ service.name }} icon" width="150" height="150">
+    {% endif %}
+    <div class="service-info">
+      <nav class="actions-section">
+	<h1 class="service-name">{{ service.name }}</h1>
+	{% block service-actions %}{% endblock %}
+      </nav>
+      <h3 class="service-briefdescrp">{{ service.brief_descrp }}</h3>
+    </div>
+  </section>
+
+  {% block specific_content %}{% endblock %}
+  
+</div>
+
+{% endblock %}
