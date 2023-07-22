@@ -1,93 +1,10 @@
 from djongo import models
 import django.contrib.auth.models as auth_models
 from django.core.validators import RegexValidator
+from tenants.models import TenantAwareModel
 
 import re
 
-IRESOURCES = [
-    ("CT", "CPU time"),
-    ("ST", "Storage usage"),
-]
-
-class IResourceUsage(models.Model):
-
-    res_name = models.CharField(
-        "resource name",
-        max_length=2,
-        choices=IRESOURCES
-    )
-
-    class Meta:
-        abstract = True
-
-class SubsLoup(models.Model):
-
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
-    charge = models.DecimalField("money charge", decimal_places=3)
-    usages = models.ArrayField(
-        model_container=IResourceUsage
-    )
-
-    class Meta:
-        abstract = True
-
-
-class IResourcePlan(models.Model):
-
-    res_name = models.CharField(
-        "resource name",
-        max_length=2,
-        choices=IRESOURCES
-    )
-
-    limit = models.DecimalField("maximum usage", decimal_places=3)
-    charge_per_unit = models.DecimalField(decimal_places=3)
-
-    class Meta:
-        abstract = True
-
-class SubsAgreement(models.Model):
-
-    date_regs = models.DateTimeField(
-        "registration date",
-        auto_now_add=True
-    )
-    end_date = models.DateTimeField()
-    card_number = models.CharField(max_length=100, blank=False)
-    plans = models.ArrayField(
-        model_container=IResourcePlan
-    )
-
-    current_loup = models.EmbeddedField(
-        model_container=SubsLoup
-    )
-
-    old_loups = models.ArrayField(
-        model_container=SubsLoup
-    )
-
-    class Meta:
-        abstract = True
-
-
-class Repo(models.Model):
-
-    repo_id = models.ObjectIdField()
-    name = models.CharField("repository name", max_length=25, blank=False)
-    repo_addr = models.CharField(
-        "repository address",
-        max_length=25,
-        blank=False
-    )
-    url = models.URLField()
-    email = models.EmailField()
-    current_agree = models.EmbeddedField(
-        model_container=SubsAgreement
-    )
-    old_agrees = models.ArrayField(
-        model_container=SubsAgreement
-    )
 
 class VersionField(models.CharField):
 
@@ -97,6 +14,7 @@ class VersionField(models.CharField):
             r"^\d{1,2}\.\d{1,2}(.\d{1,2})?$",
             flags=re.ASCII)]
         super().__init__(*args, **kwargs)
+
 
 class VersionEntry(models.Model):
 
@@ -108,9 +26,8 @@ class VersionEntry(models.Model):
         abstract = True
 
 
-class Service(models.Model):
+class Service(TenantAwareModel):
 
-    repo_id = models.ForeignKey(Repo, on_delete=models.CASCADE)
     serv_id = models.ObjectIdField()
     name = models.CharField(
         "service name",
@@ -142,16 +59,14 @@ class Service(models.Model):
     )
     
 
-class Developer(auth_models.User):
+class Developer(auth_models.User, TenantAwareModel):
 
     dev_id = models.ObjectIdField()
-    repo_id = models.ForeignKey(Repo, on_delete=models.CASCADE)
 
 
-class Client(auth_models.User):
+class Client(auth_models.User, TenantAwareModel):
 
     client_id = models.ObjectIdField()
-    repo_id = models.ForeignKey(Repo, on_delete=models.CASCADE)
     services_acq = models.ArrayReferenceField(
         to=Service,
         on_delete=models.CASCADE,

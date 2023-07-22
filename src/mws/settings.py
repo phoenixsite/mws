@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'tenants.apps.TenantsConfig',
     'mws_main.apps.MwsMainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
