@@ -1,4 +1,5 @@
 from djongo import models
+import django.contrib.auth.models as auth_models
 
 
 IRESOURCES = [
@@ -13,6 +14,7 @@ class IResourceUsage(models.Model):
         max_length=2,
         choices=IRESOURCES
     )
+    usage = models.DecimalField("resource usage", decimal_places=3, default=0)
 
     class Meta:
         abstract = True
@@ -21,10 +23,11 @@ class SubsLoup(models.Model):
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField()
-    charge = models.DecimalField("money charge", decimal_places=3)
+    charge = models.DecimalField("money charge", decimal_places=3, default=0)
     usages = models.ArrayField(
-        model_container=IResourceUsage
-    )
+        model_container=IResourceUsage,
+        null=False,
+        blank=False)
 
     class Meta:
         abstract = True
@@ -44,6 +47,7 @@ class IResourcePlan(models.Model):
     class Meta:
         abstract = True
 
+
 class SubsAgreement(models.Model):
 
     date_regs = models.DateTimeField(
@@ -53,12 +57,14 @@ class SubsAgreement(models.Model):
     end_date = models.DateTimeField()
     card_number = models.CharField(max_length=100, blank=False)
     plans = models.ArrayField(
-        model_container=IResourcePlan
-    )
+        model_container=IResourcePlan,
+        null=False,
+        blank=False)
 
     current_loup = models.EmbeddedField(
-        model_container=SubsLoup
-    )
+        model_container=SubsLoup,
+        null=False,
+        blank=False)
 
     old_loups = models.ArrayField(
         model_container=SubsLoup
@@ -68,6 +74,18 @@ class SubsAgreement(models.Model):
         abstract = True
 
 
+class DefaultSubsAgreement(models.Model):
+
+    name = models.CharField(max_length=25, unique=True)
+    plans = models.ArrayField(
+        model_container=IResourcePlan,
+        null=False,
+        blank=False)
+    
+    duration = models.DurationField()
+    objects = models.DjongoManager()
+
+
 class Tenant(models.Model):
 
     tenant_id = models.ObjectIdField()
@@ -75,21 +93,21 @@ class Tenant(models.Model):
         "repository name",
         max_length=25,
         blank=False,
-        unique=True
-    )
+        unique=True)
+
     repo_addr = models.CharField(
         "repository address",
         max_length=25,
-        blank=False
-    )
+        blank=False)
+    
     url = models.URLField()
-    email = models.EmailField()
     current_agree = models.EmbeddedField(
-        model_container=SubsAgreement
-    )
+        model_container=SubsAgreement,
+        null=False,
+        blank=False)
+    
     old_agrees = models.ArrayField(
-        model_container=SubsAgreement
-    )
+        model_container=SubsAgreement)
 
 
 class TenantAwareModel(models.Model):
@@ -97,3 +115,7 @@ class TenantAwareModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class TenantAdmin(TenantAwareModel, auth_model.User):
+    pass
