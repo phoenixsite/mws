@@ -1,0 +1,21 @@
+{% extends "tenants/base.html" %}
+
+{% block title %}Registration | MWS{% endblock %}
+
+{% block content %}
+<form action="{% url 'tenants:registration' %}" method="post">
+  {% csrf_token %}
+  <fieldset>
+    <legend>Basic repository data</legend>
+    {{ tenant_form }}
+  </fieldset>
+  
+  <fieldset>
+    <legend>Repository administrator data</legend>
+    {{ admin_form }}
+  </fieldset>
+  
+  <input type="submit" value="Submit">
+  
+</forms>
+{% endblock %}

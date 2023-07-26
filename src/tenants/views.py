@@ -1,9 +1,12 @@
 from django.shortcuts import render
-from django.views.generic.base import TemaplateView
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.http import HttpResponseRedirect
+from django.views.generic.base import TemplateView
+from django.contrib.auth.mixins import (
+    UserPassesTestMixin,
+    LoginRequiredMixin,)
 
 import tenants.forms as forms
-import tenant.models as models
+import tenants.models as models
 
 from django.utils import timezone
 import datetime
@@ -12,12 +15,12 @@ import datetime
 class NotAuthenticatedMixin(UserPassesTestMixin):
 
     def test_func(self):
-        return not self.request.user.is_authenticated()
+        return self.request.user.is_anonymous
 
 
 class RegistrationView(NotAuthenticatedMixin, TemplateView):
 
-    template_name = "registration.html"
+    template_name = "tenants/registration.html"
     tenant_form_class = forms.TenantForm
     admin_form_class = forms.AdminForm
     http_method_names = ["get", "post"]
@@ -40,53 +43,23 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
 
-        admin_form = self.tenant_form_class(request.POST.fromkeys([
-            "username",
-             "password",
-             "email",
-             "first_name",
-             "last_name"]))
-
-        tenant_form = self.admin_form_class(request.POST.fromkeys([
-            "card_number",
-            "subs_agreement_number",
-            "name",
-            "repo_addr",
-            "url"]))
-
+        admin_form = self.admin_form_class(request.POST)
+        tenant_form = self.tenant_form_class(request.POST)
+        
         if tenant_form.is_valid() and admin_form.is_valid():
 
-            # Choosen subscription agreement
-            def_agree = models.DefaultSubsAgreement.objects.get(
-                name=tenant_form.cleaned_data["subs_agreement_number"])
-            # Per-resource consumption in the first month
-            iresources = [models.IResourceUsage.objects.create(
-                res_name=plan.name) for plan in def_agree.plans]
-
-            # The first month loup
-            empty_loup = models.SubsLoup.objects.create(
-                end_date=timezone.now() + datetime.timedelta(month=1),
-                usages=iresources)
+            tenant = models.register_tenant(
+                tenant_form.cleaned_data['name'],
+                tenant_form.cleaned_data['repo_addr'],
+                admin_form.cleaned_data['card_number'],
+                tenant_form.cleaned_data['subs_agree_number']
+            )
             
-            subs_agree = models.SubsAgreement.objects.create(
-                date_regs=timezone.now(),
-                end_date=timezone.now() + def_agree.end_date,
-                card_number=tenant_form.cleaned_data["card_number"],
-                plans=def_agree.plans,
-                current_loop=empty_loup)
-
-            tenant = models.Tenant.objects.create(
-                name=tenant_form.cleaned_data["name"],
-                repo_addr=tenant_form.cleaned_data["repo_addr"],
-                url=tenant_form.cleaned_data["url"],
-                current_agree=subs_agree)
-
             tenant_admin = admin_form.save(commit=False)
             tenant_admin.tenant = tenant
-            tenant.save()
             tenant_admin.save()
 
-            return HttpResponseRedirect("completed-registration/")
+            return HttpResponseRedirect("/completed-registration/")
         
         return render(
             request,
@@ -98,7 +71,20 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
             })
 
 
-class CompletedReg(NotAuthenticatedMixin, TemplateView):
-    template_name = "completed-reg.html"
+class CompletedRegView(NotAuthenticatedMixin, TemplateView):
+    template_name = "tenants/completed-reg.html"
     http_method_names = ["get"]
 
+
+class MyRepoView(LoginRequiredMixin, TemplateView):
+    template_name = "tenants/my-repo.html"
+    http_method_names = ["get"]
+
+class MyAgreementsView(LoginRequiredMixin, TemplateView):
+    template_name = "tenants/my-agreements.html"
+    http_method_names = ["get"]
+
+class EditRepoView(LoginRequiredMixin, TemplateView):
+    template_name = "tenants/edit-repo.html"
+    http_method_names = ["get"]
+    

@@ -4,6 +4,6 @@ from . import views
 
 app_name = "mws_main"
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", views.HomeView.as_view(), name="home"),
 ]
 

@@ -1,14 +1,17 @@
 from django import forms
-from tenants.models import Tenant, TenantAdmin, DefaultSubsAgreement
+from tenants.models import (
+    Tenant, TenantAdmin, DefaultSubsAgreement,
+    IResourcePlan,
+    )
 
 
 class TenantForm(forms.ModelForm):
 
     card_number = forms.CharField(
         label="Card number",
-        max_lenth=100)
+        max_length=100)
                
-    subs_agreement_number = forms.ModelChoiceField(
+    subs_agree_number = forms.ModelChoiceField(
         label="Subscription agreement",
         queryset=DefaultSubsAgreement.objects.all(), to_field_name="name")
     
@@ -17,7 +20,6 @@ class TenantForm(forms.ModelForm):
         fields = [
             "name",
             "repo_addr",
-            "url",
         ]
 
 
@@ -32,3 +34,10 @@ class AdminForm(forms.ModelForm):
             "first_name",
             "last_name",
         ]
+
+
+class DefaultSubsAgreementForm(forms.ModelForm):
+
+    class Meta:
+        model = DefaultSubsAgreement
+        fields = ["name", "plans", "duration"]
