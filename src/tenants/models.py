@@ -2,7 +2,9 @@ from djongo import models
 from django.utils.translation import gettext_lazy as _
 import django.contrib.auth.models as auth_models
 from django import forms
+from django.utils import timezone
 
+import datetime
 
 class ResourcesType(models.TextChoices):
     CT = "CT", _("CPU time")
@@ -43,7 +45,7 @@ class DefaultSubsAgreement(models.Model):
     plans = models.ArrayField(
         model_container=IResourcePlan,
         help_text="Show the maximum usage for a resource that can be used"
-    )
+   )
     
     duration = models.DurationField(
         help_text="Units in days"
@@ -52,7 +54,7 @@ class DefaultSubsAgreement(models.Model):
     objects = models.DjongoManager()
 
     def __str__(self):
-        return f"Agreement {self.name}"
+        return self.name
 
     class Meta:
         verbose_name = "available subscription agreement"
@@ -144,6 +146,8 @@ class Tenant(models.Model):
         null=False
     )
 
+    objects = models.DjongoManager()
+
     def __str__(self):
         return self.name
 
@@ -157,7 +161,7 @@ def register_tenant(name, repo_addr, card_number, subs_agree_name):
     """
 
     # Choosen subscription agreement
-    def_agree = models.DefaultSubsAgreement.objects.get(
+    def_agree = DefaultSubsAgreement.objects.get(
         name=subs_agree_name)
 
     # Per-resource consumption in the first month
@@ -183,9 +187,9 @@ def register_tenant(name, repo_addr, card_number, subs_agree_name):
         'current_loup': empty_loup,
         'old_loups': []}
 
-    return models.Tenant.objects.create(
-        name=tenant_form.cleaned_data["name"],
-        repo_addr=tenant_form.cleaned_data["repo_addr"],
+    return Tenant.objects.create(
+        name=name,
+        repo_addr=repo_addr,
         current_agree=subs_agree,
         old_agrees=[]
     )

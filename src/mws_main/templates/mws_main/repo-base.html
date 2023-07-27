@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+
+    <title>{% block repo_name %}{% endblock %}</title>
+  </head>
+
+  <body>
+    <header>
+      <h1>{% block repo_name %}{% endblock %}</h1>
+    </header>
+
+    <nav>
+      <ul>
+      </ul>
+    </nav>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <p>{% block repo_name %}{% endblock %}</p>
+    </footer>
+
+  </body>
+</html>

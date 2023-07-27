@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8"/>
-    <title>Home | MWS</title>
-  </head>
-  
-  <body>
-    <header>
-    </header>
+{% extends "mws_main/base.html" %}
 
-    <main>
-      <p>
-	Welcome to the Multi-tenant Web Store! To start using this platform as a
-	package repository for your services, register on the next link!
-      </p>
-      <a href="{% url 'tenants:registration' %}">Register</a>
-      
-    </main>
-    <footer>
-    </footer>
+{% block title %}Home | MWS{% endblock %}
 
-  </body>
-</html>
+{% block content %}
+<p>
+  Welcome to the Multi-tenant Web Store! To start using this platform as a
+  package repository for your services, register on the next link!
+</p>
+<a href="{% url 'tenants:registration' %}">Register</a>
+{% endblock %}

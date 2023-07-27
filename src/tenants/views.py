@@ -8,9 +8,6 @@ from django.contrib.auth.mixins import (
 import tenants.forms as forms
 import tenants.models as models
 
-from django.utils import timezone
-import datetime
-
 
 class NotAuthenticatedMixin(UserPassesTestMixin):
 
@@ -51,7 +48,7 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
             tenant = models.register_tenant(
                 tenant_form.cleaned_data['name'],
                 tenant_form.cleaned_data['repo_addr'],
-                admin_form.cleaned_data['card_number'],
+                tenant_form.cleaned_data['card_number'],
                 tenant_form.cleaned_data['subs_agree_number']
             )
             

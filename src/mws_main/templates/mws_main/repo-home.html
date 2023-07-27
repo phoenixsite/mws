@@ -1,0 +1,25 @@
+{% extends "mws_main/repo-base.html" %}
+
+{% block repo_name %}{{ repo_name }}{% endblock %}
+
+{% if is_client %}
+
+{% block content %}
+Welcome to the repository {{ repo_name }}. Here you will
+find our offered software services!
+{% endblock %}
+
+{% elif is_developer %}
+
+Welcome to the repository {{ repo_name }}- Here you will find
+your software and the tools to manage them!
+
+{% else %}
+
+{% block content %}
+Welcome to the repository {{ repo_name }}. Here you will
+find your offered software and the access to manage your
+repository!
+{% endblock %}
+
+{% endif %}

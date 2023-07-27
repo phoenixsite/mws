@@ -28,7 +28,7 @@ class VersionEntry(models.Model):
 
 class Service(TenantAwareModel):
 
-    _id = models.ObjectIdField()
+    service_id = models.ObjectIdField()
     name = models.CharField(
         "service name",
         max_length=25,
@@ -62,6 +62,7 @@ class Service(TenantAwareModel):
 class Developer(TenantAwareModel, auth_models.User):
 
     _id = models.ObjectIdField()
+    
 
 
 class Client(TenantAwareModel, auth_models.User):
@@ -70,4 +71,8 @@ class Client(TenantAwareModel, auth_models.User):
     services_acq = models.ArrayReferenceField(
         to=Service,
         on_delete=models.CASCADE,
+        default=[]
     )
+
+
+
