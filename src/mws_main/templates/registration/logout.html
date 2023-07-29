@@ -1,0 +1,10 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}Logout | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<h1>Log out</h1>
+<p>Thanks for using the MWS!</p>
+<p><a href="{% url 'mws_main:login' tenant.repo_addr %}">Log in again</a>
+</p>
+{% endblock %}

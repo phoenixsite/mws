@@ -1,25 +1,102 @@
 {% extends "mws_main/repo-base.html" %}
 
-{% block repo_name %}{{ repo_name }}{% endblock %}
-
-{% if is_client %}
+{% block title %}{{ tenant.name }}{% endblock %}
 
 {% block content %}
-Welcome to the repository {{ repo_name }}. Here you will
-find our offered software services!
-{% endblock %}
+{% if is_client %}
+
+<p>
+  Welcome to the repository {{ repo_name }}. Here you will
+  find our offered software services!
+</p>
+
+<section>
+  <h2>Offered software</h2>
+
+  {% if services %}
+  <ul>
+    {% for service in services %}
+       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no offered services at this moment.</p>
+  {% endif %}
+</section>
+
 
 {% elif is_developer %}
 
-Welcome to the repository {{ repo_name }}- Here you will find
-your software and the tools to manage them!
+<p>
+  Welcome to the repository {{ repo_name }}- Here you will find
+  your software and the tools to manage them!
+</p>
 
-{% else %}
+<section>
+  <h2>Available software</h2>
 
-{% block content %}
-Welcome to the repository {{ repo_name }}. Here you will
-find your offered software and the access to manage your
-repository!
-{% endblock %}
+  {% if services %}
+  <ul>
+    {% for service in services %}
+       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no offered services at this moment.</p>
+  {% endif %}
+</section>
 
+
+{% elif is_admin %}
+
+<p>
+  Welcome to the repository {{ repo_name }}. Here you will
+  find your offered software and the access to manage your
+  repository!
+</p>
+
+
+<section>
+  <h2>Available software</h2>
+
+  {% if services %}
+  <ul>
+    {% for service in services %}
+       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no offered services at this moment.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Registered developers</h2>
+  {% if developers %}
+  <ul>
+    {% for developer in developers %}
+       <li><a href="{% url 'mws_main:developer_detail' tenant.repo_addr developer.pk %}">{{ developer.get_full_name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no registered developers at this moment.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Registered clients</h2>
+  {% if clients %}
+  <ul>
+    {% for client in clients %}
+       <li><a href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">{{ client.get_full_name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no registered clients at this moment.</p>
+  {% endif %}
+</section>
+
+
+  
 {% endif %}
+{% endblock %}

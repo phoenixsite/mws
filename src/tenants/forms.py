@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from tenants.models import (
     Tenant, TenantAdmin, DefaultSubsAgreement,
     IResourcePlan,
@@ -23,19 +24,15 @@ class TenantForm(forms.ModelForm):
         ]
 
 
-class AdminForm(forms.ModelForm):
+class AdminForm(UserCreationForm):
 
     class Meta:
         model = TenantAdmin
-        fields = [
-            "username",
-            "password",
-            "email",
-            "first_name",
-            "last_name",
-        ]
-
-
+        fields = ['username',
+                  'first_name',
+                  'last_name',
+                  'email',]
+        
 class DefaultSubsAgreementForm(forms.ModelForm):
 
     class Meta:

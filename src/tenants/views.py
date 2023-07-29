@@ -10,7 +10,7 @@ import tenants.models as models
 
 
 class NotAuthenticatedMixin(UserPassesTestMixin):
-
+    
     def test_func(self):
         return self.request.user.is_anonymous
 
@@ -70,18 +70,5 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
 
 class CompletedRegView(NotAuthenticatedMixin, TemplateView):
     template_name = "tenants/completed-reg.html"
-    http_method_names = ["get"]
-
-
-class MyRepoView(LoginRequiredMixin, TemplateView):
-    template_name = "tenants/my-repo.html"
-    http_method_names = ["get"]
-
-class MyAgreementsView(LoginRequiredMixin, TemplateView):
-    template_name = "tenants/my-agreements.html"
-    http_method_names = ["get"]
-
-class EditRepoView(LoginRequiredMixin, TemplateView):
-    template_name = "tenants/edit-repo.html"
     http_method_names = ["get"]
     

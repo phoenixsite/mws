@@ -1,0 +1,12 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Sign up | {{ repo_name }}{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'mws_main:signup' tenant.repo_addr %}">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value="Sign up">
+  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+</form>
+{% endblock %}

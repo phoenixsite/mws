@@ -3,16 +3,19 @@
   <head>
     <meta charset="utf-8"/>
 
-    <title>{% block repo_name %}{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
   </head>
 
   <body>
     <header>
-      <h1>{% block repo_name %}{% endblock %}</h1>
+      <h1>{{ tenant.name }}</h1>
     </header>
 
     <nav>
       <ul>
+	<form method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
+	  {% csrf_token %}
+	  <input type="Submit" value="Log out">
       </ul>
     </nav>
 
@@ -21,7 +24,7 @@
     </main>
 
     <footer>
-      <p>{% block repo_name %}{% endblock %}</p>
+      <p>{{ tenant.name }}</p>
     </footer>
 
   </body>

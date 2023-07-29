@@ -2,7 +2,6 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from mws_main.models import Client
-from tenants.utils import tenant_from_addr
 
 class TenantBackend(BaseBackend):
     """
