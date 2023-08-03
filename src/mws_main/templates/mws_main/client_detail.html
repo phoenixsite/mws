@@ -1,5 +1,29 @@
 {% extends 'mws_main/repo-base.html' %}
 
-{% block title %}Clients | {{ tenant.name }}{% endblock %}
+{% block title %}Profile | {{ tenant.name }}{% endblock %}
 
-{{ client }}
+{% block content %}
+<h1>Profile</h1>
+<section>
+  <h2>{{ client.get_full_name }}</h2>
+  <h3>Basic information</h3>
+
+  <ul>
+    <li>Username: {{ client.username }}</li>
+    <li>Last login: {{ client.last_login }}</li>
+    <li>Email address: {{ client.email }}</li>
+    <li>Date joined: {{ client.date_joined }} </li>
+  </ul>
+
+  <h3>Software purchased</h3>
+  {% if client.services_acq %}
+  <ul>
+    
+  </ul>
+  {% else %}
+  <p>
+    No software has been acquired yet. Start using the <a href="{% url 'mws_main:repo_home' tenant.repo_addr %}">repo software</a>!
+  </p>
+  {% endif %}
+</section>
+{% endblock %}

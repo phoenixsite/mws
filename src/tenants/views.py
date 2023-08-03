@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import (
@@ -20,23 +21,14 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
     template_name = "tenants/registration.html"
     tenant_form_class = forms.TenantForm
     admin_form_class = forms.AdminForm
-    http_method_names = ["get", "post"]
-    tenant_initial = {}
-    admin_initial = {}
-    
-    def get(self, request, *args, **kwargs):
+    #success_url = reverse("tenants:completed")
 
-        tenant_form = self.tenant_form_class(initial=self.tenant_initial)
-        admin_form = self.admin_form_class(initial=self.admin_initial)
-        return render(
-            request,
-            self.template_name,
-            {
-                "tenant_form": tenant_form,
-                "admin_form": admin_form,
-                "agreements": models.DefaultSubsAgreement.objects.all()
-            })
-            
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tenant_form"] = self.tenant_form_class()
+        context["admin_form"] = self.admin_form_class()
+        context["agreements"] = models.DefaultSubsAgreement.objects.all()
+        return context
 
     def post(self, request, *args, **kwargs):
 
@@ -56,7 +48,9 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
             tenant_admin.tenant = tenant
             tenant_admin.save()
 
-            return HttpResponseRedirect("/completed-registration/")
+            return HttpResponseRedirect(
+                "/completed-registration/",
+            )
         
         return render(
             request,

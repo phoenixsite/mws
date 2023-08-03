@@ -1,0 +1,21 @@
+{% extends 'mws_main/repo-base.html' %}
+
+{% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section>
+  <h1>{{ service.name }}</h1>
+  <a href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
+</section>
+
+<section>
+  <h2>About</h2>
+  <p>{{ service.descrp }}</p>
+
+  <ul>
+    <li>Size: {{ service.size }}</li>
+  </ul>
+</section>
+
+{% endblock %}

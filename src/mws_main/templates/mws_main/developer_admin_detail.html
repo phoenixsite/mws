@@ -1,0 +1,18 @@
+{% extends 'mws_main/repo-base.html' %}
+
+{% block title %}Developer | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+<section>
+  <h1>View developer</h1>
+  <h2>{{ developer.get_full_name }}</h2>
+
+  <ul>
+    <li>Username: {{ developer.username }}</li>
+    <li>Last login: {{ developer.last_login }}</li>
+    <li>Email address: {{ developer.email }}</li>
+    <li>Is active? {% if developer.is_active %}Yes{% else %}No{% endif %}</li>
+    <li>Date registered: {{ developer.date_joined }} </li>
+  </ul>
+</section>
+{% endblock %}

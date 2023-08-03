@@ -1,13 +1,13 @@
-{% extends "registration/base.html" %}
+{% extends "mws_main/auth_base.html" %}
 
 {% block actions %}
 <a href="{% url 'mws_main:signup' tenant.repo_addr %}">Sign up</a>
 {% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'mws_main:login' tenant.repo_addr %}">
+<form method="post" action="{% url 'mws_main:login' tenant.repo_addr %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
   {% csrf_token %}
-  {{ form }}
+  {{ form.as_ul }}
   <input type="submit" value="Login">
   {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 </form>

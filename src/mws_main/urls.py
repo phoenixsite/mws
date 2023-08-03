@@ -43,21 +43,38 @@ urlpatterns = [
                  path("password-reset-complete/",
                       views.PasswordResetCompleteView.as_view(),
                       name="password_reset_complete/"),
+                 
 
-    
-                 path("<str:pk>/",
+                 path("admin/clients/<slug:slug>/",
+                      views.ClientAdminDetailView.as_view(),
+                      name="client_detail"),
+
+                 path("admin/developers/<slug:slug>/",
+                      views.DeveloperAdminDetailView.as_view(),
+                      name="developer_detail"),
+
+                 path("admin/add-dev/",
+                      views.AddDeveloperView.as_view(),
+                      name="add_developer"),
+
+                 path("services/<slug:slug>/",
                       views.ServiceDetailView.as_view(),
                       name="service_detail"),
 
-                 path("clients/<str:client_id>/",
-                      views.ClientDetailView.as_view(),
-                      name="client_detail"),
+                 path("add-service/",
+                      views.AddServiceView.as_view(),
+                      name="add_service"),
 
-                 path("developers/<str:developer_id>/",
-                      views.DeveloperDetailView.as_view(),
-                      name="developer_detail"),
-         
-                 path("admin/add-dev/",
-                      views.AddDeveloperView.as_view(), name="add_developer"),
+                 path("view-profile/",
+                      views.UserDetailView.as_view(),
+                      name="view_profile"),
+
+                 path("update-profile/",
+                      views.UserUpdateView.as_view(),
+                      name="update_profile"),
+
+                 path("download-service/<str:service_id>",
+                      views.download_service,
+                      name="download_service"),
              ])),
 ]

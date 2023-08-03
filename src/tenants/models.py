@@ -201,9 +201,70 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
+def get_user_group(group_name, codenames=None):
+    """
+    Return the group of the users whose model is given.
+
+    If it doesn't exist, it is created.
+    
+    :param class model: Model class of a user. Must inherit
+    from django.contrib.auth.models.User.
+    :param str group_name: Name of the group.
+    :param list codenames: Permission codenames which will be
+    included in the permissions group. It is ignored if the
+    group is already created.
+    """
+
+    try:
+        group = auth_models.Group.objects.get_by_natural_key(group_name)
+    except auth_models.Group.DoesNotExist:
+        import pdb; pdb.set_trace()
+
+        permissions = auth_models.Permission.objects.filter(
+            codename__in=codenames)
+
+        group = auth_models.Group.objects.create(name=group_name)
+        group.permissions.add(*permissions)
+        group.save()
+
+    return group
+    
+ADMIN_GROUP = "admin"
+
+def get_admin_group():
+    """
+    Return the group of the administrators. If doesn't exist, 
+    it is created.
+    """
+
+    codenames = ["add_service",
+                 "view_service",
+                 "change_service",
+                 "delete_service",
+                 "add_developer",
+                 "view_developer",
+                 "change_developer",
+                 "delete_developer",
+                 "add_client",
+                 "view_client",
+                 "change_client",
+                 "delete_client",
+                 "view_tenant",
+                 "change_tenant",]
+    return get_user_group(ADMIN_GROUP, codenames)
+
 class TenantAdmin(TenantAwareModel, auth_models.User):
     """
-    Main user of a tenant. It's the only user who can manage
+    Administrator of a tenant. It's the only user who can manage
     the core information of its tenant. 
     """
-    pass
+
+    def save(self, commit=True):
+
+        super().save(commit)
+
+        if commit:
+
+            group = get_admin_group()
+            self.groups.add(group)
+            super().save()

@@ -11,7 +11,7 @@
       <a href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
 
       <nav>
-	<ul>
+	<ul>x
 	  <li>
 	    <form method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
 	      {% csrf_token %}

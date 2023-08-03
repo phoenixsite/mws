@@ -1,0 +1,26 @@
+{% extends "mws_main/repo-base.html" %}
+
+{% block title %}{{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<p>
+  Welcome to the repository {{ tenant.name }}. Here you will
+  find our offered software services!
+</p>
+
+<section>
+  <h2>Offered software</h2>
+
+  {% if services %}
+  <ul>
+    {% for service in services %}
+       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       {% endfor %}
+  </ul>
+  {% else %}
+  <p>There are no offered services at this moment.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -3,54 +3,9 @@
 {% block title %}{{ tenant.name }}{% endblock %}
 
 {% block content %}
-{% if is_client %}
 
 <p>
-  Welcome to the repository {{ repo_name }}. Here you will
-  find our offered software services!
-</p>
-
-<section>
-  <h2>Offered software</h2>
-
-  {% if services %}
-  <ul>
-    {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no offered services at this moment.</p>
-  {% endif %}
-</section>
-
-
-{% elif is_developer %}
-
-<p>
-  Welcome to the repository {{ repo_name }}- Here you will find
-  your software and the tools to manage them!
-</p>
-
-<section>
-  <h2>Available software</h2>
-
-  {% if services %}
-  <ul>
-    {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no offered services at this moment.</p>
-  {% endif %}
-</section>
-
-
-{% elif is_admin %}
-
-<p>
-  Welcome to the repository {{ repo_name }}. Here you will
+  Welcome to the repository {{ tenant.name }}. Here you will
   find your offered software and the access to manage your
   repository!
 </p>
@@ -58,6 +13,7 @@
 
 <section>
   <h2>Available software</h2>
+  
 
   {% if services %}
   <ul>
@@ -72,6 +28,7 @@
 
 <section>
   <h2>Registered developers</h2>
+  <a href="{% url 'mws_main:add_developer' tenant.repo_addr %}">Add developer</a>
   {% if developers %}
   <ul>
     {% for developer in developers %}
@@ -96,7 +53,4 @@
   {% endif %}
 </section>
 
-
-  
-{% endif %}
 {% endblock %}
