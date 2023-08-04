@@ -1,27 +1,43 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-
-    <title>{% block title %}MWS{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'tenants/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{% block title %}{% endblock %}</title>
   </head>
 
   <body>
-    <header>
-      <h1>Multi-tenant Web Store</h1>
+    <header class="site-header">
+      <a class="site-title" href="{% url 'tenants:home' %}">MWS</a>
+      <p class="subtitle-header">Multi-tenant Web Store<p>
+     
     </header>
-
-    <nav>
-      <ul>
-      </ul>
-    </nav>
 
     <main>
       {% block content %}{% endblock %}
     </main>
 
-    <footer>
-      <p>Carlos Romero Cruz</p>
+    <footer class="site-footer">
+
+      <section class="site-footer-logo-col">
+	<a class="footer-logo" href="{% url 'tenants:home' %}">MWS</a>
+	<p>Multi-tenancy service hosting provider</p>
+	<ul class="social-icons">
+	  <li>
+	    <a class="icon" href="https://github.com/phoenixsite/mws" target="_blank">
+	      <i class="fa fa-github" aria-hidden="true"></i>Github
+	    </a>
+	  </li>
+	</ul>
+      </section>
+
+      <section class="site-footer-nav1-col-1">
+	<h2>Support</h2>
+       </section>
+      
     </footer>
 
   </body>

@@ -4,7 +4,6 @@ from . import views
 
 app_name = "mws_main"
 urlpatterns = [
-    path("", views.HomeView.as_view(), name="home"),
     path("repo/<str:repo_addr>/",
          include(
              [

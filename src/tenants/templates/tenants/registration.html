@@ -3,16 +3,16 @@
 {% block title %}Registration | MWS{% endblock %}
 
 {% block content %}
-<form action="{% url 'tenants:registration' %}" method="post">
+<form class="regs-form" action="{% url 'tenants:registration' %}" method="post">
   {% csrf_token %}
   <fieldset>
     <legend>Basic repository data</legend>
-    {{ tenant_form }}
+    {{ tenant_form.as_ul }}
   </fieldset>
   
   <fieldset>
     <legend>Repository administrator data</legend>
-    {{ admin_form }}
+    {{ admin_form.as_ul }}
   </fieldset>
   
   <input type="submit" value="Submit">

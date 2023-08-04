@@ -26,18 +26,10 @@ import mws_main.forms as forms
 from tenants.models import Tenant, TenantAdmin, ADMIN_GROUP
 import mws.settings as settings
 
-class HomeView(TemplateView):
-    template_name = "mws_main/home.html"
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["user"] = self.request.user
-        return context
-
 
 class TenantMixin(ContextMixin):
     """
-    Represent a view contained in a tenant repository, so
+    Retrieve the tenant where the mixin , so
     to ensure a correct view functionality the view saves
     the tenant information.
     """
@@ -76,13 +68,6 @@ class TenantLoginRequiredMixin(TenantMixin, AccessMixin):
         """
         Check the user login information and dispatch to
         an HTTP method.
-        
-        If an authenticated user try to access to another
-        view which doesn't correspond to the users's tenant, 
-        then a PermissionDenied exception is raised. This 
-        approach violates the isolation between tenants, as
-        a user from one tenant might acknoledge the existence
-        of other tenants.
         """
         if not (self.user.is_authenticated
             and self.user.tenant
@@ -93,7 +78,14 @@ class TenantLoginRequiredMixin(TenantMixin, AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
     def handle_no_permission(self):
-
+        """
+        If an authenticated user try to access to another
+        view which doesn't correspond to the users's tenant, 
+        then a PermissionDenied exception is raised. This 
+        approach violates the isolation between tenants, as
+        a user from one tenant might acknoledge the existence
+        of other tenants.
+        """
         if (self.user.is_authenticated
             and self.user.tenant
             and self.tenant != self.user.tenant):
@@ -117,29 +109,24 @@ class TenantUserMixin(TenantLoginRequiredMixin):
 
         self.user = self.request.user
         self.user.tenant = None
-        self.UserModel = None
+        self.is_client = False
+        self.is_developer = False
+        self.is_admin = False
 
-        # The User heir class of the user must be found
-        tenant_models = [models.Client, models.Developer, TenantAdmin]
+        
+        if self.user.groups.filter(name=models.CLIENT_GROUP).count() == 1:
+            self.user = self.user.client
+            self.is_client = True
+            
+        elif self.user.groups.filter(name=models.DEV_GROUP).count() == 1:
+            self.user = self.user.developer
+            self.is_developer = True
+            
+        elif self.user.groups.filter(name=ADMIN_GROUP).count() == 1:
+            self.user = self.user.tenantadmin
+            self.is_admin = True
 
-        # Also, we need to identify the role of the user within
-        # the repository with the same procedure
-        user_group = ["is_client", "is_developer", "is_admin"]
-
-        for i, UserModel in enumerate(tenant_models):
-            try:
-                self.user = UserModel.objects.get(
-                    user_ptr_id=self.request.user.id)
-            except UserModel.DoesNotExist:
-                continue
-            else:
-                
-                # If found, stop searching and set
-                # the type of user
-                self.UserModel = UserModel
-                break
-
-
+        
 class LoginView(auth_views.LoginView, TenantMixin):
     """
     Login view. It lets client, developers and tenant
@@ -207,29 +194,28 @@ class RepoHomeView(TenantUserMixin, TemplateView):
     Home view of the tenant's repository.
 
     The template is determined by the group the authenticated
-    user belong to.
+    user belongs to.
     """
     
-    template_name = "mws_main/{}_repo_home.html"
-
     def get_template_names(self):
 
-        if self.user.groups.filter(name=models.CLIENT_GROUP).count() == 1:
-            return self.template_name.format("client")
-        
-        elif self.user.groups.filter(name=models.DEV_GROUP).count() == 1:
-            return self.template_name.format("developer")
-            
-        elif self.user.groups.filter(name=ADMIN_GROUP).count() == 1:
+        template_name = "mws_main/{}_repo_home.html"
 
-            return self.template_name.format("admin")
+        if self.is_client:
+            return template_name.format("client")
+        
+        elif self.is_developer:
+            return template_name.format("developer")
+            
+        elif self.is_admin:
+            return template_name.format("admin")
 
 
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
         
-        if self.user.groups.filter(name=ADMIN_GROUP).count() == 1:
+        if self.is_admin:
             context["developers"] = models.Developer.objects.filter(
                 tenant=self.tenant._id)
             context["clients"] = models.Client.objects.filter(
@@ -289,20 +275,21 @@ class AddRepoEntityView(FormView):
         return super().form_valid(form)
 
 
+
 class AddDeveloperView(AddRepoEntityView, TenantUserMixin):
 
     form_class = forms.DeveloperCreationForm
-    template_name = "mws_main/developer_form.html"
+    template_name = "mws_main/add_developer.html"
     
     
 class AddServiceView(AddRepoEntityView, TenantUserMixin):
 
     form_class = forms.ServiceCreationForm
-    template_name = "mws_main/service_form.html"
+    template_name = "mws_main/add_service.html"
 
-class NotURLDetailMixin(SingleObjectTemplateResponseMixin, TenantUserMixin):
+class UserDetailMixin(SingleObjectTemplateResponseMixin, TenantUserMixin):
     """
-    Detail view whose object depends on the repository (tenant),
+    Retrieve an object that depends on the repository (tenant),
     so the queryset is fixed by it and the object primary key
     is obtained from the current authenticated user.
 
@@ -320,30 +307,58 @@ class NotURLDetailMixin(SingleObjectTemplateResponseMixin, TenantUserMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class UserDetailView(NotURLDetailMixin, DetailView):
+class UserDetailView(UserDetailMixin, DetailView):
 
     def setup(self, request, *args, **kwargs):
 
         super().setup(request, *args, **kwargs)
 
-        if self.user.groups.filter(name=models.CLIENT_GROUP).count() == 1:
+        if self.is_client:
             self.model = models.Client
             context_object_name = "client"
         
-        elif self.user.groups.filter(name=models.DEV_GROUP).count() == 1:
+        elif self.is_developer:
             self.model = models.Developer
             context_object_name = "developer"
 
 
-class UserUpdateView(NotURLDetailMixin, UpdateView):
+class UserUpdateView(TenantUserMixin, UpdateView):
 
     slug_field = "_id"
+    
+    def get_queryset(self):
+        return self.model.objects.filter(tenant=self.tenant.pk)
 
     def get_object(self, queryset=None):
 
         self.kwargs.update(
             {self.slug_url_kwarg: bson.ObjectId(self.user.pk)})
         return super().get_object(queryset)
+
+    def setup(self, request, *args, **kwargs):
+
+        super().setup(request, *args, **kwargs)
+
+        if self.user.groups.filter(name=models.CLIENT_GROUP).count() == 1:
+            self.form_class = forms.ClientUpdateForm
+            self.model = models.Client
+        
+        elif self.user.groups.filter(name=models.DEV_GROUP).count() == 1:
+            self.form_class = forms.DeveloperUpdateForm
+            self.model = models.Developer
+
+    def get_template_names(self):
+
+        template_name = "mws_main/update_{}.html"
+
+        if self.is_client:
+            return template_name.format("client")
+        
+        elif self.is_developer:
+            return template_name.format("developer")
+            
+        elif self.is_admin:
+            return template_name.format("admin")
 
 
 def download_service(request, repo_addr, service_id):

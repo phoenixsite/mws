@@ -1,0 +1,19 @@
+{% extends "tenants/base.html" %}
+
+{% block title %}MWS{% endblock %}
+
+{% block content %}
+<div class="homepage-container">
+  <section class="intro-section">
+    <h1>
+      Multi-tenancy service
+      <br>hosting provider
+    </h1>
+
+    <ul>
+      <li><a class="main-ref" href="{% url 'tenants:registration' %}">Get started</a></li>
+      <li><a class="secondary-ref" href="test">View plans</a></li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

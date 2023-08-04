@@ -93,16 +93,17 @@ class ServiceCreationForm(forms.ModelForm):
                    ]
 
 
-class ClientUpdateForm(auth_forms.UserChangeForm):
+class ClientUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Client
         fields = ["username",
                   "first_name",
                   "last_name",
-                  "email"]
+                  "email",
+                  ]
 
-class DeveloperUpdateForm(auth_forms.UserChangeForm):
+class DeveloperUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Developer
@@ -110,4 +111,3 @@ class DeveloperUpdateForm(auth_forms.UserChangeForm):
                   "first_name",
                   "last_name",
                   "email",]
-    

@@ -15,7 +15,6 @@ class VersionField(models.CharField):
             r"^\d{1,2}\.\d{1,2}(.\d{1,2})?$",
             flags=re.ASCII)]
         super().__init__(**kwargs)
-        
 
 
 class VersionEntry(models.Model):

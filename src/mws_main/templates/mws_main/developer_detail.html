@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>Profile</h1>
+<a href="{% url 'mws_main:update_profile' tenant.repo_addr %}">Ipdate profile</a>
 <section>
   <h2>{{ developer.get_full_name }}</h2>
   <h3>Basic information</h3>
