@@ -1,10 +1,12 @@
 {% extends "tenants/base.html" %}
+{% load static %}
 
 {% block title %}Success | MWS{% endblock %}
 {% block content %}
-<p>
+<p class="success-message">
   The registration has been an success. You now can log in
-  as an administrator in the login page with the introduced credentials to
-  start uploading yiur services and registering your developers!
-</p> 
+  as an administrator in the login page of your repo to
+  upload your services and register your team.
+  Remember that your repo address is <em>(host)/repo/my-repo-address.</em>
+</p>
 {% endblock %}

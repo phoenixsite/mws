@@ -156,6 +156,76 @@ a {
 .site-footer-nav1-col-1 {
     grid-area: nav1;
 }
-    
 
-.regs-form 
+.registration-header {
+    margin-left: 30px;
+}
+
+.form-section {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+}
+
+.registration-form {
+    max-width: 700px;
+}
+
+.registration-form fieldset {
+    border: 0;
+    margin-top: 30px;
+}
+
+.registration-form legend {
+    font-weight: 500;
+    font-size: large;
+}
+
+.registration-form li {
+    list-style: none;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.registration-form label {
+    display: block;
+    padding: 4px 10px 0 0;
+    width: 200px;
+    word-wrap: break-word;
+    line-height: 1;
+}
+
+.registration-form .helptext {
+    margin-top: 5px;
+    width: 100%;
+    font-size: 0.8rem;
+    color: gray;
+    overflow-wrap: break-word;
+}
+
+.registration-form input[type="submit"] {
+    display: inline-block;
+    padding: 1em 50px 1em;
+    margin-bttom: 40px;
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.registration-form input[type="submit"]:hover {
+    background: #7a5269;
+}
+
+.success-message {
+    margin: 50px;
+    font-size: 1.5rem;
+}

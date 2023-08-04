@@ -1,21 +1,40 @@
 {% extends "tenants/base.html" %}
+{% load static %}
 
 {% block title %}Registration | MWS{% endblock %}
 
 {% block content %}
-<form class="regs-form" action="{% url 'tenants:registration' %}" method="post">
-  {% csrf_token %}
-  <fieldset>
-    <legend>Basic repository data</legend>
-    {{ tenant_form.as_ul }}
-  </fieldset>
+<h1 class="registration-header" >Registration process</h1>
+
+<section class="form-section">
+  <form class="registration-form" action="{% url 'tenants:registration' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+      <p>
+	A repository let you upload different software
+	services and offer them to your clients. So
+	a repository name and a URL for it must be
+	provided. We recommend that, at least, the
+	address should be easy to remember and write.
+	Once created, the repository can be accessed
+	in the URL (host)/repo/your-address.
+      </p>
+      <legend>Basic information</legend>
+      {{ tenant_form.as_ul }}
+    </fieldset>
   
-  <fieldset>
-    <legend>Repository administrator data</legend>
-    {{ admin_form.as_ul }}
-  </fieldset>
+    <fieldset>
+      <p>
+	A Tenant Administrator is the only user who can manage
+	the repository basic information, the creation and access
+	of the developers and so on... For each repository (tenant)
+	there must be an administrator. 
+      </p>
+      <legend>Repository administrator</legend>
+      {{ admin_form.as_ul }}
+    </fieldset>
   
-  <input type="submit" value="Submit">
-  
-</forms>
+    <input type="submit" value="Submit">
+  </form>
+</section>
 {% endblock %}

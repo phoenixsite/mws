@@ -19,13 +19,8 @@ class HomeView(TemplateView):
         context["user"] = self.request.user
         return context
 
-class NotAuthenticatedMixin(UserPassesTestMixin):
-    
-    def test_func(self):
-        return self.request.user.is_anonymous
 
-
-class RegistrationView(NotAuthenticatedMixin, TemplateView):
+class RegistrationView(TemplateView):
 
     template_name = "tenants/registration.html"
     tenant_form_class = forms.TenantForm
@@ -71,7 +66,6 @@ class RegistrationView(NotAuthenticatedMixin, TemplateView):
             })
 
 
-class CompletedRegView(NotAuthenticatedMixin, TemplateView):
+class CompletedRegView(TemplateView):
     template_name = "tenants/completed-reg.html"
-    http_method_names = ["get"]
     

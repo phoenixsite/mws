@@ -133,13 +133,15 @@ class Tenant(models.Model):
         "repository address",
         max_length=25,
         blank=False,
-        help_text="address to the hosted tenant store"
+        help_text="Address to the hosted tenant store."
     )
     
     current_agree = models.EmbeddedField(
         model_container=SubsAgreement,
         null=False,
-        blank=False)
+        blank=False,
+        help_text="Subscription plan chose to measure the resource usage."
+    )
     
     old_agrees = models.ArrayField(
         model_container=SubsAgreement,
