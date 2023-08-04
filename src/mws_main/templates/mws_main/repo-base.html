@@ -2,13 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
+    <link rel="stylesheet" href="{% static 'mws_main/style.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{% block title %}{% endblock %}</title>
+  </head>
 
     <title>{% block title %}{% endblock %}</title>
   </head>
 
   <body>
-    <header>
-      <a href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
+    <header class="site-header">
+      <a class="site-title" href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
 
       <nav>
 	<ul>

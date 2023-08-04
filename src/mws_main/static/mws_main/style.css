@@ -1,0 +1,103 @@
+body {
+    margin: 0 0 0 0;
+    font-family: BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+    scrollbar-color: gray;
+}
+
+a {
+    text-decoration: none;
+}
+
+.site-header {
+    background-color: #533747;
+    border-bottom: 2px solid #6A6B83;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+.site-title {
+    font-size: 32px;
+    font-weight: 700;
+    line-weight: 56px;
+    margin: 0;
+    color: white;
+    padding: 8px;
+    margin-right: auto;
+}
+
+.site-title:hover {
+    color: #86BBBD;
+}
+
+.actions-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.action {
+    color: white;
+    font-weight: 500;
+    background: #76949F;
+    padding: 0.5em 15px 0.5em;
+    border-radius: 5px;
+}
+
+.action:hover {
+    background: #86BBBD;
+}
+
+.login-section {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+}
+
+.login-form {
+    max-width: 700px;
+}
+
+.login-form li {
+    list-style: none;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.login-form label {
+    display: block;
+    padding: 4px 10px 0 0;
+    width: 100px;
+    word-wrap: break-word;
+    line-height: 1;
+}
+
+.login-form input[type="submit"] {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 0.8em 20px 0.8em;
+    margin-bttom: 40px;
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.login-form input[type="submit"]:hover {
+    background: #7a5269;
+}
+
+.errorlist {
+    color: #c92a42;
+}
