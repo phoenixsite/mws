@@ -39,11 +39,23 @@ a {
 }
 
 .action {
+    cursor: pointer;
     color: white;
     font-weight: 500;
     background: #76949F;
     padding: 0.5em 15px 0.5em;
     border-radius: 5px;
+    font-size: 15px;
+    margin: 5px;
+}
+
+.action input {
+    cursor: inherit;
+    background: none;
+    border: 0;
+    color: inherit;
+    font-weight: inherit;
+    font-size: inherit;
 }
 
 .action:hover {
@@ -60,12 +72,19 @@ a {
 }
 
 .login-form {
-    max-width: 700px;
+    max-width: 450px;
+    width: 450px;
+    border: 1px solid  lightgray;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px 0 lightgray, 0 5px 20px 0 lightgray;
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .login-form li {
     list-style: none;
-    border-bottom: 1px solid lightgray;
     display: flex;
     flex-wrap: wrap;
     overflow: hidden;
@@ -84,7 +103,7 @@ a {
     display: inline-block;
     margin-top: 10px;
     padding: 0.8em 20px 0.8em;
-    margin-bttom: 40px;
+    margin-bottom: 20px;
     background: #533747;
     color: white;
     border: 0;
@@ -100,4 +119,77 @@ a {
 
 .errorlist {
     color: #c92a42;
+}
+
+.signup-header {
+    margin-left: 30px;
+}
+
+.signup-section {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+}
+
+.signup-form {
+    max-width: 700px;
+    width: 450px;
+}
+
+.signup-form fieldset {
+    border: 0;
+    margin-top: 30px;
+}
+
+.signup-form legend {
+    font-weight: 500;
+    font-size: large;
+}
+
+.signup-form li {
+    list-style: none;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.signup-form label {
+    display: block;
+    padding: 4px 10px 0 0;
+    width: 200px;
+    word-wrap: break-word;
+    line-height: 1;
+}
+
+.signup-form .helptext {
+    margin-top: 5px;
+    width: 100%;
+    font-size: 0.8rem;
+    color: gray;
+    overflow-wrap: break-word;
+}
+
+.signup-form input[type="submit"] {
+    display: inline-block;
+    padding: 1em 50px 1em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.signup-form input[type="submit"]:hover {
+    background: #7a5269;
+}
+
+.success-message {
+    margin: 50px;
+    font-size: 1.5rem;
 }

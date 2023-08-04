@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -7,27 +9,22 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
 
-    <title>{% block title %}{% endblock %}</title>
-  </head>
-
   <body>
     <header class="site-header">
       <a class="site-title" href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
 
-      <nav>
-	<ul>
-	  <li>
-	    <form method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
-	      {% csrf_token %}
-	      <input type="Submit" value="Log out">
-	    </form>
-	  </li>
-	  <li>
-	    <a href="{% url 'mws_main:view_profile' tenant.repo_addr %}">View profile</a>
-	  </li>
-	  {% block actions %}{% endblock %}
-	</ul>
-      </nav>
+      <section class="actions-section">
+
+	<a class="action" href="{% url 'mws_main:view_profile' tenant.repo_addr %}">View profile</a>
+	
+	<form class="action" method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
+	  {% csrf_token %}
+	  <input type="submit" value="Log out">
+	</form>
+	
+	{% block actions %}{% endblock %}
+	
+      </section>
     </header>
 
     <main>

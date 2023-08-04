@@ -3,7 +3,8 @@
 {% block title %}Signup completed | {{ tenant.name }}{% endblock %}
 
 {% block content %}
-<p>The signup process has been completed! Now you can log in
+<p class="success-message">
+  The signup process has been completed! Now you can <a href="{% url 'mws_main:login' tenant.repo_addr %}">log in</a>
   in this repository with your credentials.
 </p>
 {% endblock %}

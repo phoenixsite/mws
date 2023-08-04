@@ -10,12 +10,11 @@
 {% block content %}
 
 <section class="login-section">
-  <h1>Log in</h1>
   <form class="login-form" method="post" action="{% url 'mws_main:login' tenant.repo_addr %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+    <h1>Log in</h1>
     {% csrf_token %}
     {{ form.as_ul }}
     <input type="submit" value="Login">
-    {% if error_message %}<p class="error-message"><strong>{{ error_message }}</strong></p>{% endif %}
   </form>
 </section>
 {% endblock %}

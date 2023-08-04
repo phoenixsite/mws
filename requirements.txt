@@ -1,2 +1,1 @@
 Django
-djongo @ git+https://github.com/doableware/djongo@master
