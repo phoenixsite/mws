@@ -1,7 +1,6 @@
 from djongo import models
-import django.contrib.auth.models as auth_models
 from django.core.validators import RegexValidator
-from tenants.models import TenantAwareModel, Tenant, get_user_group
+from tenants.models import TenantAwareModel, Tenant, get_user_group, TenantUser
 
 import re
 
@@ -84,7 +83,7 @@ def get_developer_group():
     return get_user_group(DEV_GROUP, codenames)
 
         
-class Developer(TenantAwareModel, auth_models.User):
+class Developer(TenantUser):
 
     _id = models.ObjectIdField()
 
@@ -113,7 +112,7 @@ def get_client_group():
     return get_user_group(CLIENT_GROUP, codenames)
 
 
-class Client(TenantAwareModel, auth_models.User):
+class Client(TenantUser):
 
     _id = models.ObjectIdField()
     services_acq = models.ArrayReferenceField(

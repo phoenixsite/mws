@@ -17,9 +17,9 @@
 
 	<a class="action" href="{% url 'mws_main:view_profile' tenant.repo_addr %}">View profile</a>
 	
-	<form class="action" method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
+	<form class="action-form" method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
 	  {% csrf_token %}
-	  <input type="submit" value="Log out">
+	  <input class="action" type="submit" value="Log out">
 	</form>
 	
 	{% block actions %}{% endblock %}

@@ -1,5 +1,6 @@
 import django.forms as forms
 from django.contrib.auth import forms as auth_forms
+from django.contrib.auth import authenticate
 from mws_main import models
 from tenants.models import Tenant
 
@@ -26,6 +27,34 @@ class ClientAdminForm(forms.ModelForm):
         model = models.Client
         exclude = ['services_acq', 'tenant']
 
+
+class AuthenticationForm(auth_forms.AuthenticationForm):
+
+    def __init__(self, request=None, *args, **kwargs):
+
+        super().__init__(request, *args, **kwargs)
+
+        repo_addr = request.path.split('/')[2]
+        tenant = Tenant.objects.get(repo_addr=repo_addr)
+        self.tenant_id = str(tenant._id)
+
+    def clean(self):
+
+        username = self.cleaned_data.get("username")
+        password = self.cleaned_data.get("password")
+
+        if username is not None and password:
+            self.user_cache = authenticate(
+                self.request,
+                tenant_id=self.tenant_id,
+                username=username,
+                password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 class TenantUserCreationForm(auth_forms.UserCreationForm):
 

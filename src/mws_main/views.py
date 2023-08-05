@@ -137,6 +137,7 @@ class LoginView(auth_views.LoginView, TenantMixin):
     """
 
     template_name = "mws_main/login.html"
+    form_class = forms.AuthenticationForm
     redirect_authenticated_user = True
 
     def get_default_redirect_url(self):

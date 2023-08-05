@@ -201,6 +201,40 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
+class TenantUser(TenantAwareModel, auth_models.User):
+    """
+    Represents a user that is associated with one and
+    only one tenant. Its username is composed of the 
+    tenant id and a typical User username. 
+
+    With this approach, there can be Users with the 
+    same username if they are in different tenants,
+    ensuring tenant isolation.
+    """
+
+    def get_username(self):
+        username = super().get_username()
+
+        if ':' not in username:
+            return username
+        else:
+            return username.split(':')[1]
+
+    def save(self, commit=True):
+        """
+        Before saving the instance to the DB, the username
+        must be composed of the tenant id and the username.
+        """
+        
+        if ':' not in self.username:
+            self.username = f"{self.tenant._id}:{self.username}"
+
+        super().save(commit)
+
+    class Meta:
+        abstract = True
+        
+
 def get_user_group(group_name, codenames=None):
     """
     Return the group of the users whose model is given.
@@ -218,7 +252,6 @@ def get_user_group(group_name, codenames=None):
     try:
         group = auth_models.Group.objects.get_by_natural_key(group_name)
     except auth_models.Group.DoesNotExist:
-        import pdb; pdb.set_trace()
 
         permissions = auth_models.Permission.objects.filter(
             codename__in=codenames)
@@ -254,7 +287,7 @@ def get_admin_group():
                  "change_tenant",]
     return get_user_group(ADMIN_GROUP, codenames)
 
-class TenantAdmin(TenantAwareModel, auth_models.User):
+class TenantAdmin(TenantUser):
     """
     Administrator of a tenant. It's the only user who can manage
     the core information of its tenant. 

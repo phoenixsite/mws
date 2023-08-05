@@ -15,19 +15,38 @@
   </p>
 </section>
 
-<section class="plans-list">
+<section class="plans-section">
 
   {% if plans %}
-  <ul>
+  <ul class="plans-list">
     {% for plan in plans %}
-    <li>
+    <li class="plan-container">
+      <h2>{{ plan.name }}</h2>
+      <p class="duration-field">Duration: {{ plan.duration }}</p>
+      <ul>
+	{% for res_plan in plan.plans %}
+	<li class="resplan-container">
+	  <h3>Resource plans</h3>
+	  <dl>
+	    <dt>Resource</dt>
+	    <dd>{{ res_plan.res_name }}</dd>
+
+	    <dt>Limit</dt>
+	    <dd>{{ res_plan.limit }}</dd>
+
+	    <dt>Charge per unit</dt>
+	    <dd>{{ res_plan.charge_per_unit }}</dd>
+	  </dl>
+	</li>
+	{% endfor %}
+      </ul>
     </li>
     {% endfor %}
   </ul>
 
   {% else %}
   <p>
-    We're sorry, we are not establish any subscription
+    We are sorry, we have not established any subscription
     plan yet.
   </p>
 
