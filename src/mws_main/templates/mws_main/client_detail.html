@@ -1,29 +1,57 @@
 {% extends 'mws_main/repo-base.html' %}
 
+{% load static %}
+
 {% block title %}Profile | {{ tenant.name }}{% endblock %}
 
 {% block content %}
-<h1>Profile</h1>
-<section>
-  <h2>{{ client.get_full_name }}</h2>
-  <h3>Basic information</h3>
 
-  <ul>
-    <li>Username: {{ client.username }}</li>
-    <li>Last login: {{ client.last_login }}</li>
-    <li>Email address: {{ client.email }}</li>
-    <li>Date joined: {{ client.date_joined }} </li>
-  </ul>
+<section class="profile-section profile-header">
+  <h1>{{ client.get_full_name }}</h1>
+</section>
 
-  <h3>Software purchased</h3>
-  {% if client.services_acq %}
-  <ul>
-    
-  </ul>
-  {% else %}
-  <p>
-    No software has been acquired yet. Start using the <a href="{% url 'mws_main:repo_home' tenant.repo_addr %}">repo software</a>!
-  </p>
-  {% endif %}
+<section class="profile-section profile-details">
+
+  <section class="profile-subsection profile-basic">
+    <nav>
+      <h2>Basic information</h2>
+      <a href="{% url 'mws_main:update_profile' tenant.repo_addr %}">Update profile</a>
+    </nav>
+
+    <dl>
+      <dt>Name</dt>
+      <dd>{{ client.get_full_name }}</dd>
+      
+      <dt>Username</dt>
+      <dd>{{ client.username }}</dd>
+      
+      <dt>Last login</dt>
+      <dd>{{ client.last_login }}</dd>
+      
+      <dt>Email address</dt>
+      <dd>{{ client.email }}</dd>
+      
+      <dt>Date joined</dt>
+      <dd>{{ client.date_joined }}</dd>
+    </dl>
+  </section>
+
+  <section class="profile-subsection profile-services">
+    <h2>Software purchased</h2>
+    {% if client.has_services %}
+    <ul>
+      {% for service in client.get_services %}
+      <li>
+	<a class="service-entry">{{ service.name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>
+      No software has been acquired yet. Start using the <a href="{% url 'mws_main:repo_home' tenant.repo_addr %}">repo software</a>
+    </p>
+    {% endif %}
+  </section>
+  
 </section>
 {% endblock %}

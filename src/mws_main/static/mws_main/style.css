@@ -23,7 +23,6 @@ a {
     font-size: 32px;
     font-weight: 700;
     line-weight: 56px;
-    margin: 0;
     color: white;
     padding: 8px;
     margin-right: auto;
@@ -60,6 +59,26 @@ a {
 
 .action:hover {
     background: #86BBBD;
+}
+
+.site-footer {
+    background: #F9F9FB;
+    padding: 2rem 1rem;
+    margin: 20px 0px;
+    postion: relative;
+    display: grid;
+    grid-template-areas: "logo nav1";
+    color: #4B4B4B;
+}
+
+.site-footer h2 {
+    margin: 0 0 .5rem;
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+.site-footer-logo-col {
+    grid-area: logo;
 }
 
 .login-section {
@@ -192,4 +211,67 @@ a {
 .success-message {
     margin: 50px;
     font-size: 1.5rem;
+}
+
+.profile-section {
+    margin: 0 20px;
+}
+
+.profile-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.profile-details section {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-details h2 {
+    font-weight: 300;
+    font-size: 20px;
+}
+
+.profile-subsection {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px;
+    max-height: 700px;
+}
+
+.profile-subsection nav {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
+}
+
+.profile-subsection nav a {
+    margin-top: 5px;
+    color: #533747;
+}
+
+.profile-subsection nav a:hover {
+    color: #7a5269;
+}
+
+.profile-subsection h2 {
+    width: fit-content;
+    margin-right: auto;
+    margin-top: 0;
+}
+
+.profile-header {
+    
+}
+
+.profile-basic dt {
+    font-weight: 600;
+    margin-top: 10px;
 }

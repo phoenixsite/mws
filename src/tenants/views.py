@@ -67,5 +67,7 @@ class RegistrationView(TemplateView):
 
 
 class CompletedRegView(TemplateView):
-    template_name = "tenants/completed-reg.html"
+    template_name = "tenants/registration-success.html"
     
+
+

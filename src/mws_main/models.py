@@ -125,3 +125,13 @@ class Client(TenantAwareModel, auth_models.User):
             group = get_client_group()
             self.groups.add(group)
             super().save()
+
+    def has_services(self):
+        return self.services_acq.get_queryset()
+    
+    def get_services(self):
+
+        if not self.services_acq:
+            return list()
+
+        return list(self.services_acq.get_queryset())
