@@ -70,4 +70,12 @@ class CompletedRegView(TemplateView):
     template_name = "tenants/registration-success.html"
     
 
+class PlansView(TemplateView):
+    template_name = "tenants/view_plans.html"
 
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+        context["plans"] = models.DefaultSubsAgreement.objects.all()
+        return context
+    

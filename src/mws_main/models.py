@@ -32,6 +32,11 @@ def repo_dir_path(instance, filename):
     repo_addr = Tenant.objects.get(_id=instance.tenant._id).repo_addr
     return f"{repo_addr}/{instance.name}/{filename}"
     
+def image_dir_path(instance, filename):
+    """Return the path for a uploaded file within a service"""
+    repo_addr = Tenant.objects.get(_id=instance.tenant._id).repo_addr
+    return f"{repo_addr}/{instance.name}/image/{filename}"
+
 
 class Service(TenantAwareModel):
 
@@ -42,6 +47,7 @@ class Service(TenantAwareModel):
         blank=False
     )
     last_version = VersionField()
+    logo = models.ImageField(upload_to=image_dir_path)
 
     package = models.FileField("package file", upload_to=repo_dir_path)
     package_type = models.CharField(

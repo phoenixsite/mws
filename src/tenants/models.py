@@ -50,8 +50,6 @@ class DefaultSubsAgreement(models.Model):
     duration = models.DurationField(
         help_text="Units in days"
     )
-    
-    objects = models.DjongoManager()
 
     def __str__(self):
         return self.name
@@ -59,7 +57,7 @@ class DefaultSubsAgreement(models.Model):
     class Meta:
         verbose_name = "available subscription agreement"
 
-    
+        
 class IResourceUsage(models.Model):
 
     res_name = models.CharField(
@@ -230,7 +228,8 @@ def get_user_group(group_name, codenames=None):
         group.save()
 
     return group
-    
+
+
 ADMIN_GROUP = "admin"
 
 def get_admin_group():
@@ -260,6 +259,8 @@ class TenantAdmin(TenantAwareModel, auth_models.User):
     Administrator of a tenant. It's the only user who can manage
     the core information of its tenant. 
     """
+
+    _id = models.ObjectIdField()
 
     def save(self, commit=True):
 

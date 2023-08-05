@@ -230,3 +230,28 @@ a {
     margin: 50px;
     font-size: 1.5rem;
 }
+
+.intro-plans {
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.intro-plans h1 {
+    font-weight: 350;
+    font-size: 38px;
+}
+
+.intro-plans p {
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0 30px;
+}
+
+.plans-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}

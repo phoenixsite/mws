@@ -176,18 +176,23 @@ class SignupView(auth_views.RedirectURLMixin, FormView, TenantMixin):
 
 class SignupSuccessView(TenantMixin, TemplateView):
     template_name = "mws_main/signup-success.html"
-        
+
+
 class PasswordResetView(auth_views.PasswordResetView, TenantUserMixin):
     pass
+
 
 class PasswordResetDoneView(auth_views.PasswordResetDoneView, TenantUserMixin):
     pass
 
+
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView, TenantUserMixin):
     pass
 
+
 class PasswordResetCompleteView(auth_views.PasswordResetCompleteView, TenantUserMixin):
     pass
+
 
 class RepoHomeView(TenantUserMixin, TemplateView):
     """
@@ -248,15 +253,18 @@ class ServiceDetailView(URLDetailMixin, DetailView):
     model = models.Service
     context_object_name = "service"
 
+
 class ClientAdminDetailView(URLDetailMixin, DetailView):
     model = models.Client
     context_object_name = "client"
     template_name = "mws_main/client_admin_detail.html"
 
+
 class DeveloperAdminDetailView(URLDetailMixin, DetailView):
     model = models.Developer
     context_object_name = "developer"
     template_name = "mws_main/developer_admin_detail.html"
+
 
 class AddRepoEntityView(FormView):
     """
@@ -275,17 +283,16 @@ class AddRepoEntityView(FormView):
         return super().form_valid(form)
 
 
-
 class AddDeveloperView(AddRepoEntityView, TenantUserMixin):
-
     form_class = forms.DeveloperCreationForm
     template_name = "mws_main/add_developer.html"
-    
-    
+
+
 class AddServiceView(AddRepoEntityView, TenantUserMixin):
 
     form_class = forms.ServiceCreationForm
     template_name = "mws_main/add_service.html"
+
 
 class UserDetailMixin(SingleObjectTemplateResponseMixin, TenantUserMixin):
     """
@@ -315,11 +322,12 @@ class UserDetailView(UserDetailMixin, DetailView):
 
         if self.is_client:
             self.model = models.Client
-            context_object_name = "client"
         
         elif self.is_developer:
             self.model = models.Developer
-            context_object_name = "developer"
+
+        elif self.is_admin:
+            self.model = TenantAdmin
 
 
 class UserUpdateView(TenantUserMixin, UpdateView):

@@ -1,56 +1,67 @@
 {% extends "mws_main/repo-base.html" %}
 
+{% load static %}
+
 {% block title %}{{ tenant.name }}{% endblock %}
 
 {% block content %}
+<section class="summary">
 
-<p>
-  Welcome to the repository {{ tenant.name }}. Here you will
-  find your offered software and the access to manage your
-  repository!
-</p>
+</section>
 
-
-<section>
-  <h2>Available software</h2>
+<section class="panel-board">
   
+  <section class="panel software-panel">
+    <nav>
+      <h2>Available software</h2>
+      <a class="panel-action" href="{% url 'mws_main:add_service' tenant.repo_addr %}"><i class="plus"></i>Add service</a>
+    </nav>
 
-  {% if services %}
-  <ul>
-    {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no offered services at this moment.</p>
-  {% endif %}
+    {% if services %}
+    <ul>
+      {% for service in services %}
+      <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no offered services at this moment.</p>
+    {% endif %}
+  </section>
+
+  
+  <section class="panel dev-panel">
+    <nav>
+      <h2>Registered developers</h2>
+      <a class="panel-action" href="{% url 'mws_main:add_developer' tenant.repo_addr %}"><i class="plus"></i>Add developer</a>
+    </nav>
+    
+    {% if developers %}
+    <ul>
+      {% for developer in developers %}
+      <li><a href="{% url 'mws_main:developer_detail' tenant.repo_addr developer.pk %}">{{ developer.get_full_name }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no registered developers at this moment.</p>
+    {% endif %}
+    
+  </section>
+
+  
+  <section class="panel client-panel">
+    
+    <h2>Clients statistics</h2>
+    
+    {% if clients %}
+    <ul>
+      {% for client in clients %}
+      <li><a href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">{{ client.get_full_name }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no registered clients at this moment.</p>
+    {% endif %}
+  </section>
+  
 </section>
-
-<section>
-  <h2>Registered developers</h2>
-  <a href="{% url 'mws_main:add_developer' tenant.repo_addr %}">Add developer</a>
-  {% if developers %}
-  <ul>
-    {% for developer in developers %}
-       <li><a href="{% url 'mws_main:developer_detail' tenant.repo_addr developer.pk %}">{{ developer.get_full_name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no registered developers at this moment.</p>
-  {% endif %}
-</section>
-
-<section>
-  <h2>Registered clients</h2>
-  {% if clients %}
-  <ul>
-    {% for client in clients %}
-       <li><a href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">{{ client.get_full_name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no registered clients at this moment.</p>
-  {% endif %}
-</section>
-
 {% endblock %}

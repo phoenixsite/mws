@@ -1,0 +1,37 @@
+{% extends 'tenants/base.html' %}
+
+{% load static %}
+
+{% block title %}Plans | MWS{% endblock %}
+
+{% block content %}
+<section class="intro-plans">
+  <h1>Subscription plans</h1>
+  <p>
+    The MWS provides in the cloud an easy-to-use software
+    services store. Like most of the SaaS, we offer
+    different subscription plans based on the pay-per-use
+    charging model.
+  </p>
+</section>
+
+<section class="plans-list">
+
+  {% if plans %}
+  <ul>
+    {% for plan in plans %}
+    <li>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% else %}
+  <p>
+    We're sorry, we are not establish any subscription
+    plan yet.
+  </p>
+
+  {% endif %}
+  
+</section>
+{% endblock %}

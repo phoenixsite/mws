@@ -1,16 +1,13 @@
 {% extends "mws_main/repo-base.html" %}
 
+{% load static %}
+
 {% block title %}{{ tenant.name }}{% endblock %}
 
 {% block content %}
 
-<p>
-  Welcome to the repository {{ tenant.name }}. Here you will
-  find our offered software services!
-</p>
-
-<section>
-  <h2>Offered software</h2>
+<section class="software-catalog">
+  <h2 class="software-header">Offered software</h2>
 
   {% if services %}
   <ul>
