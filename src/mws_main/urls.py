@@ -73,7 +73,7 @@ urlpatterns = [
                       name="update_profile"),
 
                  path("download-service/<str:service_id>",
-                      views.download_service,
+                      views.DownloadServiceView.as_view(),
                       name="download_service"),
              ])),
 ]

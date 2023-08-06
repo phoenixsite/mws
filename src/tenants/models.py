@@ -303,4 +303,3 @@ class TenantAdmin(TenantUser):
 
             group = get_admin_group()
             self.groups.add(group)
-            super().save()

@@ -20,6 +20,7 @@ from django.http import HttpResponseNotFound, Http404, HttpResponse
 import bson
 import mimetypes
 import os
+from urllib.parse import unquote
 
 import mws_main.models as models
 import mws_main.forms as forms
@@ -370,20 +371,24 @@ class UserUpdateView(TenantUserMixin, UpdateView):
             return template_name.format("admin")
 
 
-def download_service(request, repo_addr, service_id):
+class DownloadServiceView(TenantUserMixin, View):
 
-    try:
-        service = models.Service.objects.get(_id=bson.ObjectId(service_id))
-    except (models.Service.DoesNotExist,
-            bson.objectid.InvalidId):
-        raise Http404()
+    def get(self, request, *args, **kwargs):
 
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    filepath = BASE_DIR + service.package.url
-    path = open(filepath, 'rb')
-    mime_type, _ = mimetypes.guess_type(filepath)
+        try:
+            service = models.Service.objects.get(_id=bson.ObjectId(kwargs["service_id"]))
+        except (models.Service.DoesNotExist,
+                bson.objectid.InvalidId):
+            raise Http404()
 
-    response = HttpResponse(path, content_type=mime_type)
-    response['Content-Disposition'] = f"attachment; filename={service.name}"
+    
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        filepath = BASE_DIR + unquote(service.package.url)
+        path = open(filepath, 'rb')
+        mime_type, _ = mimetypes.guess_type(filepath)
 
-    return response
+        response = HttpResponse(path, content_type=mime_type)
+        response['Content-Disposition'] = f"attachment; filename={service.name}"
+
+        service.download(self.user)
+        return response

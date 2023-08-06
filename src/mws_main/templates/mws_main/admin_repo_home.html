@@ -18,9 +18,17 @@
     </nav>
 
     {% if services %}
-    <ul>
+    <ul class="panel-listing">
       {% for service in services %}
-      <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+      <li>
+	
+	<a class="entry-detail" href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">
+	  <p class="entry-name">{{ service.name }}</p>
+	  <p class="entry-info">Last version: {{ service.last_version }}</p>
+	  <p class="entry-info">{{ service.n_downloads }} download{% if service.n_downloads > 1 %}s{% endif %}</p>
+	</a>
+	
+      </li>
       {% endfor %}
     </ul>
     {% else %}
@@ -36,9 +44,14 @@
     </nav>
     
     {% if developers %}
-    <ul>
-      {% for developer in developers %}
-      <li><a href="{% url 'mws_main:developer_detail' tenant.repo_addr developer.pk %}">{{ developer.get_full_name }}</a></li>
+    <ul class="panel-listing">
+      {% for dev in developers %}
+      <li>
+	<a class="entry-detail" href="{% url 'mws_main:developer_detail' tenant.repo_addr dev.pk %}">
+	  <p class="entry-name">{{ dev.get_full_name }}</p>
+	  <p class="entry-info">Last login: {% if dev.last_login %}{{ dev.last_login|date:"D d M Y" }} {{ dev.last_login|date:"H:i" }}{% else %}Didn't log in yet.{% endif %}</p>
+	</a>
+      </li>
       {% endfor %}
     </ul>
     {% else %}

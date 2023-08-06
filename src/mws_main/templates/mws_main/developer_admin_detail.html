@@ -1,18 +1,29 @@
 {% extends 'mws_main/repo-base.html' %}
 
+{% load static %}
+
 {% block title %}Developer | {{ tenant.name }}{% endblock %}
 
 {% block content %}
-<section>
-  <h1>View developer</h1>
-  <h2>{{ developer.get_full_name }}</h2>
+<section class="developer-details">
+  <h2>Developer: {{ developer.get_full_name }}</h2>
+  <section class="developer-basic">
+    <h3>Basic information</h3>
+    <dl>
+      <dt>Username</dt>
+      <dd>{{ developer.username }}</dd>
 
-  <ul>
-    <li>Username: {{ developer.username }}</li>
-    <li>Last login: {{ developer.last_login }}</li>
-    <li>Email address: {{ developer.email }}</li>
-    <li>Is active? {% if developer.is_active %}Yes{% else %}No{% endif %}</li>
-    <li>Date registered: {{ developer.date_joined }} </li>
-  </ul>
+      <dt>Last login</dt>
+      <dd>{{ developer.last_login }}</dd>
+      
+      <dt>Email address</dt>
+      <dd>{{ developer.email }}</dd>
+      
+      <dt>Is active?</dt>
+      <dd>{% if developer.is_active %}Yes{% else %}No{% endif %}</dd>
+      <dt>Date registered</dt>
+      <dd>{{ developer.date_joined }}</dd>
+    </dl>
+  </section>
 </section>
 {% endblock %}

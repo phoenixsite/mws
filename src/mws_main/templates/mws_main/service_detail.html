@@ -1,21 +1,34 @@
 {% extends 'mws_main/repo-base.html' %}
 
+{% load static %}
+
 {% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
 
 {% block content %}
 
-<section>
+<section class="service-detail">
   <h1>{{ service.name }}</h1>
-  <a href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
+
+  <section class="detail-part short-intro">
+    <h3>Information</h3>
+    <p>{{ service.descrp }}</p>
+    
+    <a class="main-ref" href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
+  </section>
+
+  <section class="detail-part spec-info">
+    <h3>About</h3>
+    <dl>
+      <dt>Size</dt>
+      <dd>{{ service.size|filesizeformat }}</dd>
+
+      <dt>Downloads</dt>
+      <dd>{{ service.n_downloads }}</dd>
+      
+    </dl>
+  </section>
 </section>
 
-<section>
-  <h2>About</h2>
-  <p>{{ service.descrp }}</p>
 
-  <ul>
-    <li>Size: {{ service.size }}</li>
-  </ul>
-</section>
 
 {% endblock %}

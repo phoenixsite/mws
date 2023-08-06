@@ -66,6 +66,16 @@ class Service(TenantAwareModel):
         self.size = self.package.size
         super().save(*args, **kwargs)
 
+    def download(self, user):
+
+        if isinstance(user, Client):
+            self.n_downloads += 1
+
+            if self not in user.services_acq.get_queryset():
+                user.services_acq.add(self)
+
+            self.save()
+
 
 DEV_GROUP = "developers"
 CLIENT_GROUP = "clients"
@@ -87,16 +97,15 @@ class Developer(TenantUser):
 
     _id = models.ObjectIdField()
 
-
+    
     def save(self, commit=True):
 
         super().save(commit)
-
+        
         if commit:
 
             group = get_developer_group()
             self.groups.add(group)
-            super().save()
 
 
 def get_client_group():
@@ -129,7 +138,6 @@ class Client(TenantUser):
 
             group = get_client_group()
             self.groups.add(group)
-            super().save()
 
     def has_services(self):
         return self.services_acq.get_queryset()

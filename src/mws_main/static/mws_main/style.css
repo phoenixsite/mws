@@ -1,7 +1,6 @@
 body {
     margin: 0 0 0 0;
     font-family: BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
-    scrollbar-color: gray;
 }
 
 a {
@@ -264,10 +263,6 @@ a {
     margin-top: 0;
 }
 
-.profile-header {
-    
-}
-
 .profile-basic dt {
     font-weight: 600;
     margin-top: 10px;
@@ -307,6 +302,10 @@ a {
     margin-right: 10px;
 }
 
+.client-panel {
+    width: max-content;
+}
+
 .plus {
     display: inline-block;
     width: 33px;
@@ -334,3 +333,218 @@ a {
 .panel-action:hover {
     background: #F9F9FB;
 }
+
+.panel-listing {
+    max-height: 500px;
+    overflow: scroll;
+    scrollbar-width: 10px;
+    list-style: none;
+    padding-left: 0;
+}
+
+.entry-detail {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid lightgray;
+    padding-left: 10px;
+}
+
+.entry-detail:hover {
+    background: #F9F9FB;
+}
+
+.entry-name {
+    margin-right: 20px;
+    color: black;
+    font-weight: 550;
+}
+
+.entry-info {
+    color: gray;
+    margin-right: 20px;
+    font-size: 15px;
+}
+
+.logout-section {
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.logout-section h1 {
+    font-weight: 350;
+    font-size: 28px;
+}
+
+.logout-section a {
+    color: #76949F;
+    font-weight: 600;
+}
+
+.logout-section a:hover {
+    color: #86BBBD;
+}
+
+.registration-header {
+    margin-left: 30px;
+}
+
+.form-section {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+}
+
+.form-section p {
+    max-width: 700px;
+}
+
+.registration-form {
+    max-width: 700px;
+}
+
+.registration-form fieldset {
+    border: 0;
+    margin-top: 30px;
+}
+
+.registration-form legend {
+    font-weight: 500;
+    font-size: large;
+}
+
+.registration-form li {
+    list-style: none;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.registration-form label {
+    display: block;
+    padding: 4px 10px 0 0;
+    width: 200px;
+    word-wrap: break-word;
+    line-height: 1;
+}
+
+.registration-form .helptext {
+    margin-top: 5px;
+    width: 100%;
+    font-size: 0.8rem;
+    color: gray;
+    overflow-wrap: break-word;
+}
+
+.registration-form input[type="submit"] {
+    display: inline-block;
+    padding: 1em 50px 1em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.registration-form input[type="submit"]:hover {
+    background: #7a5269;
+}
+
+.success-message {
+    margin: 50px;
+    font-size: 1.5rem;
+}
+
+.developer-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.developer-details h2 {
+    margin-left: 30px;
+}
+
+.developer-basic {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 25%;
+    margin: 0 30px;
+}
+
+.developer-basic h3 {
+    font-weight: 400;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
+}
+
+.developer-basic dt {
+    font-weight: 300;
+    margin-top: 10px;
+}
+
+.service-detail {
+    display: flex;
+    flex-grow: row;
+    flex-wrap: wrap;
+    margin: 0 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-part {
+    width: 40%;
+    padding: 10px;
+    margin: 0 30px;
+    border: 1px solid lightgray;
+    border-radius: 6px;
+    max-height: 500px;
+    min-height: 300px;
+    overflow: scroll;
+}
+
+.detail-part h3 {
+    margin-top: 0;
+}
+
+.service-detail h1 {
+    width: 100%;
+    text-align: center;
+    font-size: 38px;
+    font-weight: 300;
+}
+
+.short-intro {
+    
+}
+
+.short-intro a {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.main-ref {
+    background: #533747;
+    color: white;
+    padding: 10px;
+    border-radius: 7px;
+}
+
+.main-ref:hover {
+    background: #7a5269;
+}
+
+
