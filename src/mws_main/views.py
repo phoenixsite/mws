@@ -295,6 +295,19 @@ class AddServiceView(AddRepoEntityView, TenantUserMixin):
     form_class = forms.ServiceCreationForm
     template_name = "mws_main/add_service.html"
 
+    def form_valid(self, form):
+
+        service = models.create_service(
+            form.cleaned_data["package"],
+            form.cleaned_data["descrp"],
+        )
+        service.tenant = Tenant.objects.get(
+            repo_addr=form.cleaned_data["repo_addr"])
+
+        service.save()
+        
+        super().form_valid(form)
+
 
 class UserDetailMixin(SingleObjectTemplateResponseMixin, TenantUserMixin):
     """
@@ -390,5 +403,5 @@ class DownloadServiceView(TenantUserMixin, View):
         response = HttpResponse(path, content_type=mime_type)
         response['Content-Disposition'] = f"attachment; filename={service.name}"
 
-        service.download(self.user)
+        service.new_acquirement(self.user)
         return response

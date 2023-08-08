@@ -56,6 +56,7 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
 
         return self.cleaned_data
 
+
 class TenantUserCreationForm(auth_forms.UserCreationForm):
 
     repo_addr = forms.CharField(widget=forms.HiddenInput)
@@ -98,12 +99,28 @@ class DeveloperCreationForm(TenantUserCreationForm):
         model = models.Developer
         exclude = ['tenant']
 
-class ServiceCreationForm(forms.ModelForm):
+
+class ServiceCreationForm(forms.Form):
 
     repo_addr = forms.CharField(widget=forms.HiddenInput)
+    descrp = forms.CharField(
+        max_length=1000,
+        help_text="1000 characters max.",
+        widget=forms.Textarea
+    )
+    package = forms.FileField(
+        label="Package file",
+        help_text="Only APK and iPhone IPA packages supported.",
+        widget=forms.FileInput
+    )
 
     def save(self, commit=True):
-        service = super().save(commit=False)
+
+        
+        service = models.create_service(
+            self.cleaned_data["package"],
+            self.cleaned_data["descrp"]
+        )
         service.tenant = Tenant.objects.get(
             repo_addr=self.cleaned_data["repo_addr"])
 
@@ -111,15 +128,6 @@ class ServiceCreationForm(forms.ModelForm):
             service.save()
 
         return service
-
-
-    class Meta:
-        model = models.Service
-        exclude = ["size",
-                   "n_downloads",
-                   "version_history",
-                   "tenant",
-                   ]
 
 
 class ClientUpdateForm(forms.ModelForm):

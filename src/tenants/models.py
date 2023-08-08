@@ -133,7 +133,8 @@ class Tenant(models.Model):
         blank=False,
         help_text="Address to the hosted tenant store."
     )
-    
+
+    """
     current_agree = models.EmbeddedField(
         model_container=SubsAgreement,
         null=False,
@@ -145,14 +146,14 @@ class Tenant(models.Model):
         model_container=SubsAgreement,
         null=False
     )
-
+    """
     objects = models.DjongoManager()
 
     def __str__(self):
         return self.name
 
 
-def register_tenant(name, repo_addr, card_number, subs_agree_name):
+def register_tenant(name, repo_addr, card_number):
     """
     Return the tenant created given its properties and the
     choosen subscription agreement.
@@ -161,10 +162,10 @@ def register_tenant(name, repo_addr, card_number, subs_agree_name):
     """
 
     # Choosen subscription agreement
-    def_agree = DefaultSubsAgreement.objects.get(
-        name=subs_agree_name)
+    #def_agree = DefaultSubsAgreement.objects.get(name=subs_agree_name)
 
     # Per-resource consumption in the first month
+    """
     iresources = [
         {
             'res_name': plan['res_name'],
@@ -186,12 +187,13 @@ def register_tenant(name, repo_addr, card_number, subs_agree_name):
         'plans': def_agree.plans,
         'current_loup': empty_loup,
         'old_loups': []}
-
+    """
+    
     return Tenant.objects.create(
         name=name,
         repo_addr=repo_addr,
-        current_agree=subs_agree,
-        old_agrees=[]
+        #current_agree=subs_agree,
+        #old_agrees=[]
     )
 
 class TenantAwareModel(models.Model):
@@ -286,6 +288,7 @@ def get_admin_group():
                  "view_tenant",
                  "change_tenant",]
     return get_user_group(ADMIN_GROUP, codenames)
+
 
 class TenantAdmin(TenantUser):
     """

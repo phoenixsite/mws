@@ -3,12 +3,13 @@
 {% block title %}Add service | {{ tenant.name }}{% endblock %}
 
 {% block content %}
-<h1>Add a service</h1>
-
 <section class="form-section">
+
+  <h1>Add a service</h1>
+  
   <form class="registration-form" method="post" action="{% url 'mws_main:add_service' tenant.repo_addr %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form }}
+    {{ form.as_ul }}
     <input type="submit" value="Save">
   </form>
 </section>

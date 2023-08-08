@@ -11,11 +11,12 @@ class TenantForm(forms.ModelForm):
     card_number = forms.CharField(
         label="Card number",
         max_length=100)
-               
+
+    """
     subs_agree_number = forms.ModelChoiceField(
         label="Subscription agreement",
         queryset=DefaultSubsAgreement.objects.all(), to_field_name="name")
-    
+    """
     class Meta:
         model = Tenant
         fields = [

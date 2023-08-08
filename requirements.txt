@@ -1,2 +1,4 @@
 Django
 Pillow
+pyaxmlparser
+biplist

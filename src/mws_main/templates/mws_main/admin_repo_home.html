@@ -62,18 +62,43 @@
 
   
   <section class="panel client-panel">
+
+    <nav>
+      <h2>Clients statistics</h2>
+    </nav>
     
-    <h2>Clients statistics</h2>
-    
-    {% if clients %}
-    <ul>
-      {% for client in clients %}
-      <li><a href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">{{ client.get_full_name }}</a></li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>There are no registered clients at this moment.</p>
-    {% endif %}
+    <section class="clients-listing">
+      {% if clients %}
+      <ul class="panel-listing">
+	{% for client in clients %}
+	<li>
+	  <a class="entry-detail" href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">
+	    <p class="entry-name">{{ client.get_username }}</p>
+	    <p class="entry-info">Date joined: {{ client.date_joined }}</p>
+	  </a>
+	</li>
+	{% endfor %}
+      </ul>
+      {% else %}
+      <p>There are no registered clients at this moment.</p>
+      {% endif %}
+    </section>
+
+    <section class="clients-statistics">
+      <table>
+	<tr>
+	  <th>Header 1</th>
+	  <th>Header 2</th>
+	</tr>
+
+	<tr>
+	  <td>Data 1</td>
+	  <td>Data 2</td>
+	</tr>
+	
+      </table>
+	
+    </section>
   </section>
   
 </section>
