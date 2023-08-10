@@ -1,3 +1,6 @@
+*.apk
+*.ipa
+*/testfiles/
 *~
 # Byte-compiled / optimized / DLL files
 __pycache__/

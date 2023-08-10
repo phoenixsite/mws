@@ -10,10 +10,9 @@
   <h1>{{ service.name }}</h1>
 
   <section class="detail-part short-intro">
-    <h3>Information</h3>
     <p>{{ service.descrp }}</p>
     
-    <a class="main-ref" href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
+    <a class="main-button" href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
   </section>
 
   <section class="detail-part spec-info">

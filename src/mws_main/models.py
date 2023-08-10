@@ -59,7 +59,10 @@ class Service(TenantAwareModel):
 
     n_downloads = models.PositiveIntegerField("number of downloads", default=0)
     
-    descrp = models.TextField("description")
+    descrp = models.TextField(
+        "description",
+        help_text="1000 characters max. Markdown markup available",
+    )
     
     version_history = models.ArrayField(
         model_container=VersionEntry)
@@ -109,6 +112,9 @@ class Package:
 
     def __init__(self, package_file):
 
+        if not package_file:
+            raise FileNotFoundError("A file must be provided to create a package object.")
+            
         if not zipfile.is_zipfile(package_file):
             raise InvalidPackage("The package is not a ZIP file.")
 
@@ -204,6 +210,7 @@ class Developer(TenantUser):
     """
 
     _id = models.ObjectIdField()
+    assigned_services = models.ManyToManyField(Service)
 
     
     def save(self, commit=True):

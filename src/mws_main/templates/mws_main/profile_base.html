@@ -1,0 +1,42 @@
+{% extends 'mws_main/repo-base.html' %}
+
+{% load static %}
+
+{% block title %}Profile | {{ tenant.name }}{% endblock %}
+
+{% block content %}
+
+<section class="profile-section profile-header">
+  <h1>{{ object.get_full_name }}</h1>
+</section>
+
+<section class="profile-section profile-details">
+
+  <section class="profile-subsection profile-basic">
+    <nav>
+      <h2>Basic information</h2>
+      <a href="{% url 'mws_main:update_profile' tenant.repo_addr %}">Update profile</a>
+    </nav>
+
+    <dl>
+      <dt>Username</dt>
+      <dd>{{ object.get_username }}</dd>
+      
+      <dt>Name</dt>
+      <dd>{{ object.get_full_name }}</dd>
+      
+      <dt>Last login</dt>
+      <dd>{{ object.last_login }}</dd>
+      
+      <dt>Email address</dt>
+      <dd>{{ object.email }}</dd>
+      
+      <dt>Date joined</dt>
+      <dd>{{ object.date_joined }}</dd>
+    </dl>
+  </section>
+</section>
+
+{% block specific_content %}{% endblock %}
+
+{% endblock %}

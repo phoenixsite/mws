@@ -125,13 +125,14 @@ class Tenant(models.Model):
         "repository name",
         max_length=25,
         blank=False,
-        unique=True)
+    )
 
     repo_addr = models.CharField(
         "repository address",
         max_length=25,
         blank=False,
-        help_text="Address to the hosted tenant store."
+        unique=True,
+        help_text="Address to the hosted tenant store.",
     )
 
     """
@@ -203,6 +204,17 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
+class UsernameField():
+
+    def value_from_object(self, obj):
+        value = getattr(obj, self.attname)
+
+        if ':' not in value:
+            return value
+        else:
+            return value.split(':')[1]
+
+
 class TenantUser(TenantAwareModel, auth_models.User):
     """
     Represents a user that is associated with one and
@@ -215,12 +227,11 @@ class TenantUser(TenantAwareModel, auth_models.User):
     """
 
     def get_username(self):
-        username = super().get_username()
 
-        if ':' not in username:
-            return username
+        if ':' not in self.username:
+            return self.username
         else:
-            return username.split(':')[1]
+            return self.username.split(':')[1]
 
     def save(self, commit=True):
         """

@@ -114,24 +114,6 @@ a {
     line-height: 1;
 }
 
-.login-form input[type="submit"] {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 0.8em 20px 0.8em;
-    margin-bottom: 20px;
-    background: #533747;
-    color: white;
-    border: 0;
-    font-weight: 700;
-    font-size: 15px;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.login-form input[type="submit"]:hover {
-    background: #7a5269;
-}
-
 .errorlist {
     color: #c92a42;
 }
@@ -179,29 +161,12 @@ a {
     line-height: 1;
 }
 
-.signup-form .helptext {
+.helptext {
     margin-top: 5px;
     width: 100%;
     font-size: 0.8rem;
     color: gray;
     overflow-wrap: break-word;
-}
-
-.signup-form input[type="submit"] {
-    display: inline-block;
-    padding: 1em 50px 1em;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    background: #533747;
-    color: white;
-    border: 0;
-    font-weight: 700;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.signup-form input[type="submit"]:hover {
-    background: #7a5269;
 }
 
 .success-message {
@@ -332,7 +297,7 @@ a {
 }
 
 .panel-listing {
-    max-height: 500px;
+    max-height: 400px;
     overflow: scroll;
     scrollbar-width: 10px;
      list-style: none;
@@ -521,7 +486,6 @@ a {
     width: 40%;
     padding: 10px;
     margin: 0 30px;
-    border: 1px solid lightgray;
     border-radius: 6px;
     max-height: 500px;
     min-height: 300px;
@@ -540,7 +504,8 @@ a {
 }
 
 .short-intro {
-    
+    display: flex;
+    flex-direction: column;
 }
 
 .short-intro a {
@@ -548,15 +513,45 @@ a {
     margin-bottom: 10px;
 }
 
-.main-ref {
-    background: #533747;
-    color: white;
-    padding: 10px;
-    border-radius: 7px;
+.spec-info {
+    border: 1px solid lightgray;
 }
 
-.main-ref:hover {
+.main-button {
+    padding: 1em 50px 1em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    border-radius: 7px;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.main-button:hover {
     background: #7a5269;
 }
 
+.spec-action {  
+    background: green;
+}
 
+.profile-basic form {
+    margin: 16px 0;
+}
+
+.profile-basic form li {
+    list-style: none;
+    margin-top: 10px;
+}
+
+.profile-basic form label {
+    font-weight: 600;
+}
+
+.profile-basic form input {
+    display: block;
+    margin-left: 40px;
+}

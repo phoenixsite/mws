@@ -6,23 +6,22 @@
 
 {% block content %}
 <section class="developer-details">
-  <h2>Developer: {{ developer.get_full_name }}</h2>
+  <h2>Developer: {{ object.get_full_name }}</h2>
   <section class="developer-basic">
     <h3>Basic information</h3>
     <dl>
       <dt>Username</dt>
-      <dd>{{ developer.username }}</dd>
+      <dd>{{ object.get_username }}</dd>
 
       <dt>Last login</dt>
-      <dd>{{ developer.last_login }}</dd>
+      <dd>{{ object.last_login }}</dd>
       
       <dt>Email address</dt>
-      <dd>{{ developer.email }}</dd>
-      
+      <dd>{{ object.email }}</dd>
       <dt>Is active?</dt>
-      <dd>{% if developer.is_active %}Yes{% else %}No{% endif %}</dd>
+      <dd>{% if object.is_active %}Yes{% else %}No{% endif %}</dd>
       <dt>Date registered</dt>
-      <dd>{{ developer.date_joined }}</dd>
+      <dd>{{ object.date_joined }}</dd>
     </dl>
   </section>
 </section>

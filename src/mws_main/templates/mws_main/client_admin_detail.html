@@ -5,14 +5,14 @@
 {% block content %}
 <section>
   <h1>View client</h1>
-  <h2>{{ client.get_full_name }}</h2>
+  <h2>{{ object.get_full_name }}</h2>
 
   <ul>
-    <li>Username: {{ client.username }}</li>
-    <li>Last login: {{ client.last_login }}</li>
-    <li>Email address: {{ client.email }}</li>
-    <li>Is active? {% if client.is_active %}Yes{% else %}No{% endif %}</li>
-    <li>Date joined: {{ client.date_joined }} </li>
+    <li>Username: {{ object.get_username }}</li>
+    <li>Last login: {{ object.last_login }}</li>
+    <li>Email address: {{ object.email }}</li>
+    <li>Is active? {% if object.is_active %}Yes{% else %}No{% endif %}</li>
+    <li>Date joined: {{ object.date_joined }} </li>
   </ul>
 </section>
 {% endblock %}

@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'tenants.apps.TenantsConfig',
     'mws_main.apps.MwsMainConfig',
-    'mws.apps.MWSAdminConfig',
+    #'mws.apps.MWSAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -133,7 +133,7 @@ INTERNAL_IPS = [
 
 AUTHENTICATION_BACKENDS = [
     'mws.backends.TenantBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    #'django.contrib.auth.backends.ModelBackend',
 ]
     
 MEDIA_ROOT = "media/"

@@ -3,10 +3,9 @@
 {% block title %}{{ tenant.name }}{% endblock %}
 
 {% block actions %}
-<li>
-  <a href="{% url 'mws_main:add_service' tenant.repo_addr %}">
-    Add service</a>
-</li>
+<a class="action spec-action" href="{% url 'mws_main:add_service' tenant.repo_addr %}">
+  Add service
+</a>
 {% endblock %}
 
 {% block content %}

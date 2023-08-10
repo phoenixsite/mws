@@ -1,22 +1,12 @@
-{% extends 'mws_main/repo-base.html' %}
+{% extends 'mws_main/profile_base.html' %}
 
-{% block title %}Profile | {{ tenant.name }}{% endblock %}
+{% load static %}
 
-{% block content %}
-<h1>Profile</h1>
-<a href="{% url 'mws_main:update_profile' tenant.repo_addr %}">Ipdate profile</a>
-<section>
-  <h2>{{ developer.get_full_name }}</h2>
-  <h3>Basic information</h3>
+{% block specific_content %}
 
-  <ul>
-    <li>Username: {{ developer.username }}</li>
-    <li>Last login: {{ developer.last_login }}</li>
-    <li>Email address: {{ developer.email }}</li>
-    <li>Date joined: {{ developer.date_joined }} </li>
-  </ul>
-
+<section class="profile-subsection profile-services">
   <h3>Managing software</h3>
  
 </section>
+
 {% endblock %}
