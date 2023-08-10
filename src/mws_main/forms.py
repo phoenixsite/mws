@@ -31,6 +31,7 @@ class ClientAdminForm(forms.ModelForm):
 class URLNotValidError(Exception):
     pass
 
+
 class AuthenticationForm(auth_forms.AuthenticationForm):
     """
     Form the user fill to authenticate in corresponding
@@ -142,7 +143,7 @@ class ServiceCreationForm(forms.ModelForm):
     developers = ModelMultipleChoiceField(
         queryset=None,
         help_text="The selected developers can acces, "
-        "modify and upload new versions to the service",
+        "modify and upload new versions to the service.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -173,6 +174,9 @@ class ServiceCreationForm(forms.ModelForm):
     class Meta:
         model = models.Service
         fields = ["descrp"]
+        widgets = {
+            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20})
+        }
 
 
 class UserUpdateForm(forms.ModelForm):

@@ -204,17 +204,6 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
-class UsernameField():
-
-    def value_from_object(self, obj):
-        value = getattr(obj, self.attname)
-
-        if ':' not in value:
-            return value
-        else:
-            return value.split(':')[1]
-
-
 class TenantUser(TenantAwareModel, auth_models.User):
     """
     Represents a user that is associated with one and
@@ -244,6 +233,9 @@ class TenantUser(TenantAwareModel, auth_models.User):
 
         super().save(commit)
 
+    def __str__(self):
+        return f"{self.get_full_name()} ({self.get_username()})"
+        
     class Meta:
         abstract = True
         

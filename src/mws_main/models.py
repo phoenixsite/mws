@@ -61,6 +61,7 @@ class Service(TenantAwareModel):
     
     descrp = models.TextField(
         "description",
+        max_length=1000,
         help_text="1000 characters max. Markdown markup available",
     )
     
