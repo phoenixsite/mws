@@ -9,13 +9,12 @@ from django.views.generic import (
 from django.views.generic.detail import SingleObjectTemplateResponseMixin
 from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import AccessMixin
-from django.contrib.auth.models import User
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import forms as auth_forms
 from django.shortcuts import get_object_or_404, render, resolve_url, render
 from django.forms import ModelForm
 from django.urls import reverse
-from django.http import HttpResponseNotFound, Http404, HttpResponse
+from django.http import Http404, HttpResponse
 
 import bson
 import mimetypes
@@ -24,15 +23,12 @@ from urllib.parse import unquote
 
 import mws_main.models as models
 import mws_main.forms as forms
-from tenants.models import Tenant, TenantUser, TenantAdmin, ADMIN_GROUP
-import mws.settings as settings
+from tenants.models import Tenant, TenantAdmin, User, ADMIN_GROUP
 
 
 class TenantMixin(ContextMixin):
     """
-    Retrieve the tenant where the mixin , so
-    to ensure a correct view functionality the view saves
-    the tenant information.
+    Retrieve the tenant from the the mixin url.
     """
 
     def setup(self, request, *args, **kwargs):
@@ -44,7 +40,7 @@ class TenantMixin(ContextMixin):
         
         self.tenant = get_object_or_404(
             Tenant,
-            repo_addr=self.kwargs['repo_addr'])
+            url=self.kwargs['store_url'])
         
 
     def get_context_data(self, **kwargs):
@@ -95,7 +91,7 @@ class TenantLoginRequiredMixin(TenantMixin, AccessMixin):
 
 class TenantUserMixin(TenantLoginRequiredMixin):
     """
-    Represent a view contained in a tenant repository and
+    Represent a view contained in a tenant store and
     its access is restricted to authenticated tenant users.
     
     The contents provided by the view may depend on the
@@ -107,11 +103,9 @@ class TenantUserMixin(TenantLoginRequiredMixin):
         super().setup(request, *args, **kwargs)
 
         self.user = self.request.user
-        self.user.tenant = None
         self.is_client = False
         self.is_developer = False
         self.is_admin = False
-
         
         if self.user.groups.filter(name=models.CLIENT_GROUP).exists():
             self.user = self.user.client
@@ -126,10 +120,10 @@ class TenantUserMixin(TenantLoginRequiredMixin):
             self.is_admin = True
 
         
-class LoginView(auth_views.LoginView, TenantMixin):
+class LoginView(TenantMixin, auth_views.LoginView):
     """
     Login view. It lets client, developers and tenant
-    administrators log in to its repository.
+    administrators log in to its store.
 
     When a user is already logged in, it is redirected to the
     repository home page. 
@@ -149,7 +143,7 @@ class LoginView(auth_views.LoginView, TenantMixin):
         return resolve_url(next_page)
 
 
-class LogoutView(auth_views.LogoutView, TenantMixin):
+class LogoutView(TenantMixin, auth_views.LogoutView):
     """
     Log out view. Only reachable with a POST or OPTIONS
     method.
@@ -162,25 +156,25 @@ class SignupSuccessView(TenantMixin, TemplateView):
     template_name = "mws_main/signup-success.html"
 
 
-class PasswordResetView(auth_views.PasswordResetView, TenantUserMixin):
+class PasswordResetView(TenantUserMixin, auth_views.PasswordResetView):
     pass
 
 
-class PasswordResetDoneView(auth_views.PasswordResetDoneView, TenantUserMixin):
+class PasswordResetDoneView(TenantUserMixin, auth_views.PasswordResetDoneView):
     pass
 
 
-class PasswordResetConfirmView(auth_views.PasswordResetConfirmView, TenantUserMixin):
+class PasswordResetConfirmView(TenantUserMixin, auth_views.PasswordResetConfirmView):
     pass
 
 
-class PasswordResetCompleteView(auth_views.PasswordResetCompleteView, TenantUserMixin):
+class PasswordResetCompleteView(TenantUserMixin, auth_views.PasswordResetCompleteView):
     pass
 
 
-class RepoHomeView(TenantUserMixin, TemplateView):
+class StoreHomeView(TenantUserMixin, TemplateView):
     """
-    Home view of the tenant's repository.
+    Home view of the tenant's store.
 
     The template is determined by the group the authenticated
     user belongs to.
@@ -188,7 +182,7 @@ class RepoHomeView(TenantUserMixin, TemplateView):
     
     def get_template_names(self):
 
-        template_name = "mws_main/{}_repo_home.html"
+        template_name = "mws_main/{}__home.html"
 
         if self.is_client:
             return template_name.format("client")
@@ -218,7 +212,12 @@ class RepoHomeView(TenantUserMixin, TemplateView):
 
 class TQuerysetMixin(SingleObjectTemplateResponseMixin, TenantMixin):
     """
-    The required queryset depends on the repository (tenant).
+    The required queryset depends on the store (tenant).
+    
+    It guarantees that a view access to tenant data that does
+    not correspond the its tenant.
+    It requires that the views is going to access to some
+    data from a single specific model (self.model).
     """
     
     def get_queryset(self):
@@ -240,6 +239,11 @@ class DeveloperAdminDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
     template_name = "mws_main/developer_admin_detail.html"
 
 
+class ServiceAdminDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
+    model = models.Service
+    template_name = "mws_main/service_admin_detail.html"
+
+    
 class TModelCreateView(CreateView):
     """
     Creation view whose model depends on a tenant.
@@ -247,20 +251,21 @@ class TModelCreateView(CreateView):
 
     def setup(self, request, *args, **kwargs):
         """
-        The repository address is passed to the form 
+        The store address is passed to the form 
         instance as an initial value so the tenant can 
         be identified when the form is saved
         """
         
         super().setup(request, *args, **kwargs)
-        self.initial = {'repo_addr': self.kwargs['repo_addr']}
-        self.success_url = reverse("mws_main:repo_home",
-                                 args=[self.tenant.repo_addr])
+        self.initial = {'store_url': self.kwargs['store_url']}
+        self.success_url = reverse("mws_main:store_home",
+                                 args=[self.tenant.store_url])
 
     def get_success_url(self):
         return self.success_url
 
-class ClientCreateView(TModelCreateView, TenantMixin):
+
+class ClientCreateView(TenantMixin, TModelCreateView):
     
     form_class = forms.ClientCreationForm
     template_name = "mws_main/client_form.html"
@@ -268,15 +273,15 @@ class ClientCreateView(TModelCreateView, TenantMixin):
     def setup(self, request, *args, **kwargs):
         
         super().setup(request, *args, **kwargs)
-        self.success_url = reverse("mws_main:signup_success", args=[self.tenant.repo_addr])
+        self.success_url = reverse("mws_main:signup_success", args=[self.tenant.store_url])
 
 
-class DeveloperCreateView(TModelCreateView, TenantUserMixin):
+class DeveloperCreateView(TenantUserMixin, TModelCreateView):
     form_class = forms.DeveloperCreationForm
     template_name = "mws_main/developer_form.html"
 
 
-class ServiceCreateView(TModelCreateView, TenantUserMixin):
+class ServiceCreateView(TenantUserMixin, TModelCreateView):
 
     form_class = forms.ServiceCreationForm
     model = models.Service
@@ -286,8 +291,7 @@ class ServiceCreateView(TModelCreateView, TenantUserMixin):
         super().setup(request, *args, **kwargs)
         
         # The service could be created by the tenant admin,
-        # so the service should not be added to the assigned
-        # developers (would raise an error)
+        # so the service should not be added to it.
         if self.is_developer:
             self.initial.update({"creator": self.user._id})
 
@@ -321,7 +325,8 @@ class UserUpdateView(TQuerysetMixin, TenantUserMixin, UpdateView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.success_url = reverse("mws_main:view_profile", args=[self.tenant.repo_addr])
-    
+
+
     def get_object(self, queryset=None):
         return self.user
 
@@ -330,12 +335,9 @@ class DownloadServiceView(TenantUserMixin, View):
 
     def get(self, request, *args, **kwargs):
 
-        try:
-            service = models.Service.objects.get(pk=kwargs["service_id"])
-        except (models.Service.DoesNotExist,
-                bson.objectid.InvalidId):
-            raise Http404()
-
+        service = get_object_or_404(
+            models.Service,
+            pk=kwargs["service_id"])
     
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         filepath = BASE_DIR + unquote(service.package.url)

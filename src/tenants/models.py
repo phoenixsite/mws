@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 import django.contrib.auth.models as auth_models
 from django import forms
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.conf import settings
 
 import datetime
 
@@ -122,17 +124,16 @@ class Tenant(models.Model):
     _id = models.ObjectIdField()
 
     name = models.CharField(
-        "repository name",
+        "store name",
         max_length=25,
         blank=False,
     )
 
-    repo_addr = models.CharField(
-        "repository address",
+    store_url = models.CharField(
         max_length=25,
         blank=False,
         unique=True,
-        help_text="Address to the hosted tenant store.",
+        help_text="Address to the tenant store.",
     )
 
     """
@@ -154,7 +155,7 @@ class Tenant(models.Model):
         return self.name
 
 
-def register_tenant(name, repo_addr, card_number):
+def register_tenant(name, url):
     """
     Return the tenant created given its properties and the
     choosen subscription agreement.
@@ -192,7 +193,7 @@ def register_tenant(name, repo_addr, card_number):
     
     return Tenant.objects.create(
         name=name,
-        repo_addr=repo_addr,
+        url=url,
         #current_agree=subs_agree,
         #old_agrees=[]
     )
@@ -204,13 +205,13 @@ class TenantAwareModel(models.Model):
         abstract = True
 
 
-class TenantUser(TenantAwareModel, auth_models.User):
+class User(TenantAwareModel, auth_models.AbstractUser):
     """
     Represents a user that is associated with one and
     only one tenant. Its username is composed of the 
-    tenant id and a typical User username. 
+    tenant id and a typical username.
 
-    With this approach, there can be Users with the 
+    With this approach, there can be Users with the
     same username if they are in different tenants,
     ensuring tenant isolation.
     """
@@ -227,7 +228,7 @@ class TenantUser(TenantAwareModel, auth_models.User):
         Before saving the instance to the DB, the username
         must be composed of the tenant id and the username.
         """
-        
+
         if ':' not in self.username:
             self.username = f"{self.tenant._id}:{self.username}"
 
@@ -235,19 +236,14 @@ class TenantUser(TenantAwareModel, auth_models.User):
 
     def __str__(self):
         return f"{self.get_full_name()} ({self.get_username()})"
-        
-    class Meta:
-        abstract = True
-        
+
 
 def get_user_group(group_name, codenames=None):
     """
     Return the group of the users whose model is given.
 
     If it doesn't exist, it is created.
-    
-    :param class model: Model class of a user. Must inherit
-    from django.contrib.auth.models.User.
+
     :param str group_name: Name of the group.
     :param list codenames: Permission codenames which will be
     included in the permissions group. It is ignored if the
@@ -293,7 +289,7 @@ def get_admin_group():
     return get_user_group(ADMIN_GROUP, codenames)
 
 
-class TenantAdmin(TenantUser):
+class TenantAdmin(User):
     """
     Administrator of a tenant. It's the only user who can manage
     the core information of its tenant. 

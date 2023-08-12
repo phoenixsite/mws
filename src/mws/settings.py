@@ -32,14 +32,13 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'tenants.apps.TenantsConfig',
+    'mws.apps.MWSAdminConfig',
     'mws_main.apps.MwsMainConfig',
-    #'mws.apps.MWSAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +49,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'mws.urls'
@@ -139,3 +137,5 @@ AUTHENTICATION_BACKENDS = [
 MEDIA_ROOT = "media/"
 
 MEDIA_URL = "media/"
+
+AUTH_USER_MODEL = "tenants.User"

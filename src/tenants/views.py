@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-from django.views.generic.base import TemplateView
+from django.views.generic import TemplateView
 from django.contrib.auth.mixins import (
     UserPassesTestMixin,
-    LoginRequiredMixin,)
-
-import tenants.forms as forms
-import tenants.models as models
+    LoginRequiredMixin,
+)
+from django.contrib import messages
+from . import forms
+from . import models
 
 
 class HomeView(TemplateView):
@@ -33,7 +34,7 @@ class RegistrationView(TemplateView):
         context["admin_form"] = self.admin_form_class()
         #context["agreements"] = models.DefaultSubsAgreement.objects.all()
         return context
-
+    
     def post(self, request, *args, **kwargs):
 
         admin_form = self.admin_form_class(request.POST)
@@ -43,8 +44,7 @@ class RegistrationView(TemplateView):
 
             tenant = models.register_tenant(
                 tenant_form.cleaned_data['name'],
-                tenant_form.cleaned_data['repo_addr'],
-                tenant_form.cleaned_data['card_number'],
+                tenant_form.cleaned_data['store_url'],
                 #tenant_form.cleaned_data['subs_agree_number']
             )
             
@@ -52,9 +52,13 @@ class RegistrationView(TemplateView):
             tenant_admin.tenant = tenant
             tenant_admin.save()
 
-            return HttpResponseRedirect(
-                "/completed-registration/",
+            store_url = reverse("mws_main:store_home", args=[tenant.repo_addr])
+            messages.success(
+                request,
+                'You can acces now your'
+                f' store at <a href="{store_url}">{repo_url}</a>.'
             )
+            return HttpResponseRedirect("/")
         
         return render(
             request,
@@ -66,16 +70,5 @@ class RegistrationView(TemplateView):
             })
 
 
-class CompletedRegView(TemplateView):
-    template_name = "tenants/registration-success.html"
-    
-
 class PlansView(TemplateView):
     template_name = "tenants/view_plans.html"
-
-    def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(**kwargs)
-        #context["plans"] = models.DefaultSubsAgreement.objects.all()
-        return context
-    

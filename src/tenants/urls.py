@@ -9,11 +9,7 @@ urlpatterns = [
     path("register/",
          views.RegistrationView.as_view(),
          name="registration"),
-    
-    path("completed-registration/",
-         views.CompletedRegView.as_view(),
-         name="completed"),
-
+ 
     path("plans/",
          views.PlansView.as_view(),
          name="view_plans"),

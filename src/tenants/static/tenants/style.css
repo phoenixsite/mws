@@ -157,6 +157,10 @@ a {
     grid-area: nav1;
 }
 
+.site-footer-nav1-col-1 a {
+    color: inherit;
+}
+
 .registration-header {
     margin-left: 30px;
 }
@@ -301,4 +305,16 @@ a {
 .resplan-container dt {
     color: #76949F;
     font-weight: 600;
+}
+
+.messages {
+}
+
+.messages li {
+    list-style: none;
+    padding: 10px;
+}
+
+.messages .success {
+    background: #7ee591;
 }

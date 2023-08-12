@@ -1,9 +1,8 @@
 import django.forms as forms
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
 from mws_main import models
-from tenants.models import Tenant, TenantUser
+from tenants.models import Tenant, User
 
 from bson import ObjectId
 
@@ -12,8 +11,8 @@ class SelectMongoObject(forms.Select):
 
     def value_from_datadict(self, data, files, name):
         return ObjectId(data.get(name))
-    
-    
+
+
 class MongoObjectChoiceField(forms.ModelChoiceField):
     widget = SelectMongoObject
 
@@ -28,6 +27,7 @@ class ClientAdminForm(forms.ModelForm):
         model = models.Client
         exclude = ['services_acq', 'tenant']
 
+
 class URLNotValidError(Exception):
     pass
 
@@ -35,7 +35,7 @@ class URLNotValidError(Exception):
 class AuthenticationForm(auth_forms.AuthenticationForm):
     """
     Form the user fill to authenticate in corresponding
-    repository.
+    store.
     """
 
     def __init__(self, request=None, *args, **kwargs):
@@ -43,12 +43,12 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
         super().__init__(request, *args, **kwargs)
 
         try:
-            repo_addr = request.path.split('/')[2]
+            store_url = request.path.split('/')[2]
         except KeyError:
             raise URLNotValidError("The URL provided does not"
                                    "include the tenant info")
             
-        tenant = Tenant.objects.get(repo_addr=repo_addr)
+        tenant = Tenant.objects.get(store_url=store_url)
         self.tenant_id = str(tenant._id)
 
     def clean(self):
@@ -81,7 +81,7 @@ class TenantUserCreationForm(auth_forms.UserCreationForm):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         user.tenant = Tenant.objects.get(
-            repo_addr=self.cleaned_data["repo_addr"])
+            store_url=self.cleaned_data["store_url"])
 
         if commit:
             user.save()
@@ -123,7 +123,7 @@ class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class ServiceCreationForm(forms.ModelForm):
     
-    repo_addr = forms.CharField(
+    store_url = forms.CharField(
         widget=forms.HiddenInput,
         disabled=True,
     )
@@ -149,8 +149,8 @@ class ServiceCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.fields["creator"].queryset = models.Developer.objects.filter(tenant__repo_addr=self.initial["repo_addr"])
-        self.fields["developers"].queryset = models.Developer.objects.filter(tenant__repo_addr=self.initial["repo_addr"])
+        self.fields["creator"].queryset = models.Developer.objects.filter(tenant__store_url=self.initial["store_url"])
+        self.fields["developers"].queryset = models.Developer.objects.filter(tenant__store_url=self.initial["store_url"])
 
     def save(self, commit=True):
 
@@ -159,7 +159,7 @@ class ServiceCreationForm(forms.ModelForm):
             self.cleaned_data["descrp"],
         )
         service.tenant = Tenant.objects.get(
-            repo_addr=self.cleaned_data["repo_addr"])
+            store_url=self.cleaned_data["store_url"])
 
         service.save(commit)
 
@@ -196,21 +196,23 @@ class UserUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.initial["username"] = self.instance.get_username()
 
+    """
     def save(self, commit=True):
-        """
+        "
         Save the user in the DB.
         
         It first checks if the data has changed to avoid
         unnecessary DB access.
-        """
+        "
 
         if self.has_changed():
             return super().save(commit)
         else:
             return self.instance
+    """
     
     class Meta:
-        model = TenantUser
+        model = User
         fields = ["username",
                   "first_name",
                   "last_name",

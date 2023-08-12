@@ -8,9 +8,9 @@ from tenants.models import (
 
 class TenantForm(forms.ModelForm):
 
-    card_number = forms.CharField(
-        label="Card number",
-        max_length=100)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs["autofocus"] = True
 
     """
     subs_agree_number = forms.ModelChoiceField(
@@ -21,7 +21,7 @@ class TenantForm(forms.ModelForm):
         model = Tenant
         fields = [
             "name",
-            "repo_addr",
+            "store_url",
         ]
 
 

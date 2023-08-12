@@ -1,8 +1,7 @@
 from django.contrib import admin
-from djongo.admin import ModelAdmin
+from django.contrib.auth.admin import UserAdmin
+from .models import User, Tenant, TenantAdmin
 
-from .models import DefaultSubsAgreement, Tenant, TenantAdmin
-
-admin.site.register(DefaultSubsAgreement)
+admin.site.register(User)
 admin.site.register(Tenant)
 admin.site.register(TenantAdmin)

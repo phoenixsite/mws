@@ -17,6 +17,15 @@
     </header>
 
     <main>
+
+      {% if messages %}
+      <ul class="messages">
+	{% for message in messages %}
+	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+	{% endfor %}
+      </ul>
+      {% endif %}
+      
       {% block content %}{% endblock %}
     </main>
 
@@ -36,6 +45,7 @@
 
       <section class="site-footer-nav1-col-1">
 	<h2>Support</h2>
+	<a href="mailto:romerocruz@correo.ugr.es">romerocruz@correo.ugr.es</a>
        </section>
       
     </footer>

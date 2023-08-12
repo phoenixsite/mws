@@ -1,6 +1,9 @@
 from djongo import models
 from django.core.validators import RegexValidator
-from tenants.models import TenantAwareModel, Tenant, get_user_group, TenantUser
+from django.contrib.auth import get_user_model
+from django.conf import settings
+from tenants.models import TenantAwareModel, Tenant, get_user_group, User
+
 
 from pyaxmlparser import APK
 import biplist
@@ -22,16 +25,16 @@ class VersionEntry(models.Model):
         abstract = True
 
 
-def repo_dir_path(instance, filename):
+def store_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    repo_addr = Tenant.objects.get(_id=instance.tenant._id).repo_addr
-    return f"{repo_addr}/{instance.name}/{filename}"
+    store_url = Tenant.objects.get(_id=instance.tenant._id).store_url
+    return f"{store_url}/{instance.name}/{filename}"
 
 
 def image_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    repo_addr = Tenant.objects.get(_id=instance.tenant._id).repo_addr
-    return f"{repo_addr}/{instance.name}/image/{filename}"
+    store_url = Tenant.objects.get(_id=instance.tenant._id).store_url
+    return f"{store_url}/{instance.name}/image/{filename}"
 
 
 class Service(TenantAwareModel):
@@ -44,7 +47,7 @@ class Service(TenantAwareModel):
     )
     icon = models.ImageField(upload_to=image_dir_path)
 
-    package = models.FileField("package file", upload_to=repo_dir_path)
+    package = models.FileField("package file", upload_to=store_dir_path)
     package_type = models.CharField(
         max_length=3,
         choices=[
@@ -89,8 +92,7 @@ class Service(TenantAwareModel):
         acquired the service package and assign the client
         this instance.
 
-        :param django.contrib.auth.model.User user: client
-        who acquired the service.
+        :param tenants.User user: client who acquired the service.
         """
 
         if user.groups.filter(name=CLIENT_GROUP).exists():
@@ -203,9 +205,9 @@ def get_developer_group():
     return get_user_group(DEV_GROUP, codenames)
 
         
-class Developer(TenantUser):
+class Developer(User):
     """
-    User who can access to the repository services and
+    User who can access to the store services and
     modify their information, upload new versions and
     create new services
     """
@@ -237,9 +239,9 @@ def get_client_group():
     return get_user_group(CLIENT_GROUP, codenames)
 
 
-class Client(TenantUser):
+class Client(User):
     """
-    User who can access the repository services and acquired
+    User who can access the store services and acquired
     them. Once acquired, they can download it whenever they want.
     """
 

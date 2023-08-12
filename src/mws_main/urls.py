@@ -6,12 +6,12 @@ register_converter(converters.ObjectIdConverter, "objectid")
 
 app_name = "mws_main"
 urlpatterns = [
-    path("repo/<str:repo_addr>/",
+    path("store/<str:store_url>/",
          include(
              [
                  path("",
-                      views.RepoHomeView.as_view(),
-                      name="repo_home"),
+                      views.StoreHomeView.as_view(),
+                      name="store_home"),
 
                  path("login/",
                       views.LoginView.as_view(),
@@ -78,3 +78,10 @@ urlpatterns = [
                       name="download_service"),
              ])),
 ]
+
+
+
+
+
+
+
