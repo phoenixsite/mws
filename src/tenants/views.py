@@ -52,11 +52,11 @@ class RegistrationView(TemplateView):
             tenant_admin.tenant = tenant
             tenant_admin.save()
 
-            store_url = reverse("mws_main:store_home", args=[tenant.repo_addr])
+            store_url = reverse("mws_main:store_home", args=[tenant.store_url])
             messages.success(
                 request,
                 'You can acces now your'
-                f' store at <a href="{store_url}">{repo_url}</a>.'
+                f' store at <a href="{store_url}">{store_url}</a>.'
             )
             return HttpResponseRedirect("/")
         

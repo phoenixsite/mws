@@ -1,4 +1,4 @@
-{% extends 'mws_main/repo-base.html' %}
+{% extends 'mws_main/store_base.html' %}
 
 {% block title %}Update profile | {{ tenant.name }}{% endblock %}
 
@@ -15,7 +15,7 @@
       <h2>Basic information</h2>
     </nav>
 
-    <form method="post" action="{% url 'mws_main:update_profile' tenant.repo_addr %}">
+    <form method="post" action="{% url 'mws_main:update_profile' tenant.store_url %}">
       {% csrf_token %}
       {{ form.as_ul }}
       <input class="main-button" type="submit" value="Save">

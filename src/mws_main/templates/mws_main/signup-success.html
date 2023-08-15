@@ -4,7 +4,7 @@
 
 {% block content %}
 <p class="success-message">
-  The signup process has been completed! Now you can <a href="{% url 'mws_main:login' tenant.repo_addr %}">log in</a>
-  in this repository with your credentials.
+  The signup process has been completed! Now you can <a href="{% url 'mws_main:login' tenant.store_url %}">log in</a>
+  in this store with your credentials.
 </p>
 {% endblock %}

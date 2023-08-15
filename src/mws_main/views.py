@@ -40,7 +40,7 @@ class TenantMixin(ContextMixin):
         
         self.tenant = get_object_or_404(
             Tenant,
-            url=self.kwargs['store_url'])
+            store_url=self.kwargs['store_url'])
         
 
     def get_context_data(self, **kwargs):
@@ -59,7 +59,7 @@ class TenantLoginRequiredMixin(TenantMixin, AccessMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.login_url = reverse("mws_main:login",
-                                 args=[self.tenant.repo_addr])
+                                 args=[self.tenant.store_url])
     
     def dispatch(self, request, *args, **kwargs):
         """
@@ -138,7 +138,7 @@ class LoginView(TenantMixin, auth_views.LoginView):
         if self.next_page:
             next_page = self.next_page
         else:
-            next_page = reverse("mws_main:repo_home", args=[self.tenant.repo_addr])
+            next_page = reverse("mws_main:repo_home", args=[self.tenant.store_url])
             
         return resolve_url(next_page)
 
@@ -182,7 +182,7 @@ class StoreHomeView(TenantUserMixin, TemplateView):
     
     def get_template_names(self):
 
-        template_name = "mws_main/{}__home.html"
+        template_name = "mws_main/{}_home.html"
 
         if self.is_client:
             return template_name.format("client")

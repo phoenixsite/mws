@@ -1,4 +1,4 @@
-{% extends 'mws_main/repo-base.html' %}
+{% extends 'mws_main/store_base.html' %}
 
 {% load static %}
 
@@ -16,7 +16,7 @@
     the developer can access.
   </p>
 
-  <form class="registration-form" method="post" action="{% url 'mws_main:add_developer' tenant.repo_addr %}">
+  <form class="registration-form" method="post" action="{% url 'mws_main:add_developer' tenant.store_url %}">
     {% csrf_token %}
     {{ form.as_ul }}
     <input type="submit" value="Save">

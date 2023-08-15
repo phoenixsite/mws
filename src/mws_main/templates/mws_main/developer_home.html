@@ -1,9 +1,9 @@
-{% extends "mws_main/repo-base.html" %}
+{% extends "mws_main/store_base.html" %}
 
 {% block title %}{{ tenant.name }}{% endblock %}
 
 {% block actions %}
-<a class="action spec-action" href="{% url 'mws_main:add_service' tenant.repo_addr %}">
+<a class="action spec-action" href="{% url 'mws_main:add_service' tenant.store_url %}">
   Add service
 </a>
 {% endblock %}
@@ -21,7 +21,7 @@
   {% if services %}
   <ul>
     {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       <li><a href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">{{ service.name }}</a></li>
        {% endfor %}
   </ul>
   {% else %}

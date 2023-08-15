@@ -1,4 +1,4 @@
-{% extends "mws_main/repo-base.html" %}
+{% extends "mws_main/store_base.html" %}
 
 {% load static %}
 
@@ -14,7 +14,7 @@
   <section class="panel software-panel">
     <nav>
       <h2>Available software</h2>
-      <a class="panel-action" href="{% url 'mws_main:add_service' tenant.repo_addr %}"><i class="plus"></i>Add service</a>
+      <a class="panel-action" href="{% url 'mws_main:add_service' tenant.store_url %}"><i class="plus"></i>Add service</a>
     </nav>
 
     {% if services %}
@@ -22,7 +22,7 @@
       {% for service in services %}
       <li>
 	
-	<a class="entry-detail" href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">
+	<a class="entry-detail" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
 	  <p class="entry-name">{{ service.name }}</p>
 	  <p class="entry-info">Last version: {{ service.last_version }}</p>
 	  <p class="entry-info">{{ service.n_downloads }} download{% if service.n_downloads > 1 %}s{% endif %}</p>
@@ -40,14 +40,14 @@
   <section class="panel dev-panel">
     <nav>
       <h2>Registered developers</h2>
-      <a class="panel-action" href="{% url 'mws_main:add_developer' tenant.repo_addr %}"><i class="plus"></i>Add developer</a>
+      <a class="panel-action" href="{% url 'mws_main:add_developer' tenant.store_url %}"><i class="plus"></i>Add developer</a>
     </nav>
     
     {% if developers %}
     <ul class="panel-listing">
       {% for dev in developers %}
       <li>
-	<a class="entry-detail" href="{% url 'mws_main:developer_detail' tenant.repo_addr dev.pk %}">
+	<a class="entry-detail" href="{% url 'mws_main:developer_detail' tenant.store_url dev.pk %}">
 	  <p class="entry-name">{{ dev.get_full_name }}</p>
 	  <p class="entry-info">Last login: {% if dev.last_login %}{{ dev.last_login|date:"D d M Y" }} {{ dev.last_login|date:"H:i" }}{% else %}Didn't log in yet.{% endif %}</p>
 	</a>
@@ -72,7 +72,7 @@
       <ul class="panel-listing">
 	{% for client in clients %}
 	<li>
-	  <a class="entry-detail" href="{% url 'mws_main:client_detail' tenant.repo_addr client.pk %}">
+	  <a class="entry-detail" href="{% url 'mws_main:client_detail' tenant.store_url client.pk %}">
 	    <p class="entry-name">{{ client.get_username }}</p>
 	    <p class="entry-info">Date joined: {{ client.date_joined }}</p>
 	  </a>

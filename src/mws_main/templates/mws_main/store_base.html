@@ -11,13 +11,13 @@
 
   <body>
     <header class="site-header">
-      <a class="site-title" href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
+      <a class="site-title" href="{% url 'mws_main:store_home' tenant.store_url %}">{{ tenant.name }}</a>
 
       <section class="actions-section">
 
-	<a class="action" href="{% url 'mws_main:view_profile' tenant.repo_addr %}">View profile</a>
+	<a class="action" href="{% url 'mws_main:view_profile' tenant.store_url %}">View profile</a>
 	
-	<form class="action-form" method="post" action="{% url 'mws_main:logout' tenant.repo_addr %}">
+	<form class="action-form" method="post" action="{% url 'mws_main:logout' tenant.store_url %}">
 	  {% csrf_token %}
 	  <input class="action" type="submit" value="Log out">
 	</form>

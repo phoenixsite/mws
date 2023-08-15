@@ -1,4 +1,4 @@
-{% extends "mws_main/repo-base.html" %}
+{% extends "mws_main/store_base.html" %}
 
 {% load static %}
 
@@ -12,7 +12,7 @@
   {% if services %}
   <ul>
     {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.repo_addr service.pk %}">{{ service.name }}</a></li>
+       <li><a href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">{{ service.name }}</a></li>
        {% endfor %}
   </ul>
   {% else %}

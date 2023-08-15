@@ -11,7 +11,7 @@
   
   <body>
     <header class="site-header">
-      <a class="site-title" href="{% url 'mws_main:repo_home' tenant.repo_addr %}">{{ tenant.name }}</a>
+      <a class="site-title" href="{% url 'mws_main:store_home' tenant.store_url %}">{{ tenant.name }}</a>
       {% block actions %}{% endblock %}
     </header>
     

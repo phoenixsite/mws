@@ -14,7 +14,7 @@
     provided.
   </p>
   
-  <form class="signup-form" method="post" action="{% url 'mws_main:signup' tenant.repo_addr %}">
+  <form class="signup-form" method="post" action="{% url 'mws_main:signup' tenant.store_url %}">
     {% csrf_token %}
     {{ form.as_ul }}
     <input class="main-button" type="submit" value="Sign up">
