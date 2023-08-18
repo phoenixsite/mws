@@ -478,32 +478,42 @@ a {
     flex-grow: row;
     flex-wrap: wrap;
     margin: 0 30px;
-    align-items: center;
+    /*align-items: center;*/
     justify-content: center;
 }
 
 .detail-part {
-    width: 40%;
     padding: 10px;
-    margin: 0 30px;
+    margin: 0 17px;
     border-radius: 6px;
     max-height: 500px;
     min-height: 300px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .detail-part h3 {
     margin-top: 0;
 }
 
-.service-detail h1 {
+.main-detail {
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 20px;
+}
+
+.service-detail h1 {
     text-align: center;
     font-size: 38px;
     font-weight: 300;
+    margin: 0 30px;
 }
 
 .short-intro {
+    width: 60%;
     display: flex;
     flex-direction: column;
 }
@@ -514,6 +524,7 @@ a {
 }
 
 .spec-info {
+    width: 20%;
     border: 1px solid lightgray;
 }
 

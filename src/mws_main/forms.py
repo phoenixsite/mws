@@ -1,4 +1,5 @@
 import django.forms as forms
+from django.db.models import Q
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import authenticate
 from mws_main import models
@@ -58,9 +59,10 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
 
         if username is not None and password:
 
+            username = f"{self.tenant_id}:{username}"
+            
             self.user_cache = authenticate(
                 self.request,
-                tenant_id=self.tenant_id,
                 username=username,
                 password=password)
             
@@ -74,7 +76,8 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
 
 class TenantUserCreationForm(auth_forms.UserCreationForm):
 
-    repo_addr = forms.CharField(widget=forms.HiddenInput)
+    store_url = forms.CharField(widget=forms.HiddenInput,
+                                disabled=True)
     
     def save(self, commit=True):
 
@@ -144,24 +147,50 @@ class ServiceCreationForm(forms.ModelForm):
         queryset=None,
         help_text="The selected developers can acces, "
         "modify and upload new versions to the service.",
+        required=False,
     )
 
+    class Meta:
+        model = models.Service
+        fields = ["descrp"]
+        widgets = {
+            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20})
+        }
+
+
     def __init__(self, *args, **kwargs):
+        """
+        Set the querysets for the creator and developers field.
+
+        The developers field should not include the developer
+        who is creating the service. However, the creator field may
+        be empty in case the service is being created by a tenant
+        administrator, so all the developers must be included in the
+        developers field.
+        """
 
         super().__init__(*args, **kwargs)
-        self.fields["creator"].queryset = models.Developer.objects.filter(tenant__store_url=self.initial["store_url"])
-        self.fields["developers"].queryset = models.Developer.objects.filter(tenant__store_url=self.initial["store_url"])
+        self.fields["creator"].queryset = models.Developer.objects.filter(
+            tenant__store_url=self.initial["store_url"])
+        
+        self.fields["developers"].queryset = models.Developer.objects.filter(
+            tenant__store_url=self.initial["store_url"])
+
+        # The service is being created by a developer
+        if self.initial["creator"]:
+            self.fields["creator"].queryset = self.fields["creator"].queryset.filter(
+                pk=ObjectId(self.initial["creator"]))
+            
+            self.fields["developers"].queryset = self.fields["developers"].queryset.filter(~Q(pk=ObjectId(self.initial["creator"])))
 
     def save(self, commit=True):
 
         service = models.create_service(
             self.cleaned_data["package"],
             self.cleaned_data["descrp"],
+            self.cleaned_data["store_url"],
+            commit
         )
-        service.tenant = Tenant.objects.get(
-            store_url=self.cleaned_data["store_url"])
-
-        service.save(commit)
 
         if commit:
             # Assign the service to the developer creator and
@@ -170,13 +199,6 @@ class ServiceCreationForm(forms.ModelForm):
                 self.cleaned_data["creator"].assigned_services.add(service)
                 for developer in self.cleaned_data["developers"]:
                     developer.assigned_services.add(service)
-
-    class Meta:
-        model = models.Service
-        fields = ["descrp"]
-        widgets = {
-            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20})
-        }
 
 
 class UserUpdateForm(forms.ModelForm):

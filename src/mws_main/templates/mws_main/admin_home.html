@@ -22,7 +22,7 @@
       {% for service in services %}
       <li>
 	
-	<a class="entry-detail" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' tenant.store_url service.pk %}">
 	  <p class="entry-name">{{ service.name }}</p>
 	  <p class="entry-info">Last version: {{ service.last_version }}</p>
 	  <p class="entry-info">{{ service.n_downloads }} download{% if service.n_downloads > 1 %}s{% endif %}</p>

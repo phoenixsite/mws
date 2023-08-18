@@ -1,4 +1,4 @@
-{% extends 'mws_main/repo-base.html' %}
+{% extends 'mws_main/store_base.html' %}
 
 {% load static %}
 
@@ -7,25 +7,45 @@
 {% block content %}
 
 <section class="service-detail">
-  <h1>{{ service.name }}</h1>
 
+  <section class="main-detail">
+    <h1>{{ service.name }}</h1>
+    {% if service.icon %}
+    <img src="{{ service.icon.url }}" alt="{{ service.name }} icon" width="150" height="150">
+    {% endif %}
+  </section>
+  
   <section class="detail-part short-intro">
-    <p>{{ service.descrp }}</p>
-    
-    <a class="main-button" href="{% url 'mws_main:download_service' tenant.repo_addr service.pk %}">Download</a>
+    {% if service.descrp != "" %}
+    {{ parsed_descrp | safe }}
+    {% else %}
+    <p>A description wasn't provided.</p>
+    {% endif %}
   </section>
 
   <section class="detail-part spec-info">
     <h3>About</h3>
     <dl>
+
+      <dt>Last version</dt>
+      <dd>{{ service.last_version }}</dd>
+      
       <dt>Size</dt>
-      <dd>{{ service.size|filesizeformat }}</dd>
+      <dd>{{ service.size | filesizeformat }}</dd>
 
       <dt>Downloads</dt>
       <dd>{{ service.n_downloads }}</dd>
+
+      <dt>Operative system</dt>
+      <dd>{{ service.os_name }}</dd>
+
+      <dt>Date published</dt>
+      <dd>{{ service.date_uploaded | date:"SHORT_DATE_FORMAT" }}</dd>
       
     </dl>
   </section>
+  
+  <a class="main-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk %}">Download</a>
 </section>
 
 

@@ -21,7 +21,7 @@
   {% if services %}
   <ul>
     {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">{{ service.name }}</a></li>
+       <li><a href="{% url 'mws_main:service_admin_detail' tenant.store_url service.pk %}">{{ service.name }}</a></li>
        {% endfor %}
   </ul>
   {% else %}

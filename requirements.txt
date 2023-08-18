@@ -1,4 +1,6 @@
 Django
+pytz
 Pillow
 pyaxmlparser
 biplist
+markdown

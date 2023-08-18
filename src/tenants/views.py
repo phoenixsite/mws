@@ -32,7 +32,6 @@ class RegistrationView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["tenant_form"] = self.tenant_form_class()
         context["admin_form"] = self.admin_form_class()
-        #context["agreements"] = models.DefaultSubsAgreement.objects.all()
         return context
     
     def post(self, request, *args, **kwargs):
@@ -45,7 +44,6 @@ class RegistrationView(TemplateView):
             tenant = models.register_tenant(
                 tenant_form.cleaned_data['name'],
                 tenant_form.cleaned_data['store_url'],
-                #tenant_form.cleaned_data['subs_agree_number']
             )
             
             tenant_admin = admin_form.save(commit=False)
@@ -66,7 +64,6 @@ class RegistrationView(TemplateView):
             {
                 "tenant_form": tenant_form,
                 "admin_form": admin_form,
-                #"agreements": models.DefaultSubsAgreement.objects.all()
             })
 
 

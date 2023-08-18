@@ -2,6 +2,7 @@ from djongo import models
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.files import File
 from tenants.models import TenantAwareModel, Tenant, get_user_group, User
 
 
@@ -54,9 +55,8 @@ class Service(TenantAwareModel):
             ("APK", "Android Package (APK)"),
             ("IPA", "iOS App (IPA)"),])
 
-    date_uploaded = models.DateField()
+    date_uploaded = models.DateField(auto_now_add=True)
 
-    os_version = models.CharField("operative system version", max_length=50)
     os_name = models.CharField("operative system's name", max_length=75)
     last_version = models.CharField(max_length=25)
 
@@ -65,40 +65,38 @@ class Service(TenantAwareModel):
     descrp = models.TextField(
         "description",
         max_length=1000,
+        blank=True,
         help_text="1000 characters max. Markdown markup available",
     )
     
     version_history = models.ArrayField(
         model_container=VersionEntry)
 
-    def save(
-            self,
-            force_insert=False,
-            force_update=False,
-            using=None,
-            update_fields=None
-    ):        
-        super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
-        )
+    class Meta:
+        permissions = [
+            ("view_admin_service", "Can view detailed information of a service"),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self._id})"
+
+    def size(self):
+        return self.package.size
 
     
     def new_acquirement(self, user):
         """
-        Update the number of acquirements if a client has
-        acquired the service package and assign the client
-        this instance.
+        Update the number of acquirements and downloads if a client has
+        acquired the service and assign the client to this instance.
 
-        :param tenants.User user: client who acquired the service.
+        :param tenants.models.User user: client who acquired the service.
         """
 
         if user.groups.filter(name=CLIENT_GROUP).exists():
 
-            self.n_downloads = models.F("n_downloads") + 1
-
+            #self.n_downloads = models.F("n_downloads") + 1
+            self.n_downloads = self.n_downloads + 1
+            
             if self not in user.services_acq.get_queryset():
                 user.services_acq.add(self)
 
@@ -115,6 +113,9 @@ class Package:
 
     def __init__(self, package_file):
 
+        self.zip_package = None
+        self.icon_file = None
+
         if not package_file:
             raise FileNotFoundError("A file must be provided to create a package object.")
             
@@ -130,19 +131,19 @@ class Package:
         pack_info = APK(self.package_file)
 
         if pack_info.is_valid_APK():
-            
+
             self.metadata = pack_info        
             self.type = "APK"
             self.app_name = pack_info.get_app_name()
             self.icon_filename = pack_info.get_app_icon()
             self.package_name = pack_info.get_package()
-            self.os_version = pack_info.get_min_sdk_version()
             self.os_name = "Android"
-            self.version = pack_info.get_androidversion_code()
+            self.version = pack_info.get_androidversion_name()
         else:
 
             info_filename = None
 
+            # Search for the information file of the IPA format
             with zipfile.ZipFile(self.package_file, 'r') as zip_package:
                 pattern = re.compile(f".*/?{self.IOS_INFO_FILE}")
                 
@@ -166,7 +167,6 @@ class Package:
             self.metadata = plist
             self.type = "IPA"
             self.app_name = plist["CFBundleDisplayName"]
-            self.os_version = plist["DTPlatformVersion"]
             self.os_name = plist["CFBundleSupportedPlatforms"]
             self.icon_filename = plist["CFBundleIconFiles"][0]
             self.version = plist["CFBundleInfoDictionaryVersion"]
@@ -174,23 +174,78 @@ class Package:
     def __str__(self):
         string = f"Type: {self.type}\n"
         string += f"App name: {self.app_name}\n"
-        string += f"OS version: {self.os_version}\n"
         string += f"OS name: {self.os_name}\n"
         string += f"Icon filename: {self.icon_filename}\n"
         string += f"Version: {self.version}\n"
         return string
 
+    def is_zip_opened(self):
+        return self.zip_package is not None
 
-def create_service(package_file, descrp):
+    def open_zip(self):
+
+        if not self.zip_package:
+            self.zip_package = zipfile.ZipFile(self.package_file)
+
+    def close_zip(self):
+
+        if self.zip_package:
+            self.zip_package.close()
+            self.zip_package = None
+
+    def open_icon(self):
+        
+        if not self.icon_file:
+            self.open_zip()
+            self.icon_file = self.zip_package.open(self.icon_filename)
+
+    def close_icon(self):
+
+        if self.icon_file:
+            self.icon_file.close()
+            self.icon_file = None
+
+    def close_all(self):
+        self.close_icon()
+        self.close_zip()
+
+    def to_dict(self):
+        """
+        Return a dict-like object with the attributes whose value
+        is not None
+        """
+
+        d = {
+            'name': self.app_name,
+            'last_version': self.version,
+            'package': self.package_file,
+            'package_type': self.type,
+        }
+
+        if self.icon_filename:
+            self.open_icon()    
+            d['icon'] =  File(self.icon_file)
+        
+        if self.os_name:
+            d['os_name'] = self.os_name
+
+        return d
+
+
+def create_service(package_file, descrp, store_url, commit):
     
     package = Package(package_file)
-    return Service(
-        name=package.app_name,
-        last_version=package.version,
-        package=package_file,
-        package_type=package.type,
+    service = Service(
         descrp=descrp,
+        **package.to_dict(),
     )
+    service.tenant = Tenant.objects.get(
+        store_url=store_url)
+
+    service.save(commit)
+
+    package.close_all()
+    return service
         
 
 def get_developer_group():
@@ -199,8 +254,9 @@ def get_developer_group():
     it is created.
     """
 
-    codenames = ['view_client', 'change_client',
-                 'view_service']
+    codenames = ['view_client', 'view_service', 'view_admin_service',
+                 'add_service', 'change_service', 'view_developer',
+                 'change_developer']
         
     return get_user_group(DEV_GROUP, codenames)
 
@@ -215,6 +271,11 @@ class Developer(User):
     _id = models.ObjectIdField()
     assigned_services = models.ManyToManyField(Service)
 
+
+    class Meta:
+        permissions = [
+            ("view_admin_developer", "Can view detailed information of a developer"),
+        ]
     
     def save(self, commit=True):
 
@@ -232,10 +293,7 @@ def get_client_group():
     it is created.
     """
     
-    codenames = ['add_service', 'view_service',
-                 'change_service', 'view_developer',
-                 'change_developer']
-
+    codenames = ['view_service', 'view_client', 'change_client']
     return get_user_group(CLIENT_GROUP, codenames)
 
 
@@ -251,6 +309,11 @@ class Client(User):
         on_delete=models.CASCADE,
         default=[]
     )
+
+    class Meta:
+        permissions = [
+            ("view_admin_client", "Can view detailed information of a client"),
+        ]
 
     def save(self, commit=True):
 

@@ -53,6 +53,10 @@ urlpatterns = [
                       views.DeveloperAdminDetailView.as_view(),
                       name="developer_detail"),
 
+                 path("admin/service/<objectid:pk>/",
+                      views.ServiceAdminDetailView.as_view(),
+                      name="service_admin_detail"),
+
                  path("admin/add-dev/",
                       views.DeveloperCreateView.as_view(),
                       name="add_developer"),

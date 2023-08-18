@@ -3,115 +3,14 @@ from django.utils.translation import gettext_lazy as _
 import django.contrib.auth.models as auth_models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.hashers import make_password
+from django.apps import apps
 from django import forms
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
 import datetime
-
-class ResourcesType(models.TextChoices):
-    CT = "CT", _("CPU time")
-    ST = "ST", _("Storage usage")
-
-
-class IResourcePlan(models.Model):
-
-    res_name = models.CharField(
-        "resource name",
-        max_length=2,
-        choices=ResourcesType.choices
-    )
-    
-    limit = models.FloatField("maximum usage")
-    charge_per_unit = models.FloatField()
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return self.res_name
-
-
-class DefaultSubsAgreement(models.Model):
-    """
-    Define some default conditions and limits of usage of the
-    application that a tenant must agree onto use the
-    platform.
-
-    A subscription agreement includes a time duration
-    when the agreement is effective. It also includes
-    some resource limits.
-    """
-
-    name = models.CharField(max_length=25, unique=True,
-                            help_text="Agreement name")
-    plans = models.ArrayField(
-        model_container=IResourcePlan,
-        help_text="Show the maximum usage for a resource that can be used"
-   )
-    
-    duration = models.DurationField(
-        help_text="Units in days"
-    )
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "available subscription agreement"
-
-        
-class IResourceUsage(models.Model):
-
-    res_name = models.CharField(
-        "resource name",
-        max_length=2,
-        choices=ResourcesType.choices
-    )
-    usage = models.FloatField("resource usage", default=0)
-
-    class Meta:
-        abstract = True
-
-class SubsLoup(models.Model):
-
-    start_date = models.DateTimeField(auto_now_add=True)
-    end_date = models.DateTimeField()
-    charge = models.FloatField()
-    usages = models.ArrayField(
-        model_container=IResourceUsage)
-
-    class Meta:
-        abstract = True
-
-
-class SubsAgreement(models.Model):
-    """
-    Define the conditions of usage that a tenant has
-    signed to use the platformand that must be 
-    fulfilled during a period of time.
-    """
-
-    date_regs = models.DateTimeField(
-        "registration date",
-        auto_now_add=True
-    )
-    end_date = models.DateTimeField()
-    card_number = models.CharField(max_length=100, blank=False)
-    plans = models.ArrayField(
-        model_container=IResourcePlan)
-
-    current_loup = models.EmbeddedField(
-        model_container=SubsLoup)
-
-    old_loups = models.ArrayField(
-        model_container=SubsLoup
-    )
-
-    class Meta:
-        abstract = True
-        verbose_name = "subscription agreement"
 
 
 class Tenant(models.Model):
@@ -120,7 +19,8 @@ class Tenant(models.Model):
     are hosted in the platform. 
 
     A tenant are the users of their part of the platform,
-    the resources used by them and thier clients.
+    the resources used by them and thier clients (not
+    implemented yet).
     """
     
     _id = models.ObjectIdField()
@@ -138,19 +38,6 @@ class Tenant(models.Model):
         help_text="Address to the tenant store.",
     )
 
-    """
-    current_agree = models.EmbeddedField(
-        model_container=SubsAgreement,
-        null=False,
-        blank=False,
-        help_text="Subscription plan chose to measure the resource usage."
-    )
-    
-    old_agrees = models.ArrayField(
-        model_container=SubsAgreement,
-        null=False
-    )
-    """
     objects = models.DjongoManager()
 
     def __str__(self):
@@ -159,45 +46,12 @@ class Tenant(models.Model):
 
 def register_tenant(name, url):
     """
-    Return the tenant created given its properties and the
-    choosen subscription agreement.
-
     Create a new tenant instance in the database.
-    """
-
-    # Choosen subscription agreement
-    #def_agree = DefaultSubsAgreement.objects.get(name=subs_agree_name)
-
-    # Per-resource consumption in the first month
-    """
-    iresources = [
-        {
-            'res_name': plan['res_name'],
-            'usage': 0,
-        } for plan in def_agree.plans]
-            
-    # The first month loup
-    empty_loup = {
-        'start_date': timezone.now(),
-        'end_date': timezone.now() + datetime.timedelta(days=30),
-        'charge': 0,
-        'usages': iresources
-    }
-
-    subs_agree = {
-        'date_regs': timezone.now(),
-        'end_date': timezone.now() + def_agree.duration,
-        'card_number': card_number,
-        'plans': def_agree.plans,
-        'current_loup': empty_loup,
-        'old_loups': []}
     """
     
     return Tenant.objects.create(
         name=name,
         store_url=url,
-        #current_agree=subs_agree,
-        #old_agrees=[]
     )
 
 class TenantAwareModel(models.Model):
@@ -210,21 +64,45 @@ class TenantAwareModel(models.Model):
 class UserManager(BaseUserManager):
 
     use_in_migrations = True
-
-
-
-
     
+    def create_user(self, username, email, tenant, password=None, **extra_fields):
+
+        if not username:
+            raise ValueError("The given username must be set")
+        if not (tenant
+                and Tenant.objects.exists(pk=tenant)):
+            raise ValueError("The given tenant must be set and exists")
+
+        email = self.normalize_email(email)
+
+        # Inspired by the original Django UserManager
+        GlobalUserModel = apps.get_model(
+            self.model._meta.app_label, self.model._meta.object_name
+        )
+        username = GlobalUserModel.normalize_username(username)
+        user = self.model(
+            username=username,
+            email=email,
+            tenant=tenant,
+            **extra_fields
+        )
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser():
+        """Superusers has not been established in the app."""
+        pass
 
         
-class User(TenantAwareModel, AbstractBaseUser):
+class User(TenantAwareModel, AbstractBaseUser, auth_models.PermissionsMixin):
     """
     Represents a user that is associated with one and
     only one tenant. Its username is composed of the 
-    tenant id and a typical username.
+    tenant id and a typical username separated by two dots (:).
 
-    With this approach, there can be Users with the
-    same username if they are in different tenants,
+    With this approach, users with the
+    same username can exist if they are in different tenants,
     ensuring tenant isolation.
     """
 
@@ -254,13 +132,13 @@ class User(TenantAwareModel, AbstractBaseUser):
             "Unselect this instead of deleting accounts."
         ),
     )
-    date_joined = models.DateTimeField(_("date joined"), deafault=timezone.now)
+    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
     objects = UserManager()
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email"]
+    REQUIRED_FIELDS = ["email", "tenant"]
 
     class Meta:
         verbose_name = _("user")
@@ -276,8 +154,6 @@ class User(TenantAwareModel, AbstractBaseUser):
     def get_short_name(self):
         """Return the short name for the user."""
         return self.first_name
-
-    
         
     def get_username(self):
 
@@ -286,7 +162,7 @@ class User(TenantAwareModel, AbstractBaseUser):
         else:
             return self.username.split(':')[1]
 
-    def save(self, commit=True):
+    def save(self, *args, **kwargs):
         """
         Before saving the instance to the DB, the username
         must be composed of the tenant id and the username.
@@ -295,7 +171,7 @@ class User(TenantAwareModel, AbstractBaseUser):
         if ':' not in self.username:
             self.username = f"{self.tenant._id}:{self.username}"
 
-        super().save(commit)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_full_name()} ({self.get_username()})"
@@ -337,14 +213,17 @@ def get_admin_group():
 
     codenames = ["add_service",
                  "view_service",
+                 "view_admin_service",
                  "change_service",
                  "delete_service",
                  "add_developer",
                  "view_developer",
+                 "view_admin_developer",
                  "change_developer",
                  "delete_developer",
                  "add_client",
                  "view_client",
+                 "view_admin_client",
                  "change_client",
                  "delete_client",
                  "view_tenant",

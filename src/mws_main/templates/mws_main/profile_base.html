@@ -1,4 +1,4 @@
-{% extends 'mws_main/repo-base.html' %}
+{% extends 'mws_main/store_base.html' %}
 
 {% load static %}
 
@@ -15,7 +15,7 @@
   <section class="profile-subsection profile-basic">
     <nav>
       <h2>Basic information</h2>
-      <a href="{% url 'mws_main:update_profile' tenant.repo_addr %}">Update profile</a>
+      <a href="{% url 'mws_main:update_profile' tenant.store_url %}">Update profile</a>
     </nav>
 
     <dl>

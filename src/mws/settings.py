@@ -128,14 +128,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-
-AUTHENTICATION_BACKENDS = [
-    'mws.backends.TenantBackend',
-    #'django.contrib.auth.backends.ModelBackend',
-]
     
 MEDIA_ROOT = "media/"
-
-MEDIA_URL = "media/"
-
+MEDIA_URL = "/media/"
 AUTH_USER_MODEL = "tenants.User"
+LOGIN_REDIRECT_URL = None
+LOGIN_URL = None

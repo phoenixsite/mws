@@ -11,6 +11,7 @@ from django.views.generic.base import ContextMixin
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import forms as auth_forms
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, render, resolve_url, render
 from django.forms import ModelForm
 from django.urls import reverse
@@ -20,6 +21,7 @@ import bson
 import mimetypes
 import os
 from urllib.parse import unquote
+import markdown
 
 import mws_main.models as models
 import mws_main.forms as forms
@@ -138,7 +140,7 @@ class LoginView(TenantMixin, auth_views.LoginView):
         if self.next_page:
             next_page = self.next_page
         else:
-            next_page = reverse("mws_main:repo_home", args=[self.tenant.store_url])
+            next_page = reverse("mws_main:store_home", args=[self.tenant.store_url])
             
         return resolve_url(next_page)
 
@@ -149,7 +151,10 @@ class LogoutView(TenantMixin, auth_views.LogoutView):
     method.
     """
     template_name = "mws_main/logout.html"
-    http_method_names = ["post", "options"]
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.next_page = reverse("mws_main:login", args=[self.tenant.store_url])
 
 
 class SignupSuccessView(TenantMixin, TemplateView):
@@ -214,9 +219,9 @@ class TQuerysetMixin(SingleObjectTemplateResponseMixin, TenantMixin):
     """
     The required queryset depends on the store (tenant).
     
-    It guarantees that a view access to tenant data that does
-    not correspond the its tenant.
-    It requires that the views is going to access to some
+    It guarantees that a view access to the data that belongs to its
+    tenant.
+    It requires that the view is going to access to some
     data from a single specific model (self.model).
     """
     
@@ -228,34 +233,57 @@ class ServiceDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
     model = models.Service
     context_object_name = "service"
 
+    def get_context_data(self, **kwargs):
 
-class ClientAdminDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
+        context = super().get_context_data(**kwargs)
+        context["parsed_descrp"] = markdown.markdown(self.object.descrp)
+        return context
+
+
+class ClientAdminDetailView(PermissionRequiredMixin, TQuerysetMixin,
+                            TenantUserMixin, DetailView):
     model = models.Client
     template_name = "mws_main/client_admin_detail.html"
+    permission_required = "mws_main.view_admin_client"
 
 
-class DeveloperAdminDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
+class DeveloperAdminDetailView(PermissionRequiredMixin, TQuerysetMixin,
+                               TenantUserMixin, DetailView):
     model = models.Developer
     template_name = "mws_main/developer_admin_detail.html"
+    permission_required = "mws_main.view_admin_developer"
 
 
-class ServiceAdminDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
+class ServiceAdminDetailView(PermissionRequiredMixin, TQuerysetMixin,
+                             TenantUserMixin, DetailView):
     model = models.Service
     template_name = "mws_main/service_admin_detail.html"
+    permission_required = "mws_main.view_admin_service"
 
+
+class ClientCreateView(TenantMixin, CreateView):
     
-class TModelCreateView(CreateView):
-    """
-    Creation view whose model depends on a tenant.
-    """
+    form_class = forms.ClientCreationForm
+    template_name = "mws_main/client_form.html"
 
     def setup(self, request, *args, **kwargs):
-        """
-        The store address is passed to the form 
-        instance as an initial value so the tenant can 
-        be identified when the form is saved
-        """
         
+        super().setup(request, *args, **kwargs)
+        self.initial = {'store_url': self.kwargs['store_url']}
+        self.success_url = reverse("mws_main:signup_success", args=[self.tenant.store_url])
+
+    def get_success_url(self):
+        return self.success_url
+
+
+class DeveloperCreateView(PermissionRequiredMixin, TenantUserMixin,
+                          CreateView):
+    form_class = forms.DeveloperCreationForm
+    template_name = "mws_main/developer_form.html"
+    permission_required = "mws_main.add_developer"
+
+    def setup(self, request, *args, **kwargs):
+
         super().setup(request, *args, **kwargs)
         self.initial = {'store_url': self.kwargs['store_url']}
         self.success_url = reverse("mws_main:store_home",
@@ -265,35 +293,32 @@ class TModelCreateView(CreateView):
         return self.success_url
 
 
-class ClientCreateView(TenantMixin, TModelCreateView):
-    
-    form_class = forms.ClientCreationForm
-    template_name = "mws_main/client_form.html"
-
-    def setup(self, request, *args, **kwargs):
-        
-        super().setup(request, *args, **kwargs)
-        self.success_url = reverse("mws_main:signup_success", args=[self.tenant.store_url])
-
-
-class DeveloperCreateView(TenantUserMixin, TModelCreateView):
-    form_class = forms.DeveloperCreationForm
-    template_name = "mws_main/developer_form.html"
-
-
-class ServiceCreateView(TenantUserMixin, TModelCreateView):
+class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
+                        CreateView):
 
     form_class = forms.ServiceCreationForm
     model = models.Service
+    permission_required = "mws_main.add_service"
 
     def setup(self, request, *args, **kwargs):
 
         super().setup(request, *args, **kwargs)
+
+        self.initial = {'store_url': self.kwargs['store_url']}
+        self.success_url = reverse("mws_main:store_home",
+                                 args=[self.tenant.store_url])
         
         # The service could be created by the tenant admin,
         # so the service should not be added to it.
         if self.is_developer:
-            self.initial.update({"creator": self.user._id})
+            creator_key = {"creator": self.user._id}
+        else:
+            creator_key = {"creator": None}
+
+        self.initial.update(creator_key)
+
+    def get_success_url(self):
+        return self.success_url
 
 
 class UserDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
@@ -324,7 +349,7 @@ class UserUpdateView(TQuerysetMixin, TenantUserMixin, UpdateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.success_url = reverse("mws_main:view_profile", args=[self.tenant.repo_addr])
+        self.success_url = reverse("mws_main:view_profile", args=[self.tenant.store_url])
 
 
     def get_object(self, queryset=None):
@@ -345,7 +370,7 @@ class DownloadServiceView(TenantUserMixin, View):
         mime_type, _ = mimetypes.guess_type(filepath)
 
         response = HttpResponse(path, content_type=mime_type)
-        response['Content-Disposition'] = f"attachment; filename={service.name}"
+        response['Content-Disposition'] = f"attachment; filename={service.name}.{service.package_type.lower()}"
 
         service.new_acquirement(self.user)
         return response

@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from tenants.models import (
-    Tenant, TenantAdmin, DefaultSubsAgreement,
-    IResourcePlan,
+    Tenant, TenantAdmin,
     )
 
 
@@ -12,11 +11,6 @@ class TenantForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["name"].widget.attrs["autofocus"] = True
 
-    """
-    subs_agree_number = forms.ModelChoiceField(
-        label="Subscription agreement",
-        queryset=DefaultSubsAgreement.objects.all(), to_field_name="name")
-    """
     class Meta:
         model = Tenant
         fields = [
@@ -32,10 +26,6 @@ class AdminForm(UserCreationForm):
         fields = ['username',
                   'first_name',
                   'last_name',
-                  'email',]
+                  'email',
+                  ]
         
-class DefaultSubsAgreementForm(forms.ModelForm):
-
-    class Meta:
-        model = DefaultSubsAgreement
-        fields = ["name", "plans", "duration"]
