@@ -15,12 +15,17 @@ import zipfile
 DEV_GROUP = "developers"
 CLIENT_GROUP = "clients"
 
+class DescriptionField(models.TextField):
+    max_length = 1000
+    blank = True
+    help_text = "1000 characters max. Markdown markup available",
+    
 
 class VersionEntry(models.Model):
 
     version = models.CharField(max_length=25)
     update_date = models.DateField()
-    changes = models.TextField()
+    changes = DescriptionField()
 
     class Meta:
         abstract = True
@@ -38,6 +43,43 @@ def image_dir_path(instance, filename):
     return f"{store_url}/{instance.name}/image/{filename}"
 
 
+class Package(models.Model):
+
+    n_package = models.AutoField(
+        "package number",
+        unique=True,
+        help_text="Identify the package within the service. It is not considered "
+        "as a primary key"
+    )
+    package_file = models.FileField("package file", upload_to=store_dir_path)
+    package_type = models.CharField(
+        max_length=3,
+        choices=[
+            ("APK", "Android Package (APK)"),
+            ("IPA", "iOS App (IPA)"),])
+
+    date_uploaded = models.DateField(auto_now_add=True)
+    os_name = models.CharField("operative system's name", max_length=75)
+    last_version = models.CharField(max_length=25)
+    n_downloads = models.PositiveIntegerField("number of downloads", default=0)
+    descrp = DescriptionField(
+        "package description"
+        help_text="Describes specific features of this package. For information "
+        "related to the service, use the description field of the service."
+    )
+    version_history = models.ArrayField(
+        model_container=VersionEntry)
+
+    def size(self):
+        return self.package_file.size
+
+    def __str__(self):
+        return f"{self.package_type} ({self.n_package})" 
+
+    class Meta:
+        abstract = True
+
+
 class Service(TenantAwareModel):
 
     _id = models.ObjectIdField()
@@ -46,31 +88,12 @@ class Service(TenantAwareModel):
         max_length=25,
         blank=False
     )
-    icon = models.ImageField(upload_to=image_dir_path)
-
-    package = models.FileField("package file", upload_to=store_dir_path)
-    package_type = models.CharField(
-        max_length=3,
-        choices=[
-            ("APK", "Android Package (APK)"),
-            ("IPA", "iOS App (IPA)"),])
-
-    date_uploaded = models.DateField(auto_now_add=True)
-
-    os_name = models.CharField("operative system's name", max_length=75)
-    last_version = models.CharField(max_length=25)
-
-    n_downloads = models.PositiveIntegerField("number of downloads", default=0)
-    
-    descrp = models.TextField(
-        "description",
-        max_length=1000,
-        blank=True,
-        help_text="1000 characters max. Markdown markup available",
+    icon = models.ImageField(
+        upload_to=image_dir_path,
+        help_text="Service icon",
     )
-    
-    version_history = models.ArrayField(
-        model_container=VersionEntry)
+    packages = models.ArrayField(
+        model_container=Package)
 
     class Meta:
         permissions = [
@@ -80,18 +103,16 @@ class Service(TenantAwareModel):
     def __str__(self):
         return f"{self.name} ({self._id})"
 
-    def size(self):
-        return self.package.size
-
     
-    def new_acquirement(self, user):
+    def new_acquirement(self, n_package, user):
         """
         Update the number of acquirements and downloads if a client has
         acquired the service and assign the client to this instance.
 
         :param tenants.models.User user: client who acquired the service.
         """
-
+        pass
+        """
         if user.groups.filter(name=CLIENT_GROUP).exists():
 
             #self.n_downloads = models.F("n_downloads") + 1
@@ -101,12 +122,12 @@ class Service(TenantAwareModel):
                 user.services_acq.add(self)
 
             self.save(update_fields=["n_downloads"])
-
+        """
 
 class InvalidPackage(Exception):
     pass
 
-class Package:
+class PackageFile:
 
     IOS_INFO_FILE = "Info.plist"
     IOS_VALID_BUNDLE = "APPL"
@@ -205,7 +226,7 @@ class Package:
             self.icon_file.close()
             self.icon_file = None
 
-    def close_all(self):
+    def close(self):
         self.close_icon()
         self.close_zip()
 
@@ -234,7 +255,7 @@ class Package:
 
 def create_service(package_file, descrp, store_url, commit):
     
-    package = Package(package_file)
+    package = PackageFile(package_file)
     service = Service(
         descrp=descrp,
         **package.to_dict(),
@@ -244,7 +265,7 @@ def create_service(package_file, descrp, store_url, commit):
 
     service.save(commit)
 
-    package.close_all()
+    package.close()
     return service
         
 
