@@ -6,18 +6,71 @@
 
 {% block content %}
 
-<section class="software-catalog">
-  <h2 class="software-header">Offered software</h2>
+<div class="content-wrapper">
+  <section class="software-catalog">
+    <h2 class="software-header">Offered software</h2>
 
-  {% if services %}
-  <ul>
-    {% for service in services %}
-       <li><a href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">{{ service.name }}</a></li>
-       {% endfor %}
-  </ul>
-  {% else %}
-  <p>There are no offered services at this moment.</p>
-  {% endif %}
-</section>
+    {% if services %}
+    <ul class="service-listing">
+      {% for service in services %}
+      <li class="service-item">
+	<a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	  {% if service.icon %}
+	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	  {% endif %}
+	  <div class="service-info">
+	    <h3 class="service-name">{{ service.name }}</h3>
+	    <h4 class="service-description">{{ service.brief_descrp }}</h4>
+	  </div>
+	</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no offered services at this moment.</p>
+    {% endif %}
+  </section>
+
+  <aside class="subcontent-home">
+    <section class="sidebar-widget">
+      <h3>Last uploaded services</h3>
+      <ul class="service-listing">
+	{% for service in last_uploaded_services %}
+	<li class="service-item">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	    {% if service.icon %}
+	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	    {% endif %}
+	    <div class="service-info">
+	      <h3 class="service-name">{{ service.name }}</h3>
+	      <h4 class="service-description">{{ service.brief_descrp }}</h4>
+	    </div>
+	  </a>
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+
+    <section class="sidebar-widget">
+      <h3>Last updated services</h3>
+      <ul class="service-listing">
+	{% for service in last_updated_services %}
+	<li class="service-item">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	    {% if service.icon %}
+	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
+	    {% endif %}
+	    <div class="service-info">
+	      <h3 class="service-name">{{ service.name }}</h3>
+	      <h4 class="service-description">{{ service.brief_descrp }}</h4>
+	    </div>
+	  </a>
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+    
+  </aside>
+</div>
 
 {% endblock %}

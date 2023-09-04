@@ -233,17 +233,6 @@ a {
     margin-top: 10px;
 }
 
-.software-catalog {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px 50px;
-}
-
-.software-header {
-    font-weight: 300;
-}
-
 .panel-board {
     display: flex;
     flex-direction: row;
@@ -253,7 +242,10 @@ a {
 
 .panel {
     margin: 20px 10px;
-    width: 45%;
+    width: fit-content;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 8px;
 }
 
 .panel nav {
@@ -266,6 +258,7 @@ a {
     font-size: 18px;
     font-weight: 300;
     margin-right: 10px;
+    margin-top: 5px;
 }
 
 .plus {
@@ -298,9 +291,9 @@ a {
 
 .panel-listing {
     max-height: 400px;
-    overflow: scroll;
+    overflow: auto;
     scrollbar-width: 10px;
-     list-style: none;
+    list-style: none;
     padding-left: 0;
 }
 
@@ -330,18 +323,14 @@ a {
 }
 
 .client-panel {
-    width: 80%;
+    width: fit-content;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.clients-listing {
-    width: 40%;
-}
-
-.clients.statistics {
-    width: 40%;
+.clients-statistics tr {
+    border-bottom: 1px solid lightgray;
 }
 
 .logout-section {
@@ -478,17 +467,29 @@ a {
     flex-grow: row;
     flex-wrap: wrap;
     margin: 0 30px;
-    /*align-items: center;*/
-    justify-content: center;
+}
+
+.service-detail h1 {
+    text-align: center;
+    font-size: 38px;
+    font-weight: 300;
+}
+
+.detail-wrapper {
+    display: flex;
+    width: 100%;
 }
 
 .detail-part {
-    padding: 10px;
+    flex-grow: 4;
     margin: 0 17px;
     border-radius: 6px;
     max-height: 500px;
     min-height: 300px;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .detail-part h3 {
@@ -499,27 +500,8 @@ a {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
     align-items: center;
-    margin-top: 32px;
-    margin-bottom: 20px;
-}
-
-.service-detail h1 {
-    text-align: center;
-    font-size: 38px;
-    font-weight: 300;
-    margin: 0 30px;
-}
-
-.short-intro {
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-}
-
-.short-intro a {
-    font-size: 20px;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -528,17 +510,62 @@ a {
     border: 1px solid lightgray;
 }
 
+.service-meta-info {
+    flex-grow: 2;
+}
+
+.service-meta-info ul {
+    padding: 0;
+    margin: 0;
+}
+
+.service-meta-info li {
+    margin-right: 30px;
+    list-style: none;
+}
+
+.service-packages {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.service-packages ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+}
+
+.service-packages li {
+    list-style: none;
+    padding: 3px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+}
+
+.download-button {
+    margin: 0;
+}
+
 .main-button {
-    padding: 1em 50px 1em;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    display: inline-block;
+    height: fit-content;
+    padding: 20px 30px;
+    margin: 10px 0;
     background: #533747;
     color: white;
     border: 0;
     font-weight: 700;
     border-radius: 7px;
     cursor: pointer;
-    width: fit-content;
 }
 
 .main-button:hover {
@@ -565,4 +592,76 @@ a {
 .profile-basic form input {
     display: block;
     margin-left: 40px;
+}
+
+.content-wrapper {
+    display: flex;
+    margin: 20px 0 0 0;
+    padding: 0 50px;
+}
+
+.software-catalog {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 4;
+}
+
+.software-header {
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+.service-listing {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex-basis: auto;
+    padding: 0;
+}
+
+.service-item {
+    margin: 10px 5px;
+    list-style: none;
+    margin-bottom: 11px;
+}
+
+.service-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: black;
+    transition: opacity .2s;
+}
+
+.service-header:hover {
+    opacity: .65;
+}
+
+.service-name, .service-description {
+    margin: 0;
+    font-weight: 500;
+}
+
+.service-description {
+    color: gray;
+}
+
+.service-name {
+    margin: 0;
+}
+
+.service-icon {
+    width: 50px;
+    height: 50px;
+    margin-top: 8px;
+    margin-inline-end: 16px;
+}
+
+.subcontent-home {
+    flex-grow: 2;
+    margin-right: 16px;
+}
+
+.sidebar-widget {
+    border-bottom: 1px solid lightgray;
 }

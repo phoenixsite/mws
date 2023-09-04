@@ -2,30 +2,35 @@ from djongo import models
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.core.files import File
+from django.utils import timezone
+from django.core.files.storage import default_storage
+
+import mws_main.utils as utils
 from tenants.models import TenantAwareModel, Tenant, get_user_group, User
-
-
-from pyaxmlparser import APK
-import biplist
-
-import re
-import zipfile
 
 DEV_GROUP = "developers"
 CLIENT_GROUP = "clients"
 
 class DescriptionField(models.TextField):
+    """
+    Large text field used to create a description.
+
+    It allows Markdown markup.
+    """
+    
     max_length = 1000
     blank = True
     help_text = "1000 characters max. Markdown markup available",
     
 
 class VersionEntry(models.Model):
+    """
+    A field for storing a package version change.
+    """
 
-    version = models.CharField(max_length=25)
+    version = models.CharField("version code", max_length=25)
     update_date = models.DateField()
-    changes = DescriptionField()
+    changes = DescriptionField("changes description")
 
     class Meta:
         abstract = True
@@ -36,6 +41,17 @@ def store_dir_path(instance, filename):
     store_url = Tenant.objects.get(_id=instance.tenant._id).store_url
     return f"{store_url}/{instance.name}/{filename}"
 
+class Object(object):
+    """Class used to set arbitrary attributes"""
+    pass
+
+
+def abstract_store_dir_path(tenant, name, filename):
+
+    instance = Object()
+    instance.tenant = tenant
+    instance.name = name
+    return store_dir_path(instance, filename)
 
 def image_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
@@ -44,34 +60,54 @@ def image_dir_path(instance, filename):
 
 
 class Package(models.Model):
+    """
+    Represent a package file that can be downloaded and used.
 
-    n_package = models.AutoField(
+    Because of the abstract behaviour of the model, all the fields options
+    will not be checked, so the function
+    that initialize a package must manually checked that the options
+    are valid.
+    """
+
+    n_package = models.BigIntegerField(
         "package number",
-        unique=True,
-        help_text="Identify the package within the service. It is not considered "
-        "as a primary key"
+        help_text="Identify the package in a service.",
     )
+    
+    name = models.CharField(
+        "package name",
+        max_length=30,
+        blank=False,
+    )
+
     package_file = models.FileField("package file", upload_to=store_dir_path)
+    size = models.BigIntegerField(help_text="Package size")
     package_type = models.CharField(
         max_length=3,
         choices=[
             ("APK", "Android Package (APK)"),
-            ("IPA", "iOS App (IPA)"),])
+            ("IPA", "iOS App (IPA)"),
+        ]
+    )
 
-    date_uploaded = models.DateField(auto_now_add=True)
+    date_uploaded = models.DateField(
+        auto_now_add=True,
+        help_text="Date when the package was firstly uploaded.",
+    )
+
     os_name = models.CharField("operative system's name", max_length=75)
     last_version = models.CharField(max_length=25)
-    n_downloads = models.PositiveIntegerField("number of downloads", default=0)
     descrp = DescriptionField(
-        "package description"
+        "package description",
         help_text="Describes specific features of this package. For information "
-        "related to the service, use the description field of the service."
+        "related to the service, use the description field of the service.",
+        default="",
     )
-    version_history = models.ArrayField(
-        model_container=VersionEntry)
 
-    def size(self):
-        return self.package_file.size
+    version_history = models.ArrayField(
+        model_container=VersionEntry,
+        help_text="Previous uploaded versions and its changes",
+    )
 
     def __str__(self):
         return f"{self.package_type} ({self.n_package})" 
@@ -80,7 +116,16 @@ class Package(models.Model):
         abstract = True
 
 
+class PackageNotFoundError(Exception):
+    pass
+        
 class Service(TenantAwareModel):
+    """
+    Represent a software component that offer grouped functionalities.
+
+    A service may be executed in multiple platforms or limit their functionalities,
+    so it may contain multiple packages.
+    """
 
     _id = models.ObjectIdField()
     name = models.CharField(
@@ -88,12 +133,42 @@ class Service(TenantAwareModel):
         max_length=25,
         blank=False
     )
+
+    brief_descrp = models.TextField(
+        "brief description",
+        blank=False,
+    )
+
+    descrp = models.TextField(
+        "description",
+        blank=False,
+    )
+
     icon = models.ImageField(
         upload_to=image_dir_path,
-        help_text="Service icon",
+        help_text="Copied from the first package icon.",
     )
+
+    datetime_published = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Date and time when the service was firstly published."
+    )
+    
     packages = models.ArrayField(
-        model_container=Package)
+        model_container=Package,
+        default=[],
+        help_text="Concrete software packages contained by the service."
+    )
+
+    # This field is in Service and not in Package because as Package is an abstract
+    # model we cannot avoid race conditions when incrementing the number of downloads
+    # of a Package instance and updating the whole packages array of a Service is
+    # too expensive
+    n_downloads = models.PositiveIntegerField("number of downloads", default=0)
+
+    autoid_for_packages = models.BigIntegerField(
+        help_text="Last id used to create a package within the service.",
+    )
 
     class Meta:
         permissions = [
@@ -104,170 +179,67 @@ class Service(TenantAwareModel):
         return f"{self.name} ({self._id})"
 
     
-    def new_acquirement(self, n_package, user):
+    def new_acquirement(self, user):
         """
         Update the number of acquirements and downloads if a client has
         acquired the service and assign the client to this instance.
 
         :param tenants.models.User user: client who acquired the service.
         """
-        pass
-        """
+
         if user.groups.filter(name=CLIENT_GROUP).exists():
 
-            #self.n_downloads = models.F("n_downloads") + 1
-            self.n_downloads = self.n_downloads + 1
+            self.n_downloads = models.F("n_downloads") + 1
             
             if self not in user.services_acq.get_queryset():
                 user.services_acq.add(self)
 
             self.save(update_fields=["n_downloads"])
-        """
-
-class InvalidPackage(Exception):
-    pass
-
-class PackageFile:
-
-    IOS_INFO_FILE = "Info.plist"
-    IOS_VALID_BUNDLE = "APPL"
-
-    def __init__(self, package_file):
-
-        self.zip_package = None
-        self.icon_file = None
-
-        if not package_file:
-            raise FileNotFoundError("A file must be provided to create a package object.")
-            
-        if not zipfile.is_zipfile(package_file):
-            raise InvalidPackage("The package is not a ZIP file.")
-
-        self.package_file = package_file
-
-        # Identify the package type (APK or IPA)
-        # Both are zips internally, so we if there is an
-        # AndroidManifest.xml file, it is probably an
-        # Android package.
-        pack_info = APK(self.package_file)
-
-        if pack_info.is_valid_APK():
-
-            self.metadata = pack_info        
-            self.type = "APK"
-            self.app_name = pack_info.get_app_name()
-            self.icon_filename = pack_info.get_app_icon()
-            self.package_name = pack_info.get_package()
-            self.os_name = "Android"
-            self.version = pack_info.get_androidversion_name()
-        else:
-
-            info_filename = None
-
-            # Search for the information file of the IPA format
-            with zipfile.ZipFile(self.package_file, 'r') as zip_package:
-                pattern = re.compile(f".*/?{self.IOS_INFO_FILE}")
-                
-                # Look for the package information file
-                for filename in zip_package.namelist():
-
-                    if pattern.fullmatch(filename):
-                        info_filename = zip_package.open(filename)
-                        break
-
-                if not info_filename:
-                    raise InvalidPackage("The package uploaded is not supported.")
-
-            plist = biplist.readPlist(info_filename)
-
-            
-            if (plist["CFBundlePackageType"]
-                and plist["CFBundlePackageType"] != self.IOS_VALID_BUNDLE):
-                raise InvalidPackage("The package uploaded is not supported")
-
-            self.metadata = plist
-            self.type = "IPA"
-            self.app_name = plist["CFBundleDisplayName"]
-            self.os_name = plist["CFBundleSupportedPlatforms"]
-            self.icon_filename = plist["CFBundleIconFiles"][0]
-            self.version = plist["CFBundleInfoDictionaryVersion"]
-
-    def __str__(self):
-        string = f"Type: {self.type}\n"
-        string += f"App name: {self.app_name}\n"
-        string += f"OS name: {self.os_name}\n"
-        string += f"Icon filename: {self.icon_filename}\n"
-        string += f"Version: {self.version}\n"
-        return string
-
-    def is_zip_opened(self):
-        return self.zip_package is not None
-
-    def open_zip(self):
-
-        if not self.zip_package:
-            self.zip_package = zipfile.ZipFile(self.package_file)
-
-    def close_zip(self):
-
-        if self.zip_package:
-            self.zip_package.close()
-            self.zip_package = None
-
-    def open_icon(self):
-        
-        if not self.icon_file:
-            self.open_zip()
-            self.icon_file = self.zip_package.open(self.icon_filename)
-
-    def close_icon(self):
-
-        if self.icon_file:
-            self.icon_file.close()
-            self.icon_file = None
-
-    def close(self):
-        self.close_icon()
-        self.close_zip()
-
-    def to_dict(self):
-        """
-        Return a dict-like object with the attributes whose value
-        is not None
-        """
-
-        d = {
-            'name': self.app_name,
-            'last_version': self.version,
-            'package': self.package_file,
-            'package_type': self.type,
-        }
-
-        if self.icon_filename:
-            self.open_icon()    
-            d['icon'] =  File(self.icon_file)
-        
-        if self.os_name:
-            d['os_name'] = self.os_name
-
-        return d
 
 
-def create_service(package_file, descrp, store_url, commit):
+def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
+
+    packages_objs = []
+    icon = None
+
+    for n_package, package in enumerate(packages):
+
+        # Due to a package is an abstract class, we must fill manually all its
+        # fields, even the file field (storage class interaction)
+        parsed_package = utils.ParsedPackage(package["package"])
+        package_obj = parsed_package.to_dict()
+        package_obj["descrp"] = package["descrp"]
+        package_obj["date_uploaded"] = timezone.now()
+        package_obj["version_history"] = []
+        package_obj["n_package"] = n_package
+
+        # This is a dangerous operation because the packages files
+        # are being saved before creating the service
+        path = abstract_store_dir_path(tenant, name, parsed_package.package_name)
+        path = default_storage.generate_filename(path)
+        package_obj["package_file"] = default_storage.save(path, parsed_package.package_file)
+        packages_objs.append(package_obj)
+
+        if not icon:
+            icon = parsed_package.get_icon()
     
-    package = PackageFile(package_file)
-    service = Service(
+    service = Service.objects.create(
+        name=name,
+        icon=icon,
+        brief_descrp=brief_descrp,
         descrp=descrp,
-        **package.to_dict(),
+        tenant=tenant,
+        packages=packages_objs,
+        autoid_for_packages=len(packages_objs),
     )
-    service.tenant = Tenant.objects.get(
-        store_url=store_url)
 
-    service.save(commit)
+    if creator:
+        creator.assigned_services.add(service)
 
-    package.close()
+    for developer in developers:
+        developer.assigned_services.add(service)
+
     return service
-        
 
 def get_developer_group():
     """
@@ -281,7 +253,7 @@ def get_developer_group():
         
     return get_user_group(DEV_GROUP, codenames)
 
-        
+
 class Developer(User):
     """
     User who can access to the store services and

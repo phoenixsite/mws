@@ -1,5 +1,6 @@
 Django
 pytz
+djongo @ git+https://github.com/phoenixsite/djongo.git@master
 Pillow
 pyaxmlparser
 biplist

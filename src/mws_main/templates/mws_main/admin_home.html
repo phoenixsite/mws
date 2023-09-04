@@ -13,7 +13,7 @@
   
   <section class="panel software-panel">
     <nav>
-      <h2>Available software</h2>
+      <h2>Uploaded services</h2>
       <a class="panel-action" href="{% url 'mws_main:add_service' tenant.store_url %}"><i class="plus"></i>Add service</a>
     </nav>
 
@@ -24,8 +24,6 @@
 	
 	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' tenant.store_url service.pk %}">
 	  <p class="entry-name">{{ service.name }}</p>
-	  <p class="entry-info">Last version: {{ service.last_version }}</p>
-	  <p class="entry-info">{{ service.n_downloads }} download{% if service.n_downloads > 1 %}s{% endif %}</p>
 	</a>
 	
       </li>
@@ -64,41 +62,25 @@
   <section class="panel client-panel">
 
     <nav>
-      <h2>Clients statistics</h2>
+      <h2>Clients</h2>
     </nav>
+
+    <table class="clients-statistics">
+      <caption>Monthly statistics</caption>
+      <tr>
+	<th>Registered clients</th>
+	<td>{{ monthly_reg_clients }}</td>
+      </tr>
+      <tr>
+	<th>Number of acquisitions</th>
+	<td>{{ monthly_acquisitions }}</td>
+      </tr>
+      <tr>
+	<th>Number of logins</th>
+      </tr>
+      
+    </table>
     
-    <section class="clients-listing">
-      {% if clients %}
-      <ul class="panel-listing">
-	{% for client in clients %}
-	<li>
-	  <a class="entry-detail" href="{% url 'mws_main:client_detail' tenant.store_url client.pk %}">
-	    <p class="entry-name">{{ client.get_username }}</p>
-	    <p class="entry-info">Date joined: {{ client.date_joined }}</p>
-	  </a>
-	</li>
-	{% endfor %}
-      </ul>
-      {% else %}
-      <p>There are no registered clients at this moment.</p>
-      {% endif %}
-    </section>
-
-    <section class="clients-statistics">
-      <table>
-	<tr>
-	  <th>Header 1</th>
-	  <th>Header 2</th>
-	</tr>
-
-	<tr>
-	  <td>Data 1</td>
-	  <td>Data 2</td>
-	</tr>
-	
-      </table>
-	
-    </section>
   </section>
   
 </section>

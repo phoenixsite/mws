@@ -9,7 +9,12 @@
   
   <form class="registration-form" method="post" action="{% url 'mws_main:add_service' tenant.store_url %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_ul }}
+    {{ basic_form.as_ul }}
+
+    <h2>Platform-specific packages</h2>
+    <p>You can upload up to 5 packages for specific platforms.</p>
+    {{ platform_formset.as_ul }}
+    
     <input type="submit" value="Save">
   </form>
 </section>

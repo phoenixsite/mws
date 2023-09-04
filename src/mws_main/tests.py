@@ -1,11 +1,13 @@
 from django.test import TestCase
-import mws_main.models as mmodels
+import mws_main.utils as utils
 import tenants.models as tmodels
 import os
 
 class PackageTestCase(TestCase):
 
-    TEST_DIR = "mws_main/test_files"
+    TEST_DIR = "mws_main/test_files/"
+    APK_DIR = "APK/"
+    IPA_DIR = "IPA/"
 
     def packages_creation(self, filenames):
         """
@@ -18,12 +20,12 @@ class PackageTestCase(TestCase):
         
         for filename in filenames:
             
-            package = mmodels.Package(filename)
+            package = utils.ParsedPackage(filename)
             print(package)
 
     def test_apk_files(self):
-
-        base_path = f"{self.TEST_DIR}/apk/"
+        """Test the parsing of APK packages."""
+        base_path = f"{self.TEST_DIR}{self.APK_DIR}"
         filenames = [f for f in os.listdir(base_path)
                      if os.path.isfile(os.path.join(base_path, f))]
         
@@ -31,8 +33,8 @@ class PackageTestCase(TestCase):
         self.packages_creation(filenames)
 
     def test_ipa_files(self):
-
-        base_path = f"{self.TEST_DIR}/ipa/"
+        """Test the parsing of IPA packages."""
+        base_path = f"{self.TEST_DIR}{self.IPA_DIR}"
         filenames = [f for f in os.listdir(base_path)
                      if os.path.isfile(os.path.join(base_path, f))]
         
@@ -40,6 +42,7 @@ class PackageTestCase(TestCase):
         self.packages_creation(filenames)
 
 
+"""
 class ServiceTestCase(TestCase):
 
     def setUp(self):
@@ -60,3 +63,4 @@ class ServiceTestCase(TestCase):
 
         tenant_admin.tenant = tenant
         tenant_admin.save()
+"""

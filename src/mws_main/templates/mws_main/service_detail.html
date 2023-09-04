@@ -6,48 +6,66 @@
 
 {% block content %}
 
-<section class="service-detail">
+<div class="service-detail">
 
   <section class="main-detail">
-    <h1>{{ service.name }}</h1>
     {% if service.icon %}
     <img src="{{ service.icon.url }}" alt="{{ service.name }} icon" width="150" height="150">
     {% endif %}
-  </section>
-  
-  <section class="detail-part short-intro">
-    {% if service.descrp != "" %}
-    {{ parsed_descrp | safe }}
-    {% else %}
-    <p>A description wasn't provided.</p>
-    {% endif %}
+    <div class="service-info">
+      <h1 class="service-name">{{ service.name }}</h1>
+      <h3 class="service-description">{{ service.brief_descrp }}</h3>
+    </div>
   </section>
 
-  <section class="detail-part spec-info">
-    <h3>About</h3>
-    <dl>
+  <div class="detail-wrapper">
 
-      <dt>Last version</dt>
-      <dd>{{ service.last_version }}</dd>
+    <section class="detail-part">
+
+      {% if service.descrp != "" %}
+      {{ parsed_descrp | safe }}
+      {% else %}
+      <p>A description wasn't provided.</p>
+      {% endif %}
       
-      <dt>Size</dt>
-      <dd>{{ service.size | filesizeformat }}</dd>
+      <section class="service-packages">
+	<ul>
+	  {% for package in service.packages %}
+	  <li>
+	    <h3>Package {{ package.n_package }}</h3>
+	    {% if package.descrp %}
+	    <p>
+	      {{ package.descrp }}
+	    </p>
+	    {% endif %}
+	    <dl>
+	      <dt>Last version</dt>
+	      <dd>{{ package.last_version }}</dd>
+	      
+	      <dt>Size</dt>
+	      <dd>{{ package.size | filesizeformat }}</dd>
+	      
+	      <dt>Operative system</dt>
+	      <dd>{{ package.os_name }}</dd>
 
-      <dt>Downloads</dt>
-      <dd>{{ service.n_downloads }}</dd>
+	      <dd class="download-button">
+		<a class="main-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
+	      </dd>
+	    </dl>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+    </section>
 
-      <dt>Operative system</dt>
-      <dd>{{ service.os_name }}</dd>
+    <aside class="service-meta-info">
+      <ul>
+	<li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT"  }}</li>
+	<li>{{ service.n_downloads }} downloads</li>
+      </ul>
+    </aside>
 
-      <dt>Date published</dt>
-      <dd>{{ service.date_uploaded | date:"SHORT_DATE_FORMAT" }}</dd>
-      
-    </dl>
-  </section>
+  </div>
   
-  <a class="main-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk %}">Download</a>
-</section>
-
-
-
+</div>
 {% endblock %}

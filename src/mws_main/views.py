@@ -12,16 +12,18 @@ from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import get_object_or_404, render, resolve_url, render
-from django.forms import ModelForm
+from django.shortcuts import get_object_or_404, render, resolve_url, redirect
 from django.urls import reverse
 from django.http import Http404, HttpResponse
+from django.forms import formset_factory
+from django.utils import timezone
 
 import bson
 import mimetypes
 import os
 from urllib.parse import unquote
 import markdown
+import datetime
 
 import mws_main.models as models
 import mws_main.forms as forms
@@ -30,13 +32,10 @@ from tenants.models import Tenant, TenantAdmin, User, ADMIN_GROUP
 
 class TenantMixin(ContextMixin):
     """
-    Retrieve the tenant from the the mixin url.
+    Retrieve the tenant from the url.
     """
 
     def setup(self, request, *args, **kwargs):
-        """
-        Fetch the view's tenant using the url in the request.
-        """
         
         super().setup(request, *args, **kwargs)
         
@@ -146,10 +145,7 @@ class LoginView(TenantMixin, auth_views.LoginView):
 
 
 class LogoutView(TenantMixin, auth_views.LogoutView):
-    """
-    Log out view. Only reachable with a POST or OPTIONS
-    method.
-    """
+    
     template_name = "mws_main/logout.html"
 
     def setup(self, request, *args, **kwargs):
@@ -202,13 +198,18 @@ class StoreHomeView(TenantUserMixin, TemplateView):
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
-        
+
         if self.is_admin:
             context["developers"] = models.Developer.objects.filter(
                 tenant=self.tenant._id)
             context["clients"] = models.Client.objects.filter(
                 tenant=self.tenant._id)
-
+            context["monthly_reg_clients"] = models.Client.objects.filter(
+                tenant_id=self.tenant._id).filter(date_joined__month=timezone.now().month).count()
+        if self.is_client:
+            context["last_updated_services"] = models.Service.objects.filter()[:3]
+            context["last_uploaded_services"] = models.Service.objects.order_by("-datetime_published")[:3]
+        
         context["services"] = models.Service.objects.filter(
             tenant_id=self.tenant._id)
 
@@ -294,10 +295,11 @@ class DeveloperCreateView(PermissionRequiredMixin, TenantUserMixin,
 
 
 class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
-                        CreateView):
+                        TemplateView):
 
-    form_class = forms.ServiceCreationForm
-    model = models.Service
+    template_name = "mws_main/service_form.html"
+    basic_form_class = forms.ServiceBasicInfoForm
+    platform_form_class = forms.PlatformServiceForm
     permission_required = "mws_main.add_service"
 
     def setup(self, request, *args, **kwargs):
@@ -305,8 +307,6 @@ class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
         super().setup(request, *args, **kwargs)
 
         self.initial = {'store_url': self.kwargs['store_url']}
-        self.success_url = reverse("mws_main:store_home",
-                                 args=[self.tenant.store_url])
         
         # The service could be created by the tenant admin,
         # so the service should not be added to it.
@@ -317,8 +317,55 @@ class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
 
         self.initial.update(creator_key)
 
-    def get_success_url(self):
-        return self.success_url
+        self.basic_form = None
+        self.platform_formset = None
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        if not self.basic_form:
+            self.basic_form = self.basic_form_class(initial=self.initial)
+
+        if not self.platform_formset:
+            self.platform_formset = formset_factory(
+                self.platform_form_class,
+                extra=3,
+                max_num=5,
+                absolute_max=5)(prefix="platforms")
+        
+        context["basic_form"] = self.basic_form
+        context["platform_formset"] = self.platform_formset
+        return context
+
+    def post(self, request, *args, **kwargs):
+
+        self.basic_form = self.basic_form_class(request.POST, initial=self.initial)
+        self.platform_formset = formset_factory(self.platform_form_class)(
+            request.POST,
+            request.FILES,
+            prefix="platforms"
+        )
+
+
+        if self.basic_form.is_valid() and self.platform_formset.is_valid():
+
+            service = models.create_service(
+                self.basic_form.cleaned_data["name"],
+                self.basic_form.cleaned_data["brief_descrp"],
+                self.basic_form.cleaned_data["descrp"],
+                [form.cleaned_data for form in self.platform_formset if form.cleaned_data and form.cleaned_data["package"] is not None],
+                self.tenant,
+                self.basic_form.cleaned_data["creator"],
+                self.basic_form.cleaned_data["developers"]
+            )
+
+            return redirect(
+                "mws_main:service_detail",
+                store_url=self.tenant.store_url,
+                pk=service.pk)
+        else:
+            return render(request, self.template_name, self.get_context_data())
 
 
 class UserDetailView(TQuerysetMixin, TenantUserMixin, DetailView):
@@ -363,14 +410,19 @@ class DownloadServiceView(TenantUserMixin, View):
         service = get_object_or_404(
             models.Service,
             pk=kwargs["service_id"])
-    
+
+        n_package = kwargs["n_package"]
+        package = service.packages[n_package]
+        package_url = package["package_file"].url
+        package_name = package["name"]
+        
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        filepath = BASE_DIR + unquote(service.package.url)
+        filepath = BASE_DIR + unquote(package_url)
         path = open(filepath, 'rb')
         mime_type, _ = mimetypes.guess_type(filepath)
 
         response = HttpResponse(path, content_type=mime_type)
-        response['Content-Disposition'] = f"attachment; filename={service.name}.{service.package_type.lower()}"
+        response['Content-Disposition'] = f"attachment; filename={package_name}"
 
         service.new_acquirement(self.user)
         return response

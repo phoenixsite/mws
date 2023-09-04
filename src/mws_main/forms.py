@@ -122,18 +122,28 @@ class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):
             return [ObjectId(v) for v in value]
         else:
             return super().prepare_value(value)
-    
 
-class ServiceCreationForm(forms.ModelForm):
-    
-    store_url = forms.CharField(
-        widget=forms.HiddenInput,
-        disabled=True,
-    )
+
+class PlatformServiceForm(forms.Form):
 
     package = forms.FileField(
         label="Package file",
-        help_text="Only APK and iPhone IPA packages supported.",
+        help_text="Only APK and iPhone IPA packages are supported.",
+    )
+
+    descrp = forms.CharField(
+        label="Description",
+        required=False,
+        help_text="Details specifically for the platform. Markdown markup available.",
+        widget=forms.Textarea(attrs={"cols": 80, "rows": 20})
+    )
+    
+
+class ServiceBasicInfoForm(forms.Form):
+
+    name = forms.CharField(
+        label="Service name",
+        max_length=25,
     )
 
     creator = forms.ModelChoiceField(
@@ -146,16 +156,21 @@ class ServiceCreationForm(forms.ModelForm):
     developers = ModelMultipleChoiceField(
         queryset=None,
         help_text="The selected developers can acces, "
-        "modify and upload new versions to the service.",
+        "modify and upload new versions to the service's packages.",
         required=False,
     )
 
-    class Meta:
-        model = models.Service
-        fields = ["descrp"]
-        widgets = {
-            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20})
-        }
+    brief_descrp = forms.CharField(
+        label="Brief description",
+        help_text="Brief description of the service (What is and main function)",
+        widget=forms.Textarea(attrs={"cols": 80, "rows": 10}),
+    )
+
+    descrp = forms.CharField(
+        label="Description",
+        help_text="General description of the service. Markdown markup available.",
+        widget=forms.Textarea(attrs={"cols": 80, "rows": 20})
+    )
 
 
     def __init__(self, *args, **kwargs):
@@ -182,23 +197,6 @@ class ServiceCreationForm(forms.ModelForm):
                 pk=ObjectId(self.initial["creator"]))
             
             self.fields["developers"].queryset = self.fields["developers"].queryset.filter(~Q(pk=ObjectId(self.initial["creator"])))
-
-    def save(self, commit=True):
-
-        service = models.create_service(
-            self.cleaned_data["package"],
-            self.cleaned_data["descrp"],
-            self.cleaned_data["store_url"],
-            commit
-        )
-
-        if commit:
-            # Assign the service to the developer creator and
-            # the selected developers
-            if self.cleaned_data["creator"]:
-                self.cleaned_data["creator"].assigned_services.add(service)
-                for developer in self.cleaned_data["developers"]:
-                    developer.assigned_services.add(service)
 
 
 class UserUpdateForm(forms.ModelForm):

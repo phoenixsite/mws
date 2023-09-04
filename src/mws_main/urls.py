@@ -77,7 +77,7 @@ urlpatterns = [
                       views.UserUpdateView.as_view(),
                       name="update_profile"),
 
-                 path("download-service/<objectid:service_id>",
+                 path("download-service/<objectid:service_id>/<int:n_package>",
                       views.DownloadServiceView.as_view(),
                       name="download_service"),
              ])),
