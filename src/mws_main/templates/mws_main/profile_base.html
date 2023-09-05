@@ -5,12 +5,9 @@
 {% block title %}Profile | {{ tenant.name }}{% endblock %}
 
 {% block content %}
+<h1>{{ object.get_full_name }}</h1>
 
-<section class="profile-section profile-header">
-  <h1>{{ object.get_full_name }}</h1>
-</section>
-
-<section class="profile-section profile-details">
+<div class="profile-wrapper">
 
   <section class="profile-subsection profile-basic">
     <nav>
@@ -35,8 +32,9 @@
       <dd>{{ object.date_joined }}</dd>
     </dl>
   </section>
-</section>
 
-{% block specific_content %}{% endblock %}
+  {% block specific_content %}{% endblock %}
+
+</div>
 
 {% endblock %}

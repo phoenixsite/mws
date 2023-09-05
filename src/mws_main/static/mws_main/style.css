@@ -7,6 +7,10 @@ a {
     text-decoration: none;
 }
 
+main {
+    margin: 0 30px;
+}
+
 .site-header {
     background-color: #533747;
     border-bottom: 2px solid #6A6B83;
@@ -174,6 +178,12 @@ a {
     font-size: 1.5rem;
 }
 
+.profile-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .profile-section {
     margin: 0 20px;
 }
@@ -199,6 +209,8 @@ a {
 .profile-subsection {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
+    width: 400px;
     border: 1px solid lightgray;
     border-radius: 5px;
     padding: 20px;
@@ -231,6 +243,10 @@ a {
 .profile-basic dt {
     font-weight: 600;
     margin-top: 10px;
+}
+
+.profile-services-listing {
+    max-height: 400px;
 }
 
 .panel-board {
@@ -466,11 +482,9 @@ a {
     display: flex;
     flex-grow: row;
     flex-wrap: wrap;
-    margin: 0 30px;
 }
 
 .service-detail h1 {
-    text-align: center;
     font-size: 38px;
     font-weight: 300;
 }
@@ -482,7 +496,7 @@ a {
 
 .detail-part {
     flex-grow: 4;
-    margin: 0 17px;
+    margin: 0;
     border-radius: 6px;
     max-height: 500px;
     min-height: 300px;
@@ -510,45 +524,57 @@ a {
     border: 1px solid lightgray;
 }
 
-.service-meta-info {
-    flex-grow: 2;
-}
-
-.service-meta-info ul {
+.stats {
+    display: flex;
+    flex-direction: row;
     padding: 0;
-    margin: 0;
+    margin-top: 0;
 }
 
-.service-meta-info li {
-    margin-right: 30px;
+.stats li {
     list-style: none;
+    margin-right: 30px;
+    font-size: 18px;
+    font-weight: 300;
 }
 
 .service-packages {
-    width: 100%;
+    width: 90%
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    padding: 10px;
+    background: #faedcd;
+    border-radius: 10px;
+}
+
+.service-packages h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .service-packages ul {
     display: flex;
     flex-direction: row;
-    justify-content: center;
     padding: 0;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     width: 100%;
+    margin-top: 0;
 }
 
 .service-packages li {
     list-style: none;
     padding: 3px;
-    border: 1px solid lightgray;
-    border-radius: 4px;
+    border-right: 2px solid #d4a373;
     margin: 0 10px;
     display: flex;
     flex-direction: column;
     width: 400px;
+}
+
+.package-name {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .download-button {
@@ -614,9 +640,9 @@ a {
 .service-listing {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
     flex-basis: auto;
     padding: 0;
+    overflow: auto;
 }
 
 .service-item {

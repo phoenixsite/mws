@@ -18,6 +18,13 @@
     </div>
   </section>
 
+  <section>
+    <ul class="stats">
+      <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT"  }}</li>
+      <li>{{ service.n_downloads }} downloads</li>
+    </ul>
+  </section>
+
   <div class="detail-wrapper">
 
     <section class="detail-part">
@@ -29,10 +36,11 @@
       {% endif %}
       
       <section class="service-packages">
+	<h4>Available packages</h4>
 	<ul>
 	  {% for package in service.packages %}
 	  <li>
-	    <h3>Package {{ package.n_package }}</h3>
+	    <h5 class="package-name">Package {{ package.n_package }}</h5>
 	    {% if package.descrp %}
 	    <p>
 	      {{ package.descrp }}
@@ -57,13 +65,6 @@
 	</ul>
       </section>
     </section>
-
-    <aside class="service-meta-info">
-      <ul>
-	<li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT"  }}</li>
-	<li>{{ service.n_downloads }} downloads</li>
-      </ul>
-    </aside>
 
   </div>
   
