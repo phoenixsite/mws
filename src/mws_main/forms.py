@@ -105,14 +105,14 @@ class ClientCreationForm(TenantUserCreationForm):
     
     class Meta(TenantUserCreationForm.Meta):
         model = models.Client
-        exclude = ['services_acq', 'tenant']
+        exclude = ['services_acq']
 
 
 class DeveloperCreationForm(TenantUserCreationForm):
 
     class Meta(TenantUserCreationForm.Meta):
         model = models.Developer
-        exclude = ['tenant', 'assigned_services']
+        exclude = ['assigned_services']
 
 
 class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):

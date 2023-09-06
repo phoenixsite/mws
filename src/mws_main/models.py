@@ -217,7 +217,7 @@ def create_service(name, brief_descrp, descrp, packages, tenant, creator, develo
         # are being saved before creating the service
         path = abstract_store_dir_path(tenant, name, parsed_package.package_name)
         path = default_storage.generate_filename(path)
-        package_obj["package_file"] = default_storage.save(path, parsed_package.package_file)
+        package_obj["package_file"] = default_storage.save(path, parsed_package.file)
         packages_objs.append(package_obj)
 
         if not icon:
@@ -270,13 +270,12 @@ class Developer(User):
             ("view_admin_developer", "Can view detailed information of a developer"),
         ]
     
-    def save(self, commit=True):
+    def save(self, *args, **kwargs):
 
-        super().save(commit)
-        
-        if commit:
+        super().save(*args, **kwargs)
+        group = get_developer_group()
 
-            group = get_developer_group()
+        if not self.groups.filter(name=group.name).exists():
             self.groups.add(group)
 
 
@@ -308,13 +307,12 @@ class Client(User):
             ("view_admin_client", "Can view detailed information of a client"),
         ]
 
-    def save(self, commit=True):
+    def save(self, *args, **kwargs):
 
-        super().save(commit)
+        super().save(*args, **kwargs)
+        group = get_client_group()
 
-        if commit:
-
-            group = get_client_group()
+        if not self.groups.filter(name=group.name).exists():
             self.groups.add(group)
 
     def has_services(self):

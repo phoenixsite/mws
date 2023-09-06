@@ -7,8 +7,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
 from django.contrib import messages
-from . import forms
-from . import models
+from tenants import forms, models
 
 
 class HomeView(TemplateView):
@@ -18,6 +17,7 @@ class HomeView(TemplateView):
 
         context = super().get_context_data(**kwargs)
         context["user"] = self.request.user
+        context["stores"] = models.Tenant.objects.all()
         return context
 
 

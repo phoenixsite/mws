@@ -15,5 +15,27 @@
       <li><a class="secondary-ref" href="{% url 'tenants:view_plans' %}">View plans</a></li>
     </ul>
   </section>
+
+  <section class="available-stores">
+    <h2>Available stores</h2>
+
+    {% if stores %}
+    <ul>
+      {% for store in stores %}
+      <li>
+	<h3>
+	  <a href="{% url 'mws_main:store_home' store.store_url %}">
+	    {{ store.name }}
+	  </a>
+	</h3>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>There are no available stores at this moment.</p>
+    {% endif %}
+    
+  </section>
+  
 </div>
 {% endblock %}

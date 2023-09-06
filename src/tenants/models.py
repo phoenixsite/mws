@@ -239,11 +239,10 @@ class TenantAdmin(User):
 
     _id = models.ObjectIdField()
 
-    def save(self, commit=True):
+    def save(self, *args, **kwargs):
 
-        super().save(commit)
+        super().save(*args, **kwargs)
+        group = get_admin_group()
 
-        if commit:
-
-            group = get_admin_group()
+        if not self.groups.filter(name=group.name).exists():
             self.groups.add(group)

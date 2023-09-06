@@ -1,7 +1,9 @@
 from django.core.files import File
+from django.core.files.uploadhandler import TemporaryFileUploadHandler
 
 import re
 import zipfile
+import os
 
 from pyaxmlparser import APK
 import biplist
@@ -40,6 +42,11 @@ class ParsedPackage:
     IOS_VALID_BUNDLE = "APPL"
 
     def __init__(self, package_file):
+        """
+        Extract the data from an initial package file.
+
+        :param django.core.files.File package_file
+        """
         self.parse_package(package_file)
         
     def __str__(self):
@@ -127,10 +134,11 @@ class ParsedPackage:
 
         if not package_file:
             raise FileNotFoundError("A file must be provided to create a package object.")
-            
+
+        """
         if not zipfile.is_zipfile(package_file):
             raise InvalidPackage("The package is not a ZIP file.")
-
+        """
         self.package_file = package_file
 
         while not self.valid_parse:
@@ -182,7 +190,26 @@ class ParsedPackage:
     @property
     def package_name(self):
         """Return the package file name."""
-        return self.package_file.name
+        if not isinstance(self.package_file, str):
+            return self.package_file.name
+        else:
+            return os.path.basename(self.package_file)
+
+    @property
+    def size(self):
+        """Return the package size"""
+        if not isinstance(self.package_file, str):
+            return self.package_file.size
+        else:
+            return os.path.getsize(self.package_file)
+
+    @property
+    def file(self):
+        if not isinstance(self.package_file, str):
+            return self.package_file
+        else:
+            return File(open(self.package_file, "rb"), name=self.package_file)
+            
 
     def to_dict(self):
         """
@@ -193,7 +220,7 @@ class ParsedPackage:
         d = {
             'name': self.package_name,
             'last_version': self.version,
-            'size': self.package_file.size,
+            'size': self.size,
             'package_type': self.type,
         }
 
