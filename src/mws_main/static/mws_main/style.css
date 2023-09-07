@@ -69,6 +69,7 @@ main {
     display: grid;
     grid-template-areas: "logo nav1";
     color: #4B4B4B;
+    clear: both;
 }
 
 .site-footer h2 {
@@ -480,7 +481,6 @@ main {
 
 .service-detail {
     display: flex;
-    flex-grow: row;
     flex-wrap: wrap;
 }
 
@@ -498,7 +498,6 @@ main {
     flex-grow: 4;
     margin: 0;
     border-radius: 6px;
-    max-height: 500px;
     min-height: 300px;
     overflow: auto;
     display: flex;
@@ -517,6 +516,12 @@ main {
     align-items: center;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.main-detail img {
+    margin-right: 20px;
+    height: 150px;
+    width: 150px;
 }
 
 .spec-info {
@@ -623,13 +628,13 @@ main {
 .content-wrapper {
     display: flex;
     margin: 20px 0 0 0;
-    padding: 0 50px;
 }
 
 .software-catalog {
     display: flex;
     flex-direction: column;
-    flex-grow: 4;
+    max-width: 67%;
+    float: left;
 }
 
 .software-header {
@@ -663,17 +668,17 @@ main {
     opacity: .65;
 }
 
-.service-name, .service-description {
+.service-name, .service-description, .service-briefdescrp {
     margin: 0;
     font-weight: 500;
 }
 
-.service-description {
+.service-description, .service-briefdescrp {
     color: gray;
 }
 
-.service-name {
-    margin: 0;
+.service-description {
+    font-size: 15px;
 }
 
 .service-icon {
@@ -684,8 +689,10 @@ main {
 }
 
 .subcontent-home {
-    flex-grow: 2;
+    max-width: 30%;
     margin-right: 16px;
+    margin-left: 60px;
+    float: right;
 }
 
 .sidebar-widget {
