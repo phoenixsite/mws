@@ -6,6 +6,7 @@
 
 {% block content %}
 
+
 <div class="service-detail">
 
   <section class="main-detail">
@@ -21,7 +22,7 @@
   <section>
     <ul class="stats">
       <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT"  }}</li>
-      <li>{{ service.n_downloads }} downloads</li>
+      <li>{{ service.n_downloads }} download{{ service.n_downloads | pluralize }}</li>
     </ul>
   </section>
 
@@ -40,7 +41,13 @@
 	<ul>
 	  {% for package in service.packages %}
 	  <li>
-	    <h5 class="package-name">Package {{ package.n_package }}</h5>
+	    <nav class="package-header">
+	      <h5 class="package-name">
+		Package {{ package.n_package }}
+	      </h5>
+	      <a class="download-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
+	    </nav>
+	    
 	    {% if package.descrp %}
 	    <p>
 	      {{ package.descrp }}
@@ -55,10 +62,6 @@
 	      
 	      <dt>Operative system</dt>
 	      <dd>{{ package.os_name }}</dd>
-
-	      <dd class="download-button">
-		<a class="main-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
-	      </dd>
 	    </dl>
 	  </li>
 	  {% endfor %}

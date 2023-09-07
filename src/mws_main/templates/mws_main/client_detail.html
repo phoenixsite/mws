@@ -13,12 +13,12 @@
   <ul class="service-listing profile-services-listing">
     {% for service in object.get_services %}
     <li class="service-item">
-      <a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+      <a class="service-header small-entry" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
 	  {% if service.icon %}
 	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	  {% endif %}
 	  <div class="service-info">
-	    <h3 class="service-name">{{ service.name }}</h3>
+	    <p class="service-name">{{ service.name }}</p>
 	  </div>
 	</a>
     </li>

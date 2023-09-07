@@ -575,14 +575,32 @@ main {
     display: flex;
     flex-direction: column;
     min-width: 350px;
+    max-width: 350px;
+}
+
+
+.package-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .package-name {
     margin-top: 0;
+    margin-right: 30px;
     margin-bottom: 10px;
+    width: fit-content;
 }
 
 .download-button {
+    background: #533747;
+    color: white;
+    border: 0;
+    font-weight: 700;
+    border-radius: 7px;
+    width: fit-content;
+    font-size: 15px;
+    padding: 10px 20px;
     margin: 0;
 }
 
@@ -639,21 +657,19 @@ main {
 
 .software-header {
     font-weight: 400;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 .service-listing {
     display: flex;
     flex-direction: column;
-    flex-basis: auto;
     padding: 0;
     overflow: auto;
 }
 
 .service-item {
-    margin: 10px 5px;
     list-style: none;
-    margin-bottom: 11px;
+    margin-bottom: 10px;
 }
 
 .service-header {
@@ -696,5 +712,14 @@ main {
 }
 
 .sidebar-widget {
+    margin-bottom: 20px;
     border-bottom: 1px solid lightgray;
+}
+
+.sidebar-widget .service-listing {
+    margin-top: 10px;
+}
+
+.sidebar-widget .service-icon {
+    margin-top: 0;
 }

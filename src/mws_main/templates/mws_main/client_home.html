@@ -20,7 +20,7 @@
 	  {% endif %}
 	  <div class="service-info">
 	    <h3 class="service-name">{{ service.name }}</h3>
-	    <h4 class="service-description">{{ service.brief_descrp }}</h4>
+	    <h4 class="service-description">{{ service.brief_descrp | truncatewords:15 }}</h4>
 	  </div>
 	</a>
       </li>
@@ -33,7 +33,7 @@
 
   <aside class="subcontent-home">
     <section class="sidebar-widget">
-      <h3>Last uploaded services</h3>
+      <h3 class="software-header">Last uploaded services</h3>
       <ul class="service-listing">
 	{% for service in last_uploaded_services %}
 	<li class="service-item">
@@ -42,8 +42,7 @@
 	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	    {% endif %}
 	    <div class="service-info">
-	      <h3 class="service-name">{{ service.name }}</h3>
-	      <!--<h4 class="service-description">{{ service.brief_descrp }}</h4>-->
+	      <h4 class="service-name">{{ service.name }}</h3>
 	    </div>
 	  </a>
 	</li>
@@ -52,7 +51,7 @@
     </section>
 
     <section class="sidebar-widget">
-      <h3>Last updated services</h3>
+      <h3 class="software-header">Last updated services</h3>
       <ul class="service-listing">
 	{% for service in last_updated_services %}
 	<li class="service-item">
@@ -61,8 +60,7 @@
 	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	    {% endif %}
 	    <div class="service-info">
-	      <h3 class="service-name">{{ service.name }}</h3>
-	      <!--<h4 class="service-description">{{ service.brief_descrp }}</h4>-->
+	      <h4 class="service-name">{{ service.name }}</h3>
 	    </div>
 	  </a>
 	</li>
