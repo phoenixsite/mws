@@ -198,6 +198,8 @@ class StoreHomeView(TenantUserMixin, TemplateView):
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
+        context["services"] = models.Service.objects.filter(
+            tenant_id=self.tenant._id)
 
         if self.is_admin:
             context["developers"] = models.Developer.objects.filter(
@@ -207,11 +209,8 @@ class StoreHomeView(TenantUserMixin, TemplateView):
             context["monthly_reg_clients"] = models.Client.objects.filter(
                 tenant_id=self.tenant._id).filter(date_joined__month=timezone.now().month).count()
         if self.is_client:
-            context["last_updated_services"] = models.Service.objects.filter()[:3]
-            context["last_uploaded_services"] = models.Service.objects.order_by("-datetime_published")[:3]
-        
-        context["services"] = models.Service.objects.filter(
-            tenant_id=self.tenant._id)
+            context["last_updated_services"] = context["services"][:3]
+            context["last_uploaded_services"] = context["services"].order_by("-datetime_published")[:3]
 
         return context
 

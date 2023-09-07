@@ -574,7 +574,7 @@ main {
     margin: 0 10px;
     display: flex;
     flex-direction: column;
-    width: 400px;
+    min-width: 350px;
 }
 
 .package-name {
