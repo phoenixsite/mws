@@ -7,25 +7,11 @@
 {% block content %}
 
 <section class="service-detail">
-  <h1>{{ service.name }}</h1>
 
-  <section class="detail-part short-intro">
-    <p>{{ service.descrp }}</p>
-    
-    <a class="main-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk %}">Download</a>
-  </section>
-
-  <section class="detail-part spec-info">
-    <h3>About</h3>
-    <dl>
-      <dt>Size</dt>
-      <dd>{{ service.size|filesizeformat }}</dd>
-
-      <dt>Downloads</dt>
-      <dd>{{ service.n_downloads }}</dd>
-      
-    </dl>
-  </section>
+  <a href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+    See service page
+  </a>
+  
 </section>
 
 
