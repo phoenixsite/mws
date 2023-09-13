@@ -486,6 +486,7 @@ class StoreInfoView(PermissionRequiredMixin, TenantUserMixin,
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
+        context
         return context
 
 class UpdateStoreInfo(PermissionRequiredMixin, TenantUserMixin,
