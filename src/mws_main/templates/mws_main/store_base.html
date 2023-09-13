@@ -4,22 +4,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
+    <link rel="icon" type="image/png" href="{% static 'mws_main/favicon.png' %}"/>
     <link rel="stylesheet" href="{% static 'mws_main/style.css' %}" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>{% block title %}{% endblock %}</title>
   </head>
 
   <body>
-    <header class="site-header">
+    <header class="site-header {{ metadata.main_theme_color}}-background">
       <a class="site-title" href="{% url 'mws_main:store_home' tenant.store_url %}">{{ tenant.name }}</a>
 
       <section class="actions-section">
 
-	<a class="action" href="{% url 'mws_main:view_profile' tenant.store_url %}">View profile</a>
+	<a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:view_profile' tenant.store_url %}">View profile</a>
 	
 	<form class="action-form" method="post" action="{% url 'mws_main:logout' tenant.store_url %}">
 	  {% csrf_token %}
-	  <input class="action" type="submit" value="Log out">
+	  <input class="action {{ metadata.main_theme_color }}-action" type="submit" value="Log out">
 	</form>
 	
 	{% block actions %}{% endblock %}
@@ -32,7 +33,74 @@
     </main>
 
     <footer class="site-footer">
-      <p>{{ tenant.name }}</p>
+
+      <section class="site-footer-logo-col">
+	<a class="footer-logo" href="{% url 'mws_main:store_home' tenant.store_url %}">{{ tenant.name }}</a>
+
+	{% if metadata.has_social_links %}
+	<ul class="social-icons">
+	  <li>
+	    <a class="icon" href="https://github.com/phoenixsite/mws" target="_blank">
+	      <i class="fa fa-github" aria-hidden="true"></i>Github
+	    </a>
+	  </li>
+	</ul>
+	{% endif %}
+	
+      </section>
+
+      {% if metadata.has_footer_col1 %}
+      <section class="site-footer-nav1-col-1">
+	<h2>{{ metadata.title1 }}</h2>
+	<ul>
+	  {% for row in metadata.col1 %}
+	  <li>
+	    <a href="{{ row.1 }}">{{ row.0 }}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+      {% endif %}
+
+      {% if metadata.has_footer_col2 %}
+      <section class="site-footer-nav2-col-1">
+	<h2>{{ metadata.title2 }}</h2>
+	<ul>
+	  {% for row in metadata.col2 %}
+	  <li>
+	    <a href="{{ row.1 }}">{{ row.0 }}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+      {% endif %}
+
+      {% if metadata.has_footer_col3 %}
+      <section class="site-footer-nav3-col-1">
+	<h2>{{ metadata.title3 }}</h2>
+	<ul>
+	  {% for row in metadata.col3 %}
+	  <li>
+	    <a href="{{ row.1 }}">{{ row.0 }}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+      {% endif %}
+
+      {% if metadata.has_footer_col4 %}
+      <section class="site-footer-nav4-col-1">
+	<h2>{{ metadata.title4 }}</h2>
+	<ul>
+	  {% for row in metadata.col4 %}
+	  <li>
+	    <a href="{{ row.1 }}">{{ row.0 }}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </section>
+      {% endif %}
+      
     </footer>
 
   </body>

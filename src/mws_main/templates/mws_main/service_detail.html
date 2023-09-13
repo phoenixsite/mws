@@ -1,75 +1,80 @@
-{% extends 'mws_main/store_base.html' %}
+{% extends 'mws_main/service_base.html' %}
 
 {% load static %}
+{% load mws_main_extras %}
 
 {% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
 
-{% block content %}
+{% block specific_content %}
 
+<section>
+  <ul class="stats">
+    <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT" }}</li>
+    <li>{{ service.n_downloads }} download{{ service.n_downloads | pluralize }}</li>
+  </ul>
+</section>
 
-<div class="service-detail">
+<div class="detail-wrapper">
 
-  <section class="main-detail">
-    {% if service.icon %}
-    <img src="{{ service.icon.url }}" alt="{{ service.name }} icon" width="150" height="150">
+  <section class="detail-part">
+
+    {% if service.descrp != "" %}
+    {{ service.descrp | to_markdown | safe }}
+    {% else %}
+    <p>A description wasn't provided.</p>
     {% endif %}
-    <div class="service-info">
-      <h1 class="service-name">{{ service.name }}</h1>
-      <h3 class="service-briefdescrp">{{ service.brief_descrp }}</h3>
-    </div>
-  </section>
-
-  <section>
-    <ul class="stats">
-      <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT" }}</li>
-      <li>{{ service.n_downloads }} download{{ service.n_downloads | pluralize }}</li>
-    </ul>
-  </section>
-
-  <div class="detail-wrapper">
-
-    <section class="detail-part">
-
-      {% if service.descrp != "" %}
-      {{ parsed_descrp | safe }}
-      {% else %}
-      <p>A description wasn't provided.</p>
-      {% endif %}
-      
-      <section class="service-packages">
-	<h4>Available packages</h4>
-	<ul>
-	  {% for package in service.packages %}
-	  <li>
-	    <nav class="package-header">
-	      <h5 class="package-name">
-		Package {{ package.n_package }}
-	      </h5>
-	      <a class="download-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
-	    </nav>
+    
+    <section class="service-packages {{ metadata.main_theme_color }}-highlight-background">
+      <p class="packages-info">There are {{ service.packages | length }} packages.</p>
+      <ul class="packages-listing">
+	{% for package in service.packages %}
+	<li class="package-entry {{ metadata.main_theme_color }}-with-separator">
+	  <nav class="package-header">
+	    <h5 class="package-name">
+	      Package {{ package.n_package | add:1 }}
+	    </h5>
+	    <a class="download-button {{ metadata.main_theme_color }}-background" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
+	  </nav>
+	  
+	  {% if package.descrp %}
+	  <p>
+	    {{ package.descrp | to_markdown | safe }}
+	  </p>
+	  {% endif %}
+	  <dl>
+	    <dt>Last version</dt>
+	    <dd>{{ package.last_version }}</dd>
 	    
-	    {% if package.descrp %}
-	    <p>
-	      {{ package.descrp }}
-	    </p>
-	    {% endif %}
-	    <dl>
-	      <dt>Last version</dt>
-	      <dd>{{ package.last_version }}</dd>
-	      
-	      <dt>Size</dt>
-	      <dd>{{ package.size | filesizeformat }}</dd>
-	      
-	      <dt>Operative system</dt>
-	      <dd>{{ package.os_name }}</dd>
-	    </dl>
-	  </li>
-	  {% endfor %}
-	</ul>
-      </section>
-    </section>
+	    <dt>Size</dt>
+	    <dd>{{ package.size | filesizeformat }}</dd>
+	    
+	    <dt>Operative system</dt>
+	    <dd>{{ package.os_name }}</dd>
+	  </dl>
 
-  </div>
-  
+	  {% if package.version_history %}
+	  <section class="version-history {{ metadata.main_theme_color }}-over-highlight">
+	    <h5 class="version-history-title">Version history</h5>
+
+	    <ul class="version-listing">
+	      {% for version_entry in package.version_history %}
+	      <li class="version-entry">
+		<h6 class="version-title">{{ version_entry.update_date }}</h6>
+		<p>Version {{ version_entry.version }}</p>
+		<p>{{ version_entry.changes | to_markdown | safe }}</p>
+	      </li>
+	      {% endfor %}
+	    </ul>
+	    
+	  </section>
+	  {% endif %}
+	  
+	</li>
+	{% endfor %}
+      </ul>
+    </section>
+  </section>
+
 </div>
+
 {% endblock %}

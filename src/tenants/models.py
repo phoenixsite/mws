@@ -12,6 +12,8 @@ from django.conf import settings
 
 import datetime
 
+from mws_metadata.models import StoreMetadata
+
 
 class Tenant(models.Model):
     """
@@ -38,6 +40,11 @@ class Tenant(models.Model):
         help_text="Address to the tenant store.",
     )
 
+    metadata = models.OneToOneField(
+        StoreMetadata,
+        on_delete=models.CASCADE,
+    )
+
     objects = models.DjongoManager()
 
     def __str__(self):
@@ -48,10 +55,12 @@ def register_tenant(name, url):
     """
     Create a new tenant instance in the database.
     """
-    
+
+    metadata = StoreMetadata.objects.create()
     return Tenant.objects.create(
         name=name,
         store_url=url,
+        metadata=metadata,
     )
 
 class TenantAwareModel(models.Model):

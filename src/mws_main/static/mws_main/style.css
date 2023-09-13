@@ -11,9 +11,183 @@ main {
     margin: 0 30px;
 }
 
-.site-header {
+/****************** Purple theme */
+.purple-background {
     background-color: #533747;
-    border-bottom: 2px solid #6A6B83;
+}
+
+.purple-action {
+    background: #76949F;
+    color: white;
+}
+
+.purple-action:hover {
+    background: #86BBBD;
+}
+
+.purple-light-ref {
+    color: #7a5269;
+}
+
+.purple-spec-action {  
+    background: green;
+    color: white;
+    transition: opacity .2s;
+}
+
+.purple-spec-action:hover {
+    opacity: .65;
+}
+
+.purple-highlight-background {
+    background: #efd9fc;
+}
+
+.purple-with-separator {
+    border-right: 2px solid #7a5269;
+}
+
+.purple-over-highlight {
+    background: #7a5269;
+    color: white;
+}
+
+
+/****************** Red theme */
+.red-background {
+    background: #933b4b;
+}
+
+.red-action {
+    background: #d3d3d3;
+    color: black;
+}
+
+.red-action:hover {
+    background: #fb8b24;
+    color: white;
+}
+
+.red-hover:hover {
+    background: #a36570;
+}
+
+.red-light-ref {
+    color: #a36570;
+}
+
+.red-spec-action {  
+    background: #fb8b24;
+    color: white;
+    transition: opacity .2s;
+}
+
+.red-spec-action:hover {
+    opacity: .65;
+}
+
+.red-highlight-background {
+    background: #faedcd;
+}
+
+.red-with-separator {
+    border-right: 2px solid #d18e30;
+}
+
+.red-over-highlight {
+    background: #fccf8f;
+}
+
+/****************** Blue theme */
+.blue-background {
+    background: #3b6a93;
+}
+
+.blue-action {
+    background: #a9d6e5;
+    color: black;
+}
+
+.blue-action:hover {
+    background: #e0fbfc;
+}
+
+.blue-hover:hover {
+    background: #468faf;
+}
+
+.blue-light-ref {
+    color: #468faf;
+}
+
+.blue-spec-action {  
+    background: #134074;
+    color: white;
+    transition: opacity .2s;
+}
+
+.blue-spec-action:hover {
+    opacity: .65;
+}
+
+.blue-highlight-background {
+    background: #e0fbfc;
+}
+
+.blue-with-separator {
+    border-right: 2px solid #89c2d9;
+}
+
+.blue-over-highlight {
+    background: #89c2d9;
+}
+
+/****************** Yellow theme */
+.yellow-background {
+    background: #9e9627;
+}
+
+.yellow-action {
+    background: #e09f3e;
+    color: white;
+}
+
+.yellow-action:hover {
+    background: #ffd670;
+}
+
+.yellow-hover:hover {
+    background: #ffd670;
+}
+
+.yellow-light-ref {
+    color: #9e9627;
+}
+
+.yellow-spec-action {  
+    background: #ff9770;
+    color: white;
+    transition: opacity .2s;
+}
+
+.yellow-spec-action:hover {
+    opacity: .65;
+}
+
+.yellow-highlight-background {
+    background: #efecbd;
+}
+
+.yellow-with-separator {
+    border-right: 2px solid #9e9627;
+}
+
+.yellow-over-highlight {
+    background: #9e9627;
+    color: white;
+}
+
+.site-header {
     min-height: 56px;
     display: flex;
     align-items: center;
@@ -31,10 +205,6 @@ main {
     margin-right: auto;
 }
 
-.site-title:hover {
-    color: #86BBBD;
-}
-
 .actions-section {
     display: flex;
     flex-direction: row;
@@ -47,18 +217,12 @@ main {
 
 .action {
     cursor: pointer;
-    color: white;
     font-weight: 500;
-    background: #76949F;
     padding: 0.5em 15px 0.5em;
     border: 0;
     border-radius: 5px;
     font-size: 15px;
     margin: 5px;
-}
-
-.action:hover {
-    background: #86BBBD;
 }
 
 .site-footer {
@@ -67,9 +231,17 @@ main {
     margin: 20px 0px;
     postion: relative;
     display: grid;
-    grid-template-areas: "logo nav1";
+    grid-template-areas: "logo nav1 nav2 nav3 nav4";
     color: #4B4B4B;
     clear: both;
+}
+
+.site-footer ul {
+    padding: 0;
+}
+
+.site-footer li {
+    list-style: none;
 }
 
 .site-footer h2 {
@@ -80,6 +252,65 @@ main {
 
 .site-footer-logo-col {
     grid-area: logo;
+}
+
+.footer-logo {
+    font-size: 17px;
+    font-weight: 700;
+    color: gray;
+    margin-bottom: 10px;
+}
+
+.site-footer-logo-col p {
+    margin: 1rem 0 2rem;
+    max-width: 55ch;
+    margin-top: 0;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: .5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.icon {
+    display: block;
+    height: 21px;
+    width: 21px;
+}
+
+.site-footer-nav1-col-1 {
+    grid-area: nav1;
+}
+
+.site-footer-nav1-col-1 a {
+    color: inherit;
+}
+
+.site-footer-nav2-col-1 {
+    grid-area: nav2;
+}
+
+.site-footer-nav2-col-1 a {
+    color: inherit;
+}
+
+.site-footer-nav3-col-1 {
+    grid-area: nav3;
+}
+
+.site-footer-nav3-col-1 a {
+    color: inherit;
+}
+
+.site-footer-nav4-col-1 {
+    grid-area: nav4;
+}
+
+.site-footer-nav4-col-1 a {
+    color: inherit;
 }
 
 .login-section {
@@ -183,23 +414,42 @@ main {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .profile-section {
     margin: 0 20px;
+    width: fit-content;
+    min-width: 400px;
+    padding: 20px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+}
+
+.profile-section nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 10px;
+}
+
+.profile-section h2 {
+    font-weight: 300;
+    font-size: 20px;
+    margin: 0;
+    flex: 1 1 100px;
 }
 
 .profile-details {
+    width: fit-content;
+    max-width: 610px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row;
+    flex-direction: column;
 }
 
-.profile-details section {
-    width: 50%;
-    display: flex;
-    justify-content: center;
+.profile-details li {
+    list-style: none;
 }
 
 .profile-details h2 {
@@ -207,47 +457,16 @@ main {
     font-size: 20px;
 }
 
-.profile-subsection {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    width: 400px;
-    border: 1px solid lightgray;
-    border-radius: 5px;
-    padding: 20px;
-    margin: 10px;
-    max-height: 700px;
-}
-
-.profile-subsection nav {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    border-bottom: 1px solid lightgray;
-}
-
-.profile-subsection nav a {
-    margin-top: 5px;
-    color: #533747;
-}
-
-.profile-subsection nav a:hover {
-    color: #7a5269;
-}
-
-.profile-subsection h2 {
-    width: fit-content;
-    margin-right: auto;
-    margin-top: 0;
-}
-
 .profile-basic dt {
     font-weight: 600;
-    margin-top: 10px;
 }
 
 .profile-services-listing {
     max-height: 400px;
+}
+
+.profile-basic a {
+    margin-left: 10px;
 }
 
 .panel-board {
@@ -259,7 +478,7 @@ main {
 
 .panel {
     margin: 20px 10px;
-    width: fit-content;
+    width: 25em;
     border: 1px solid lightgray;
     border-radius: 4px;
     padding: 8px;
@@ -269,6 +488,27 @@ main {
     display: flex;
     flex-direction: row;
     width: 100%;
+}
+
+.client-panel {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-content: start;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.dashboard-statistics {
+    width: 100%;
+}
+
+.dashboard-statistics tr {
+    border-bottom: 1px solid lightgray;
+}
+
+.dashboard-statistics th {
+    text-align: left;
 }
 
 .panel h2 {
@@ -328,6 +568,7 @@ main {
 }
 
 .entry-name {
+    margin-left: 10px;
     margin-right: 20px;
     color: black;
     font-weight: 550;
@@ -336,18 +577,7 @@ main {
 .entry-info {
     color: gray;
     margin-right: 20px;
-    font-size: 15px;
-}
-
-.client-panel {
-    width: fit-content;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.clients-statistics tr {
-    border-bottom: 1px solid lightgray;
+    font-size: 14px;
 }
 
 .logout-section {
@@ -426,23 +656,6 @@ main {
     font-size: 0.8rem;
     color: gray;
     overflow-wrap: break-word;
-}
-
-.registration-form input[type="submit"] {
-    display: inline-block;
-    padding: 1em 50px 1em;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    background: #533747;
-    color: white;
-    border: 0;
-    font-weight: 700;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.registration-form input[type="submit"]:hover {
-    background: #7a5269;
 }
 
 .success-message {
@@ -548,8 +761,15 @@ main {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    background: #faedcd;
     border-radius: 10px;
+}
+
+.packages-info {
+    margin: 0 0 10px 0;
+}
+
+.service-packages dt {
+    font-weight: 700;
 }
 
 .service-packages h4 {
@@ -557,7 +777,7 @@ main {
     margin-bottom: 10px;
 }
 
-.service-packages ul {
+.packages-listing, .version-listing {
     display: flex;
     flex-direction: row;
     padding: 0;
@@ -567,17 +787,15 @@ main {
     margin-top: 0;
 }
 
-.service-packages li {
+.package-entry {
     list-style: none;
     padding: 3px;
-    border-right: 2px solid #d4a373;
     margin: 0 10px;
     display: flex;
     flex-direction: column;
-    min-width: 350px;
-    max-width: 350px;
+    min-width: 500px;
+    max-width: 500px;
 }
-
 
 .package-header {
     display: flex;
@@ -588,12 +806,11 @@ main {
 .package-name {
     margin-top: 0;
     margin-right: 30px;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     width: fit-content;
 }
 
 .download-button {
-    background: #533747;
     color: white;
     border: 0;
     font-weight: 700;
@@ -609,20 +826,11 @@ main {
     height: fit-content;
     padding: 20px 30px;
     margin: 10px 0;
-    background: #533747;
     color: white;
     border: 0;
     font-weight: 700;
     border-radius: 7px;
     cursor: pointer;
-}
-
-.main-button:hover {
-    background: #7a5269;
-}
-
-.spec-action {  
-    background: green;
 }
 
 .profile-basic form {
@@ -652,7 +860,6 @@ main {
     display: flex;
     flex-direction: column;
     max-width: 67%;
-    float: left;
 }
 
 .software-header {
@@ -707,8 +914,7 @@ main {
 .subcontent-home {
     max-width: 30%;
     margin-right: 16px;
-    margin-left: 60px;
-    float: right;
+    margin-left: 120px;
 }
 
 .sidebar-widget {
@@ -722,4 +928,64 @@ main {
 
 .sidebar-widget .service-icon {
     margin-top: 0;
+}
+
+.update-button {
+    color: white;
+    font-weight: 450;
+    padding: 7px;
+    margin-right: 10px;
+    transition: opacity .2s;
+    border-radius: 5px;
+}
+
+.update-button:hover {
+    opacity: .65;
+}
+
+.download-admin-button {
+    color: #533747;
+    font-weight: 700;
+}
+
+.download-admin-button:hover {
+    color: #7a5269;
+}
+
+.version-history {
+    padding: 10px;
+    border-radius: 20px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.version-history-title {
+    font-size: 20px;
+    margin: 0;
+}
+
+.version-entry {
+    min-width: 100%;
+    list-style: none;
+}
+
+.version-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.column-fields {
+    width: fit-content;
+    margin: 0 30px;
+}
+
+.multiple-fieldsets {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.multiple-fieldsets p {
+    flex-grow: 1;
 }

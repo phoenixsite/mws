@@ -10,7 +10,7 @@
   </head>
   
   <body>
-    <header class="site-header">
+    <header class="site-header {{ metadata.main_theme_color }}-background">
       <a class="site-title" href="{% url 'mws_main:store_home' tenant.store_url %}">{{ tenant.name }}</a>
       {% block actions %}{% endblock %}
     </header>

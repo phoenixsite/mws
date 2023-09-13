@@ -233,8 +233,21 @@ class UserUpdateForm(forms.ModelForm):
     
     class Meta:
         model = User
-        fields = ["username",
-                  "first_name",
-                  "last_name",
-                  "email",
-                  ]
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+        ]
+
+
+class UpdatePackageForm(forms.Form):
+
+    changes = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 20, "cols": 80}),
+        help_text="Markdown markup available",
+    )
+    package = forms.FileField()
+    n_package = forms.CharField(
+        widget=forms.HiddenInput,
+        disabled=True
+    )

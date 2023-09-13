@@ -80,12 +80,17 @@ urlpatterns = [
                  path("download-service/<objectid:service_id>/<int:n_package>",
                       views.DownloadServiceView.as_view(),
                       name="download_service"),
+
+                 path("update-package/<objectid:service_id>/<int:n_package>",
+                      views.UpdatePackageView.as_view(),
+                      name="update_package"),
+
+                 path("store-info/",
+                      views.StoreInfoView.as_view(),
+                      name="store_info"),
+
+                 path("update-store-info/",
+                      views.UpdateStoreInfo.as_view(),
+                      name="update_store")
              ])),
 ]
-
-
-
-
-
-
-

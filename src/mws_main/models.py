@@ -28,7 +28,7 @@ class VersionEntry(models.Model):
     A field for storing a package version change.
     """
 
-    version = models.CharField("version code", max_length=25)
+    version = models.CharField(max_length=25)
     update_date = models.DateField()
     changes = DescriptionField("changes description")
 
@@ -160,6 +160,8 @@ class Service(TenantAwareModel):
         help_text="Concrete software packages contained by the service."
     )
 
+    objects = models.DjongoManager()
+
     # This field is in Service and not in Package because as Package is an abstract
     # model we cannot avoid race conditions when incrementing the number of downloads
     # of a Package instance and updating the whole packages array of a Service is
@@ -178,6 +180,52 @@ class Service(TenantAwareModel):
     def __str__(self):
         return f"{self.name} ({self._id})"
 
+    def update_package(self, npackage, package_file, changes):
+        """
+        Upload a new version of a package of the current service.
+
+        :param npackage: Number of the updated package.
+        :param package_file: File-like object containing the file.
+        :param changes: Description of the included changes in the package.
+        """
+
+        package = self.packages[npackage]
+        parsed_package = utils.ParsedPackage(package_file)
+        package.update(parsed_package.to_dict())
+        
+        # This is a dangerous operation because the packages files
+        # are being saved before creating the service
+        path = abstract_store_dir_path(self.tenant, self.name, parsed_package.package_name)
+        path = default_storage.generate_filename(path)
+        package["package_file"] = default_storage.save(path, parsed_package.file)
+        
+        new_version_entry = {
+            'version': package["last_version"],
+            'update_date': timezone.now(),
+            'changes': changes,
+        }
+
+        new_history = [new_version_entry]
+
+        if not package["version_history"]:
+
+            package["version_history"] = []
+
+            initial_version_entry = {
+                'version': package["last_version"],
+                'update_date': self.datetime_published,
+                'changes': "Initial upload."
+            }
+            new_history = [new_version_entry, initial_version_entry]
+
+        # Version history should behave like a stack, so the
+        # newer updates appear first
+        print(package["version_history"])
+        new_history.extend(package["version_history"])
+        package["version_history"] = new_history
+        
+        self.packages[npackage] = package
+        self.save()
     
     def new_acquirement(self, user):
         """
@@ -196,6 +244,47 @@ class Service(TenantAwareModel):
 
             self.save(update_fields=["n_downloads"])
 
+
+def get_nupdates(tenant_id):
+    """
+    Return the number of packages updates that has been made in a store.
+    """
+    
+    # unwind to deconstruct the packages array of every service
+    # project to get only the versions array of each package
+    # group to count the array of versions array
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$unwind": "$packages"},
+        {"$project": {"versions": "$packages.version_history"}},
+        {"$group": {"_id": None, "total_updates": {
+            "$sum": {"$size": "$versions"}
+        }}}
+    ]
+
+    result = list(Service.objects.mongo_aggregate(pipeline))
+    return result[0]["total_updates"]
+
+def get_monthly_nupdates(tenant_id):
+    """
+    Return the number of packages updates that has been made in the
+    current month.
+    """
+
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$unwind": "$packages"},
+        {"$project": {"versions": "$packages.version_history"}},
+        {"$unwind": "$versions"},
+        {"$match": {"$expr": {"$eq": [{"$month": "$versions.update_date"}, {"$month": timezone.now()}]}}},
+        {"$group": {"_id": None, "updates": {
+            "$sum": 1
+        }}}
+    ]
+
+    result = list(Service.objects.mongo_aggregate(pipeline))
+    return result[0]["updates"]
+    
 
 def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
 
@@ -299,7 +388,9 @@ class Client(User):
     services_acq = models.ArrayReferenceField(
         to=Service,
         on_delete=models.CASCADE,
-        default=[]
+        default=[],
+        help_text="""An acquisition can be defined as the first time a"""\
+        """service is downloaded."""
     )
 
     class Meta:

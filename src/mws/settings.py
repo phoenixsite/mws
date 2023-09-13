@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'tenants.apps.TenantsConfig',
     'mws.apps.MWSAdminConfig',
     'mws_main.apps.MwsMainConfig',
+    'mws_metadata.apps.MwsMetadataConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'mws_main.stats_middleware.StatsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -79,8 +81,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'mwsdb',
-    }
+    },
+    'metadata': {
+        'ENGINE': 'djongo',
+        'NAME': 'mwsmetadatadb',
+    },
 }
+
+DATABASE_ROUTERS = ["mws.routers.MetadataRouter", "mws.routers.DefaultRouter"]
 
 
 # Password validation

@@ -15,7 +15,7 @@
     <p>You can upload up to 5 packages for specific platforms.</p>
     {{ platform_formset.as_ul }}
     
-    <input type="submit" value="Save">
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Save">
   </form>
 </section>
 {% endblock %}

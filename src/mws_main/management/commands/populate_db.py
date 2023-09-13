@@ -90,9 +90,9 @@ def populate():
         print(f"Creating store {i}: {store_name}...")
 
         url = store_name.lower().replace(" ", "-") + str(random.randint(1, 100000))
-        tenant = tmodels.Tenant.objects.create(
+        tenant = tmodels.register_tenant(
             name=store_name.title(),
-            store_url=url
+            url=url
         )
 
         # Generate admins

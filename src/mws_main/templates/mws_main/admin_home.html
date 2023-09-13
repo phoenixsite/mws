@@ -4,10 +4,15 @@
 
 {% block title %}{{ tenant.name }}{% endblock %}
 
-{% block content %}
-<section class="summary">
+<!-- CHANGE THIS-->
+{% block actions %}
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:store_info' tenant.store_url %}">
+  View store data
+</a>
+{% endblock %}
 
-</section>
+{% block content %}
+<h1>Administrator dashboard</h1>
 
 <section class="panel-board">
   
@@ -23,6 +28,9 @@
       <li>
 	
 	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' tenant.store_url service.pk %}">
+	  {% if service.icon %}
+	  <img src="{{ service.icon.url }}" alt="Service icon" width="40" height="40">
+	  {% endif %}
 	  <p class="entry-name">{{ service.name }}</p>
 	</a>
 	
@@ -62,23 +70,30 @@
   <section class="panel client-panel">
 
     <nav>
-      <h2>Clients</h2>
+      <h2>Statistics</h2>
     </nav>
 
-    <table class="clients-statistics">
-      <caption>Monthly statistics</caption>
+    <table class="dashboard-statistics">
       <tr>
-	<th>Registered clients</th>
+	<th>Registered clients this month</th>
 	<td>{{ monthly_reg_clients }}</td>
       </tr>
       <tr>
-	<th>Number of acquisitions</th>
-	<td>{{ monthly_acquisitions }}</td>
+	<th>Registered clients</th>
+	<td>{{ reg_clients }}</td>
       </tr>
       <tr>
-	<th>Number of logins</th>
+	<th>Total acquisitions</th>
+	<td>{{ acquisitions }}</td>
       </tr>
-      
+      <tr>
+	<th>Updates this month</th>
+	<td>{{ monthly_updates }}</td>
+      </tr>
+      <tr>
+	<th>Total updates</th>
+	<td>{{ updates }}</td>
+      </tr>
     </table>
     
   </section>

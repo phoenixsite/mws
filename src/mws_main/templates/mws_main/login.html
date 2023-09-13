@@ -3,7 +3,7 @@
 
 {% block actions %}
 <section class="actions-section">
-  <a class="action" href="{% url 'mws_main:signup' tenant.store_url %}">Sign up as client</a>
+  <a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:signup' tenant.store_url %}">Sign up as client</a>
 </section>
 {% endblock %}
 
@@ -14,7 +14,7 @@
     <h1>Log in</h1>
     {% csrf_token %}
     {{ form.as_ul }}
-    <input class="main-button" type="submit" value="Login">
+    <input class="main-button {{ metadata.main_theme_color }}-background {{ metadata.main_theme_color }}-hover" type="submit" value="Login">
   </form>
 </section>
 {% endblock %}

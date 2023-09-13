@@ -17,7 +17,7 @@
   <form class="signup-form" method="post" action="{% url 'mws_main:signup' tenant.store_url %}">
     {% csrf_token %}
     {{ form.as_ul }}
-    <input class="main-button" type="submit" value="Sign up">
+    <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Sign up">
   </form>
 </section>
 {% endblock %}
