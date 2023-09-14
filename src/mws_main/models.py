@@ -263,7 +263,11 @@ def get_nupdates(tenant_id):
     ]
 
     result = list(Service.objects.mongo_aggregate(pipeline))
-    return result[0]["updates"]
+
+    if result:
+        return result[0]["updates"]
+    else:
+        return 0
 
 def get_monthly_nupdates(tenant_id):
     """
@@ -283,7 +287,11 @@ def get_monthly_nupdates(tenant_id):
     ]
 
     result = list(Service.objects.mongo_aggregate(pipeline))
-    return result[0]["updates"]
+
+    if result:
+        return result[0]["updates"]
+    else:
+        return 0
     
 
 def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
