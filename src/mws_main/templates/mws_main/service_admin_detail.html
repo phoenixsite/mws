@@ -5,13 +5,28 @@
 
 {% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
 
+{% block service-actions %}
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_service' tenant.store_url service.pk %}">Update service</a>
+{% endblock %}
+
 {% block specific_content %}
 
-<section>
+<section class="secondary-info">
   <ul class="stats">
     <li>{{ service.datetime_published | date:"SHORT_DATETIME_FORMAT" }}</li>
     <li>{{ service.n_downloads }} download{{ service.n_downloads | pluralize }}</li>
   </ul>
+
+  <div class="dev-assigned-panel">
+    <h3>Assigned developers</h3>
+    <ul>
+      {% for developer in service.developer_set.all %}
+      <li>
+	{{ developer.get_full_name }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </section>
 
 <div class="detail-wrapper">

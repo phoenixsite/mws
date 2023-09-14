@@ -85,6 +85,10 @@ urlpatterns = [
                       views.UpdatePackageView.as_view(),
                       name="update_package"),
 
+                 path("update_service/<objectid:pk>/",
+                      views.UpdateServiceView.as_view(),
+                      name="update_service"),
+
                  path("store-info/",
                       views.StoreInfoView.as_view(),
                       name="store_info"),

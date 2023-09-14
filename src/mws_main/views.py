@@ -14,7 +14,7 @@ from django.contrib.auth import forms as auth_forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, render, resolve_url, redirect
 from django.urls import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.forms import formset_factory
 from django.utils import timezone
 
@@ -201,7 +201,15 @@ class StoreHomeView(TenantUserMixin, TemplateView):
         context["services"] = models.Service.objects.filter(
             tenant_id=self.tenant._id)
 
-        if self.is_admin:
+        if self.is_client:
+            context["last_updated_services"] = context["services"][:3]
+            context["last_uploaded_services"] = context["services"].order_by("-datetime_published")[:3]
+        elif self.is_developer:
+            context["services"] = self.user.assigned_services.all()
+            context["updates"] = models.get_nupdates(self.tenant.pk)
+            context["monthly_updates"] = models.get_monthly_nupdates(self.tenant.pk)
+            
+        elif self.is_admin:
             context["developers"] = models.Developer.objects.filter(
                 tenant=self.tenant._id)
             context["clients"] = models.Client.objects.filter(
@@ -211,10 +219,6 @@ class StoreHomeView(TenantUserMixin, TemplateView):
             context["acquisitions"] = sum([client.services_acq.get_queryset().count() for client in context["clients"]])
             context["updates"] = models.get_nupdates(self.tenant.pk)
             context["monthly_updates"] = models.get_monthly_nupdates(self.tenant.pk)
-            
-        if self.is_client:
-            context["last_updated_services"] = context["services"][:3]
-            context["last_uploaded_services"] = context["services"].order_by("-datetime_published")[:3]
 
         return context
 
@@ -257,6 +261,19 @@ class ServiceAdminDetailView(PermissionRequiredMixin, TQuerysetMixin,
     model = models.Service
     template_name = "mws_main/service_admin_detail.html"
     permission_required = "mws_main.view_admin_service"
+
+    def dispatch(self, *args, **kwargs):
+        """
+        Check that if the user is a developer, the service is assigned to it.
+        """
+        
+        if (
+                self.is_developer
+                and self.get_object() not in self.user.assigned_services.all()
+        ):
+            return HttpResponseForbidden("You cannot access the administrative page of this service")
+
+        return super().dispatch(*args, **kwargs)
 
 
 class ClientCreateView(TenantMixin, CreateView):
@@ -400,6 +417,17 @@ class UserUpdateView(TQuerysetMixin, TenantUserMixin, UpdateView):
         return self.user
 
 
+class UpdateServiceView(TenantUserMixin, UpdateView):
+
+    template_name = "mws_main/update_service.html"
+    form_class = forms.UpdateServiceForm
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.queryset = models.Service.objects.filter(tenant_id=self.tenant.pk)
+        self.success_url = reverse("mws_main:service_admin_detail", args=[self.tenant.store_url, self.get_object().pk])
+    
+
 class PackageMixin(TenantUserMixin):
     """
     View whose functionality depends on a service package.
@@ -486,7 +514,6 @@ class StoreInfoView(PermissionRequiredMixin, TenantUserMixin,
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
-        context
         return context
 
 class UpdateStoreInfo(PermissionRequiredMixin, TenantUserMixin,

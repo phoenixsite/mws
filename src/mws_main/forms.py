@@ -199,6 +199,17 @@ class ServiceBasicInfoForm(forms.Form):
             self.fields["developers"].queryset = self.fields["developers"].queryset.filter(~Q(pk=ObjectId(self.initial["creator"])))
 
 
+class UpdateServiceForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Service
+        fields = [
+            "name",
+            "brief_descrp",
+            "descrp",
+        ]
+
+
 class UserUpdateForm(forms.ModelForm):
 
     template_name = "mws_main/update_user.html"

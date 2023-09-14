@@ -14,7 +14,7 @@
 {% block content %}
 <h1>Administrator dashboard</h1>
 
-<section class="panel-board">
+<div class="panel-board">
   
   <section class="panel software-panel">
     <nav>
@@ -26,14 +26,12 @@
     <ul class="panel-listing">
       {% for service in services %}
       <li>
-	
 	<a class="entry-detail" href="{% url 'mws_main:service_admin_detail' tenant.store_url service.pk %}">
 	  {% if service.icon %}
 	  <img src="{{ service.icon.url }}" alt="Service icon" width="40" height="40">
 	  {% endif %}
 	  <p class="entry-name">{{ service.name }}</p>
 	</a>
-	
       </li>
       {% endfor %}
     </ul>
@@ -66,7 +64,6 @@
     
   </section>
 
-  
   <section class="panel client-panel">
 
     <nav>
@@ -98,5 +95,5 @@
     
   </section>
   
-</section>
+</div>
 {% endblock %}

@@ -478,7 +478,6 @@ main {
 
 .panel {
     margin: 20px 10px;
-    width: 25em;
     border: 1px solid lightgray;
     border-radius: 4px;
     padding: 8px;
@@ -824,7 +823,7 @@ main {
 .main-button {
     display: inline-block;
     height: fit-content;
-    padding: 20px 30px;
+    padding: 10px 10px;
     margin: 10px 0;
     color: white;
     border: 0;
@@ -894,6 +893,10 @@ main {
 .service-name, .service-description, .service-briefdescrp {
     margin: 0;
     font-weight: 500;
+}
+
+.service-name {
+    margin-right: 30px;
 }
 
 .service-description, .service-briefdescrp {
@@ -986,6 +989,27 @@ main {
     justify-content: center;
 }
 
-.multiple-fieldsets p {
-    flex-grow: 1;
+.column-fieldsets-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.column-fields li {
+    list-style: none;
+}
+
+.secondary-info {
+    display: flex;
+    flex-direction: row;
+}
+
+.dev-assigned-panel h3 {
+    margin-top: 0;
+}
+
+.dev-assigned-panel li {
+    list-style: none;
+    font-size: 18px;
+    font-weight: 300;
 }

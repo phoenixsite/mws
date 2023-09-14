@@ -257,13 +257,13 @@ def get_nupdates(tenant_id):
         {"$match": {"tenant_id": tenant_id}},
         {"$unwind": "$packages"},
         {"$project": {"versions": "$packages.version_history"}},
-        {"$group": {"_id": None, "total_updates": {
+        {"$group": {"_id": None, "updates": {
             "$sum": {"$size": "$versions"}
         }}}
     ]
 
     result = list(Service.objects.mongo_aggregate(pipeline))
-    return result[0]["total_updates"]
+    return result[0]["updates"]
 
 def get_monthly_nupdates(tenant_id):
     """
