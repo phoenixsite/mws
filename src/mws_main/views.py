@@ -463,18 +463,8 @@ class DownloadServiceView(PackageMixin, View):
     def get(self, request, *args, **kwargs):
         
         package_url = self.package["package_file"].url
-        package_name = self.package["name"]
-
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        filepath = BASE_DIR + unquote(package_url)
-        path = open(filepath, 'rb')
-        mime_type, _ = mimetypes.guess_type(filepath)
-
-        response = HttpResponse(path, content_type=mime_type)
-        response['Content-Disposition'] = f"attachment; filename={package_name}"
-
         self.service.new_acquirement(self.user)
-        return response
+        return redirect(package_url)
 
 class UpdatePackageView(PackageMixin, FormView):
 
