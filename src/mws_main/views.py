@@ -214,8 +214,8 @@ class StoreHomeView(TenantUserMixin, TemplateView):
             context["monthly_reg_clients"] = context["clients"].filter(date_joined__month=timezone.now().month).count()
             context["reg_clients"] = context["clients"].count()
             context["acquisitions"] = sum([client.services_acq.get_queryset().count() for client in context["clients"]])
-            context["updates"] = models.get_nupdates(self.tenant.pk)
-            context["monthly_updates"] = models.get_monthly_nupdates(self.tenant.pk)
+            context["updates"] = models.get_nupdates(self.tenant)
+            context["monthly_updates"] = models.get_monthly_nupdates(self.tenant)
 
         return context
 

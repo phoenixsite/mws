@@ -196,22 +196,21 @@ class Service(TenantAwareModel):
             self.save(update_fields=["n_downloads"])
 
 
-def get_nupdates(tenant_id):
+def get_nupdates(tenant):
     """
     Return the number of packages updates that has been made in a store.
     """
-    # IMPLEMENT
-    result = 0
+    return VersionEntry.objects.filter(package__service__tenant=tenant).count()
 
 
-def get_monthly_nupdates(tenant_id):
+def get_monthly_nupdates(tenant):
     """
     Return the number of packages updates that has been made in the
     current month.
     """
-
-    # IMPLEMENT
-    pass
+    
+    return VersionEntry.objects.filter(package__service__tenant=tenant).filter(update_date__month=timezone.now().month).count()
+    
 
 def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
 
