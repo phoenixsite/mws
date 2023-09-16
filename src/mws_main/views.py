@@ -18,16 +18,13 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.forms import formset_factory
 from django.utils import timezone
 
-import bson
-import mimetypes
 import os
 from urllib.parse import unquote
 import datetime
 
 import mws_main.models as models
 import mws_main.forms as forms
-import mws_metadata.models as meta_models
-from tenants.models import Tenant, TenantAdmin, User, ADMIN_GROUP
+from tenants.models import StoreMetadata, Tenant, TenantAdmin, User, ADMIN_GROUP
 
 
 class TenantMixin(ContextMixin):
@@ -199,7 +196,7 @@ class StoreHomeView(TenantUserMixin, TemplateView):
 
         context = super().get_context_data(**kwargs)
         context["services"] = models.Service.objects.filter(
-            tenant_id=self.tenant._id)
+            tenant=self.tenant)
 
         if self.is_client:
             context["last_updated_services"] = context["services"][:3]
@@ -211,9 +208,9 @@ class StoreHomeView(TenantUserMixin, TemplateView):
             
         elif self.is_admin:
             context["developers"] = models.Developer.objects.filter(
-                tenant=self.tenant._id)
+                tenant=self.tenant)
             context["clients"] = models.Client.objects.filter(
-                tenant=self.tenant._id)
+                tenant=self.tenant)
             context["monthly_reg_clients"] = context["clients"].filter(date_joined__month=timezone.now().month).count()
             context["reg_clients"] = context["clients"].count()
             context["acquisitions"] = sum([client.services_acq.get_queryset().count() for client in context["clients"]])
@@ -325,7 +322,7 @@ class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
         # The service could be created by the tenant admin,
         # so the service should not be added to it.
         if self.is_developer:
-            creator_key = {"creator": self.user._id}
+            creator_key = {"creator": self.user.pk}
         else:
             creator_key = {"creator": None}
 
@@ -360,7 +357,6 @@ class ServiceCreateView(PermissionRequiredMixin, TenantUserMixin,
             request.FILES,
             prefix="platforms"
         )
-
 
         if self.basic_form.is_valid() and self.platform_formset.is_valid():
 
@@ -424,7 +420,7 @@ class UpdateServiceView(TenantUserMixin, UpdateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.queryset = models.Service.objects.filter(tenant_id=self.tenant.pk)
+        self.queryset = models.Service.objects.filter(tenant=self.tenant)
         self.success_url = reverse("mws_main:service_admin_detail", args=[self.tenant.store_url, self.get_object().pk])
     
 
@@ -443,12 +439,10 @@ class PackageMixin(TenantUserMixin):
             models.Service,
             pk=kwargs["service_id"])
 
-        n_package = kwargs["n_package"]
-        
-        try:
-            self.package = self.service.packages[n_package]
-        except IndexError:
-            raise Http404()
+        self.package = get_object_or_404(
+            models.Package,
+            pk=kwargs["package_id"]
+        )
 
     def get_context_data(self, **kwargs):
         
@@ -462,9 +456,10 @@ class DownloadServiceView(PackageMixin, View):
 
     def get(self, request, *args, **kwargs):
         
-        package_url = self.package["package_file"].url
+        package_url = self.package.package_file.url
         self.service.new_acquirement(self.user)
         return redirect(package_url)
+
 
 class UpdatePackageView(PackageMixin, FormView):
 
@@ -476,18 +471,10 @@ class UpdatePackageView(PackageMixin, FormView):
 
         super().setup(request, *args, **kwargs)
         self.success_url = f"/store/{self.tenant.store_url}/admin/service/{str(self.service.pk)}/"
-        self.initial = {"n_package": self.package["n_package"]}
-        """
-        self.success_url = resolve_url(
-            self.success_url,
-            args=[self.tenant.store_url, self.service.pk]
-        )
-        """
 
     def form_valid(self, form):
 
-        self.service.update_package(
-            self.package["n_package"],
+        self.package.update_package(
             form.cleaned_data["package"],
             form.cleaned_data["changes"]
         )
@@ -510,7 +497,7 @@ class UpdateStoreInfo(PermissionRequiredMixin, TenantUserMixin,
                         UpdateView):
     template_name = "mws_main/update_store.html"
     permission_required = "tenants.change_tenant"
-    model = meta_models.StoreMetadata
+    model = StoreMetadata
     success_url = "mws_main:store_home"
     fields = "__all__"
 

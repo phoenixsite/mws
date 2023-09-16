@@ -208,7 +208,7 @@ class ParsedPackage:
         if not isinstance(self.package_file, str):
             return self.package_file
         else:
-            return File(open(self.package_file, "rb"), name=self.package_file)
+            return File(open(self.package_file, "rb"))
             
 
     def to_dict(self):

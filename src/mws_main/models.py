@@ -1,4 +1,4 @@
-from djongo import models
+from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -7,6 +7,8 @@ from django.core.files.storage import default_storage
 
 import mws_main.utils as utils
 from tenants.models import TenantAwareModel, Tenant, get_user_group, User
+
+import os
 
 DEV_GROUP = "developers"
 CLIENT_GROUP = "clients"
@@ -21,7 +23,7 @@ class DescriptionField(models.TextField):
     max_length = 1000
     blank = True
     help_text = "1000 characters max. Markdown markup available",
-    
+
 
 class VersionEntry(models.Model):
     """
@@ -29,58 +31,39 @@ class VersionEntry(models.Model):
     """
 
     version = models.CharField(max_length=25)
-    update_date = models.DateField()
+    update_date = models.DateField(auto_now_add=True)
     changes = DescriptionField("changes description")
-
-    class Meta:
-        abstract = True
+    package = models.ForeignKey("Package", on_delete=models.CASCADE)
 
 
 def store_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    store_url = Tenant.objects.get(_id=instance.tenant._id).store_url
-    return f"{store_url}/{instance.name}/{filename}"
-
-class Object(object):
-    """Class used to set arbitrary attributes"""
-    pass
-
-
-def abstract_store_dir_path(tenant, name, filename):
-
-    instance = Object()
-    instance.tenant = tenant
-    instance.name = name
-    return store_dir_path(instance, filename)
+    store_url = Tenant.objects.get(pk=instance.service.tenant.pk).store_url
+    filename = os.path.split(filename)[-1]
+    return f"{store_url}/{instance.service.name}/{filename}"
 
 def image_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    store_url = Tenant.objects.get(_id=instance.tenant._id).store_url
+    store_url = Tenant.objects.get(pk=instance.tenant.pk).store_url
     return f"{store_url}/{instance.name}/image/{filename}"
 
 
 class Package(models.Model):
     """
     Represent a package file that can be downloaded and used.
-
-    Because of the abstract behaviour of the model, all the fields options
-    will not be checked, so the function
-    that initialize a package must manually checked that the options
-    are valid.
     """
-
-    n_package = models.BigIntegerField(
-        "package number",
-        help_text="Identify the package in a service.",
-    )
     
     name = models.CharField(
         "package name",
-        max_length=30,
+        max_length=60,
         blank=False,
     )
 
-    package_file = models.FileField("package file", upload_to=store_dir_path)
+    package_file = models.FileField(
+        "package file",
+        max_length=150,
+        upload_to=store_dir_path,
+    )
     size = models.BigIntegerField(help_text="Package size")
     package_type = models.CharField(
         max_length=3,
@@ -103,21 +86,47 @@ class Package(models.Model):
         "related to the service, use the description field of the service.",
         default="",
     )
-
-    version_history = models.ArrayField(
-        model_container=VersionEntry,
-        help_text="Previous uploaded versions and its changes",
-    )
+    service = models.ForeignKey("Service", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.package_type} ({self.n_package})" 
+        return f"{self.package_type} ({self.pk})"
 
-    class Meta:
-        abstract = True
+    def update_package(self, package_file, changes):
+        """
+        Upload a new version of the current package.
+
+        :param package_file: File-like object containing the file.
+        :param changes: Description of the included changes in the package.
+        """
+
+        if not self.versionentry_set.all().exists():
+
+            VersionEntry.objects.create(
+                version=self.last_version,
+                update_date=self.service.datetime_published,
+                changes="Initial upload.",
+                package=self,
+            )
+
+        parsed_package = utils.ParsedPackage(package_file)
+
+        VersionEntry.objects.create(
+            version=parsed_package.version,
+            changes=changes,
+            package=self,
+        )
+
+        parsed_dict = parsed_package.to_dict()
+        self.size = parsed_dict["size"]
+        self.package_file = parsed_package.file
+        self.os_name = parsed_dict["os_name"]
+        self.last_version = parsed_dict["last_version"]
+        self.save()
 
 
 class PackageNotFoundError(Exception):
     pass
+
         
 class Service(TenantAwareModel):
     """
@@ -127,7 +136,6 @@ class Service(TenantAwareModel):
     so it may contain multiple packages.
     """
 
-    _id = models.ObjectIdField()
     name = models.CharField(
         "service name",
         max_length=25,
@@ -137,11 +145,13 @@ class Service(TenantAwareModel):
     brief_descrp = models.TextField(
         "brief description",
         blank=False,
+        help_text="Brief description of the service (What is and main function)",
     )
 
     descrp = models.TextField(
         "description",
         blank=False,
+        help_text="General description of the service. Markdown markup available.",
     )
 
     icon = models.ImageField(
@@ -153,14 +163,6 @@ class Service(TenantAwareModel):
         auto_now_add=True,
         help_text="Date and time when the service was firstly published."
     )
-    
-    packages = models.ArrayField(
-        model_container=Package,
-        default=[],
-        help_text="Concrete software packages contained by the service."
-    )
-
-    objects = models.DjongoManager()
 
     # This field is in Service and not in Package because as Package is an abstract
     # model we cannot avoid race conditions when incrementing the number of downloads
@@ -168,64 +170,13 @@ class Service(TenantAwareModel):
     # too expensive
     n_downloads = models.PositiveIntegerField("number of downloads", default=0)
 
-    autoid_for_packages = models.BigIntegerField(
-        help_text="Last id used to create a package within the service.",
-    )
-
     class Meta:
         permissions = [
             ("view_admin_service", "Can view detailed information of a service"),
         ]
 
     def __str__(self):
-        return f"{self.name} ({self._id})"
-
-    def update_package(self, npackage, package_file, changes):
-        """
-        Upload a new version of a package of the current service.
-
-        :param npackage: Number of the updated package.
-        :param package_file: File-like object containing the file.
-        :param changes: Description of the included changes in the package.
-        """
-
-        package = self.packages[npackage]
-        parsed_package = utils.ParsedPackage(package_file)
-        package.update(parsed_package.to_dict())
-        
-        # This is a dangerous operation because the packages files
-        # are being saved before creating the service
-        path = abstract_store_dir_path(self.tenant, self.name, parsed_package.package_name)
-        path = default_storage.generate_filename(path)
-        package["package_file"] = default_storage.save(path, parsed_package.file)
-        
-        new_version_entry = {
-            'version': package["last_version"],
-            'update_date': timezone.now(),
-            'changes': changes,
-        }
-
-        new_history = [new_version_entry]
-
-        if not package["version_history"]:
-
-            package["version_history"] = []
-
-            initial_version_entry = {
-                'version': package["last_version"],
-                'update_date': self.datetime_published,
-                'changes': "Initial upload."
-            }
-            new_history = [new_version_entry, initial_version_entry]
-
-        # Version history should behave like a stack, so the
-        # newer updates appear first
-        print(package["version_history"])
-        new_history.extend(package["version_history"])
-        package["version_history"] = new_history
-        
-        self.packages[npackage] = package
-        self.save()
+        return f"{self.name} ({self.pk})"
     
     def new_acquirement(self, user):
         """
@@ -249,25 +200,9 @@ def get_nupdates(tenant_id):
     """
     Return the number of packages updates that has been made in a store.
     """
-    
-    # unwind to deconstruct the packages array of every service
-    # project to get only the versions array of each package
-    # group to count the array of versions array
-    pipeline = [
-        {"$match": {"tenant_id": tenant_id}},
-        {"$unwind": "$packages"},
-        {"$project": {"versions": "$packages.version_history"}},
-        {"$group": {"_id": None, "updates": {
-            "$sum": {"$size": "$versions"}
-        }}}
-    ]
+    # IMPLEMENT
+    result = 0
 
-    result = list(Service.objects.mongo_aggregate(pipeline))
-
-    if result:
-        return result[0]["updates"]
-    else:
-        return 0
 
 def get_monthly_nupdates(tenant_id):
     """
@@ -275,60 +210,41 @@ def get_monthly_nupdates(tenant_id):
     current month.
     """
 
-    pipeline = [
-        {"$match": {"tenant_id": tenant_id}},
-        {"$unwind": "$packages"},
-        {"$project": {"versions": "$packages.version_history"}},
-        {"$unwind": "$versions"},
-        {"$match": {"$expr": {"$eq": [{"$month": "$versions.update_date"}, {"$month": timezone.now()}]}}},
-        {"$group": {"_id": None, "updates": {
-            "$sum": 1
-        }}}
-    ]
-
-    result = list(Service.objects.mongo_aggregate(pipeline))
-
-    if result:
-        return result[0]["updates"]
-    else:
-        return 0
-    
+    # IMPLEMENT
+    pass
 
 def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
 
     packages_objs = []
     icon = None
 
-    for n_package, package in enumerate(packages):
-
-        # Due to a package is an abstract class, we must fill manually all its
-        # fields, even the file field (storage class interaction)
-        parsed_package = utils.ParsedPackage(package["package"])
-        package_obj = parsed_package.to_dict()
-        package_obj["descrp"] = package["descrp"]
-        package_obj["date_uploaded"] = timezone.now()
-        package_obj["version_history"] = []
-        package_obj["n_package"] = n_package
-
-        # This is a dangerous operation because the packages files
-        # are being saved before creating the service
-        path = abstract_store_dir_path(tenant, name, parsed_package.package_name)
-        path = default_storage.generate_filename(path)
-        package_obj["package_file"] = default_storage.save(path, parsed_package.file)
-        packages_objs.append(package_obj)
-
-        if not icon:
-            icon = parsed_package.get_icon()
-    
     service = Service.objects.create(
         name=name,
-        icon=icon,
         brief_descrp=brief_descrp,
         descrp=descrp,
         tenant=tenant,
-        packages=packages_objs,
-        autoid_for_packages=len(packages_objs),
     )
+
+    for package in packages:
+
+        parsed_package = utils.ParsedPackage(package["package"])
+
+        Package.objects.create(
+            name=parsed_package.package_name,
+            last_version=parsed_package.version,
+            size=parsed_package.size,
+            package_type=parsed_package.type,
+            os_name=parsed_package.os_name,
+            descrp=package["descrp"],
+            package_file=parsed_package.file,
+            service=service,
+        )
+
+        if not icon:
+            icon = parsed_package.get_icon()
+
+    service.icon = icon
+    service.save(update_fields=["icon"])
 
     if creator:
         creator.assigned_services.add(service)
@@ -358,9 +274,7 @@ class Developer(User):
     create new services
     """
 
-    _id = models.ObjectIdField()
     assigned_services = models.ManyToManyField(Service)
-
 
     class Meta:
         permissions = [
@@ -392,14 +306,7 @@ class Client(User):
     them. Once acquired, they can download it whenever they want.
     """
 
-    _id = models.ObjectIdField()
-    services_acq = models.ArrayReferenceField(
-        to=Service,
-        on_delete=models.CASCADE,
-        default=[],
-        help_text="""An acquisition can be defined as the first time a"""\
-        """service is downloaded."""
-    )
+    services_acq = models.ManyToManyField(Service)
 
     class Meta:
         permissions = [

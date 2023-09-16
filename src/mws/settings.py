@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'tenants.apps.TenantsConfig',
     'mws.apps.MWSAdminConfig',
     'mws_main.apps.MwsMainConfig',
-    'mws_metadata.apps.MwsMetadataConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -79,16 +78,14 @@ WSGI_APPLICATION = 'mws.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
+        'ENGINE': 'django.db.backends.postgresql', 
         'NAME': 'mwsdb',
-    },
-    'metadata': {
-        'ENGINE': 'djongo',
-        'NAME': 'mwsmetadatadb',
+        'USER': 'mws_user',
     },
 }
 
-DATABASE_ROUTERS = ["mws.routers.MetadataRouter", "mws.routers.DefaultRouter"]
+with open("mws/mwsdb_passwd.txt") as f:
+    DATABASES['default']['PASSWORD'] = f.read().strip()
 
 
 # Password validation

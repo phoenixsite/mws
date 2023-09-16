@@ -25,15 +25,15 @@
     {% endif %}
     
     <section class="service-packages {{ metadata.main_theme_color }}-highlight-background">
-      <p class="packages-info">There are {{ service.packages | length }} packages.</p>
+      <p class="packages-info">There are {{ service.package_set.all | length }} package{{ service.package_set.all | length | pluralize }}.</p>
       <ul class="packages-listing">
-	{% for package in service.packages %}
+	{% for package in service.package_set.all %}
 	<li class="package-entry {{ metadata.main_theme_color }}-with-separator">
 	  <nav class="package-header">
 	    <h5 class="package-name">
-	      Package {{ package.n_package | add:1 }}
+	      Package <!--{{ package.n_package | add:1 }}-->
 	    </h5>
-	    <a class="download-button {{ metadata.main_theme_color }}-background" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.n_package %}">Download</a>
+	    <a class="download-button {{ metadata.main_theme_color }}-background" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.pk %}">Download</a>
 	  </nav>
 	  
 	  {% if package.descrp %}
@@ -52,12 +52,12 @@
 	    <dd>{{ package.os_name }}</dd>
 	  </dl>
 
-	  {% if package.version_history %}
+	  {% if package.versionentry_set.all %}
 	  <section class="version-history {{ metadata.main_theme_color }}-over-highlight">
 	    <h5 class="version-history-title">Version history</h5>
 
 	    <ul class="version-listing">
-	      {% for version_entry in package.version_history %}
+	      {% for version_entry in package.versionentry_set.all %}
 	      <li class="version-entry">
 		<h6 class="version-title">{{ version_entry.update_date }}</h6>
 		<p>Version {{ version_entry.version }}</p>

@@ -5,22 +5,10 @@ from django.contrib.auth import authenticate
 from mws_main import models
 from tenants.models import Tenant, User
 
-from bson import ObjectId
-
-
-class SelectMongoObject(forms.Select):
-
-    def value_from_datadict(self, data, files, name):
-        return ObjectId(data.get(name))
-
-
-class MongoObjectChoiceField(forms.ModelChoiceField):
-    widget = SelectMongoObject
-
 
 class ClientAdminForm(forms.ModelForm):
 
-    tenant = MongoObjectChoiceField(
+    tenant = forms.ModelChoiceField(
         queryset=Tenant.objects.all(),
     )
     
@@ -50,7 +38,7 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
                                    "include the tenant info")
             
         tenant = Tenant.objects.get(store_url=store_url)
-        self.tenant_id = str(tenant._id)
+        self.tenant_pk = str(tenant.pk)
 
     def clean(self):
 
@@ -59,7 +47,7 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
 
         if username is not None and password:
 
-            username = f"{self.tenant_id}:{username}"
+            username = f"{self.tenant_pk}:{username}"
             
             self.user_cache = authenticate(
                 self.request,
@@ -115,15 +103,6 @@ class DeveloperCreationForm(TenantUserCreationForm):
         exclude = ['assigned_services']
 
 
-class ModelMultipleChoiceField(forms.ModelMultipleChoiceField):
-
-    def prepare_value(self, value):
-        if value and hasattr(value, "__iter__"):
-            return [ObjectId(v) for v in value]
-        else:
-            return super().prepare_value(value)
-
-
 class PlatformServiceForm(forms.Form):
 
     package = forms.FileField(
@@ -139,12 +118,7 @@ class PlatformServiceForm(forms.Form):
     )
     
 
-class ServiceBasicInfoForm(forms.Form):
-
-    name = forms.CharField(
-        label="Service name",
-        max_length=25,
-    )
+class ServiceBasicInfoForm(forms.ModelForm):
 
     creator = forms.ModelChoiceField(
         widget=forms.HiddenInput,
@@ -153,25 +127,21 @@ class ServiceBasicInfoForm(forms.Form):
         required=False,
     )
 
-    developers = ModelMultipleChoiceField(
+    developers = forms.ModelMultipleChoiceField(
         queryset=None,
         help_text="The selected developers can acces, "
         "modify and upload new versions to the service's packages.",
         required=False,
     )
 
-    brief_descrp = forms.CharField(
-        label="Brief description",
-        help_text="Brief description of the service (What is and main function)",
-        widget=forms.Textarea(attrs={"cols": 80, "rows": 10}),
-    )
-
-    descrp = forms.CharField(
-        label="Description",
-        help_text="General description of the service. Markdown markup available.",
-        widget=forms.Textarea(attrs={"cols": 80, "rows": 20})
-    )
-
+    class Meta:
+        model = models.Service
+        exclude = ["icon", "datetime_published", "tenant", "n_downloads"]
+        widgets = {
+            "brief_descrp": forms.Textarea(attrs={"cols": 80, "rows": 10}),
+            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20}),
+        }
+        
 
     def __init__(self, *args, **kwargs):
         """
@@ -194,9 +164,9 @@ class ServiceBasicInfoForm(forms.Form):
         # The service is being created by a developer
         if self.initial["creator"]:
             self.fields["creator"].queryset = self.fields["creator"].queryset.filter(
-                pk=ObjectId(self.initial["creator"]))
+                pk=self.initial["creator"])
             
-            self.fields["developers"].queryset = self.fields["developers"].queryset.filter(~Q(pk=ObjectId(self.initial["creator"])))
+            self.fields["developers"].queryset = self.fields["developers"].queryset.filter(~Q(pk=self.initial["creator"]))
 
 
 class UpdateServiceForm(forms.ModelForm):
@@ -208,11 +178,13 @@ class UpdateServiceForm(forms.ModelForm):
             "brief_descrp",
             "descrp",
         ]
+        widgets = {
+            "brief_descrp": forms.Textarea(attrs={"cols": 80, "rows": 10}),
+            "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20}),
+        }
 
 
 class UserUpdateForm(forms.ModelForm):
-
-    template_name = "mws_main/update_user.html"
 
     def __init__(self, *args, **kwargs):
         """
@@ -227,20 +199,6 @@ class UserUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.initial["username"] = self.instance.get_username()
 
-    """
-    def save(self, commit=True):
-        "
-        Save the user in the DB.
-        
-        It first checks if the data has changed to avoid
-        unnecessary DB access.
-        "
-
-        if self.has_changed():
-            return super().save(commit)
-        else:
-            return self.instance
-    """
     
     class Meta:
         model = User
@@ -258,7 +216,3 @@ class UpdatePackageForm(forms.Form):
         help_text="Markdown markup available",
     )
     package = forms.FileField()
-    n_package = forms.CharField(
-        widget=forms.HiddenInput,
-        disabled=True
-    )

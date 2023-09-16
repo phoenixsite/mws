@@ -165,7 +165,7 @@ def populate():
             descrp = loremipsum.generate(1, loremipsum.ParagraphLength.MEDIUM)
             # Randomly select the developers assigned to this service
             nselected_devs = get_number("assigned_services")
-            selected_devs = random.sample(developers, nselected_devs)
+            selected_devs = random.sample(developers, min(ndevs, nselected_devs))
 
             service = mmodels.create_service(
                 service_name,
