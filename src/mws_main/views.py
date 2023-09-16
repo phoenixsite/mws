@@ -24,7 +24,7 @@ import datetime
 
 import mws_main.models as models
 import mws_main.forms as forms
-from tenants.models import StoreMetadata, Tenant, TenantAdmin, User, ADMIN_GROUP
+from tenants.models import Tenant, TenantAdmin, User, ADMIN_GROUP
 
 
 class TenantMixin(ContextMixin):
@@ -494,17 +494,45 @@ class StoreInfoView(PermissionRequiredMixin, TenantUserMixin,
         return context
 
 class UpdateStoreInfo(PermissionRequiredMixin, TenantUserMixin,
-                        UpdateView):
+                        FormView):
     template_name = "mws_main/update_store.html"
     permission_required = "tenants.change_tenant"
-    model = StoreMetadata
+    form_class = forms.StoreMetadataForm
     success_url = "mws_main:store_home"
-    fields = "__all__"
 
     def setup(self, request, *args, **kwargs):
-
         super().setup(request, *args, **kwargs)
         self.success_url = f"/store/{self.tenant.store_url}/"
 
-    def get_object(self):
-        return self.get_queryset().filter(pk=self.tenant.metadata.pk).get()
+    def get(self, request, *args, **kwargs):
+        
+        self.initial["main_theme_color"] = self.tenant.metadata["main_theme_color"]
+
+        if "footer" in self.tenant.metadata:
+            metadata_foot = self.tenant.metadata["footer"]
+        
+            for ncol, col in enumerate(metadata_foot):
+                
+                self.initial[f"footer_col{ncol + 1}_title"] = col["title"]
+                
+                for nrow, row in enumerate(col["rows"]):
+
+                    self.initial[f"footer_col{ncol + 1}_row{nrow + 1}_text"] = row["text"]
+                    self.initial[f"footer_col{ncol + 1}_row{nrow + 1}_url"] = row["url"]
+        return super().get(request, *args, **kwargs)
+        
+    def form_valid(self, form):
+        
+        self.tenant.metadata["main_theme_color"] = form.cleaned_data["main_theme_color"]
+
+        if form.has_footer():
+            self.tenant.metadata["footer"] = []
+
+            for col in form.get_non_empty_cols():
+                col_dict = {"title": col[0]}
+                col_dict["rows"] = [{'text': row[0], 'url': row[1]} for row in col[1]]
+
+                self.tenant.metadata["footer"].append(col_dict)
+
+        self.tenant.save(update_fields=["metadata"])
+        return super().form_valid(form)
