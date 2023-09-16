@@ -20,12 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f&ac!zqw^5!resz(tjs9$@*700y1&!l@)m+ot_es-n-vhrs)vh'
-
+with open("/etc/secret_key.txt") as f:
+    SECRET_KEY = f.read().strip()
+    
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -123,7 +124,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/static/'
+
+MEDIA_ROOT = "/media/"
+MEDIA_URL = "/var/www/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -133,9 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-    
-MEDIA_ROOT = "media/"
-MEDIA_URL = "/media/"
+
 AUTH_USER_MODEL = "tenants.User"
 LOGIN_REDIRECT_URL = None
 LOGIN_URL = None
