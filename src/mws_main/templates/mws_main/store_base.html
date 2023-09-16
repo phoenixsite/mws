@@ -49,56 +49,19 @@
 	
       </section>
 
-      {% if metadata.has_footer_col1 %}
-      <section class="site-footer-nav1-col-1">
-	<h2>{{ metadata.title1 }}</h2>
+      {% if metadata.footer %}
+      {% for col in metadata.footer %}
+      <section class="site-footer-nav{{ forloop.counter }}-col-1">
+	<h2>{{ col.title }}</h2>
 	<ul>
-	  {% for row in metadata.col1 %}
+	  {% for row in col.rows %}
 	  <li>
-	    <a href="{{ row.1 }}">{{ row.0 }}</a>
+	    <a href="{{ row.url }}">{{ row.text }}</a>
 	  </li>
 	  {% endfor %}
 	</ul>
       </section>
-      {% endif %}
-
-      {% if metadata.has_footer_col2 %}
-      <section class="site-footer-nav2-col-1">
-	<h2>{{ metadata.title2 }}</h2>
-	<ul>
-	  {% for row in metadata.col2 %}
-	  <li>
-	    <a href="{{ row.1 }}">{{ row.0 }}</a>
-	  </li>
-	  {% endfor %}
-	</ul>
-      </section>
-      {% endif %}
-
-      {% if metadata.has_footer_col3 %}
-      <section class="site-footer-nav3-col-1">
-	<h2>{{ metadata.title3 }}</h2>
-	<ul>
-	  {% for row in metadata.col3 %}
-	  <li>
-	    <a href="{{ row.1 }}">{{ row.0 }}</a>
-	  </li>
-	  {% endfor %}
-	</ul>
-      </section>
-      {% endif %}
-
-      {% if metadata.has_footer_col4 %}
-      <section class="site-footer-nav4-col-1">
-	<h2>{{ metadata.title4 }}</h2>
-	<ul>
-	  {% for row in metadata.col4 %}
-	  <li>
-	    <a href="{{ row.1 }}">{{ row.0 }}</a>
-	  </li>
-	  {% endfor %}
-	</ul>
-      </section>
+      {% endfor %}
       {% endif %}
       
     </footer>

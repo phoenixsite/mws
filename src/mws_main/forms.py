@@ -216,3 +216,333 @@ class UpdatePackageForm(forms.Form):
         help_text="Markdown markup available",
     )
     package = forms.FileField()
+
+
+class ColURLField(forms.URLField):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.required = False
+
+
+class ColTextField(forms.CharField):
+    
+    def __init__(
+            self, *, max_length=None, min_length=None, strip=True, empty_value="", **kwargs
+    ):
+        super().__init__(
+            max_length=None, min_length=None, strip=True, empty_value="", **kwargs
+        )
+        self.required = False
+        self.max_length = 50
+
+
+    
+class StoreMetadataForm(forms.Form):
+
+    COLOR_CHOICES = [
+        ("purple", "Purple"),
+        ("red", "Red"),
+        ("blue", "Blue"),
+        ("yellow", "Yellow"),
+    ]
+    
+    main_theme_color = forms.ChoiceField(
+        choices=COLOR_CHOICES,
+        #default="purple",
+        help_text="Please pick a color for the main theme."
+    )
+
+    # First column
+    footer_col1_title = ColTextField(
+        label="Title of the first footer column",
+    )
+
+    footer_col1_row1_text = ColTextField(
+        label="Text of the first row of the first footer column",
+    )
+
+    footer_col1_row1_url = ColURLField(
+        label="Url of the first row of first footer column",
+    )
+
+    footer_col1_row2_text = ColTextField(
+        label="Text of the second row of the first footer column",
+    )
+
+    footer_col1_row2_url = ColURLField(
+        label="Url of the second row of first footer column",
+    )
+
+    footer_col1_row3_text = ColTextField(
+        label="Text of the third row of the first footer column",
+    )
+
+    footer_col1_row3_url = ColURLField(
+        label="Url of the third row of first footer column",
+    )
+
+    footer_col1_row4_text = ColTextField(
+        label="Text of the fourth row of the first footer column",
+    )
+
+    footer_col1_row4_url = ColURLField(
+        label="Url of the fourth row of first footer column",
+    )
+
+    footer_col1_row5_text = ColTextField(
+        label="Text of the fifth row of the first footer column",
+    )
+
+    footer_col1_row5_url = ColURLField(
+        label="Url of the fifth row of first footer column",
+    )
+
+
+    # Second column
+    footer_col2_title = ColTextField(
+        label="Title of the second footer column",
+    )
+
+    footer_col2_row1_text = ColTextField(
+        label="Text of the first row of the second footer column",
+    )
+
+    footer_col2_row1_url = ColURLField(
+        label="Url of the first row of second footer column",
+    )
+
+    footer_col2_row2_text = ColTextField(
+        label="Text of the second row of the second footer column",
+    )
+
+    footer_col2_row2_url = ColURLField(
+        label="Url of the second row of second footer column",
+    )
+
+    footer_col2_row3_text = ColTextField(
+        label="Text of the third row of the second footer column",
+    )
+
+    footer_col2_row3_url = ColURLField(
+        label="Url of the third row of second footer column",
+    )
+
+    footer_col2_row4_text = ColTextField(
+        label="Text of the fourth row of the second footer column",
+    )
+
+    footer_col2_row4_url = ColURLField(
+        label="Url of the fourth row of second footer column",
+    )
+
+    footer_col2_row5_text = ColTextField(
+        label="Text of the fifth row of the second footer column",
+    )
+
+    footer_col2_row5_url = ColURLField(
+        label="Url of the fifth row of second footer column",
+    )
+
+
+    # Third column
+    footer_col3_title = ColTextField(
+        label="Title of the first footer column",
+    )
+
+    footer_col3_row1_text = ColTextField(
+        label="Text of the first row of the third footer column",
+    )
+
+    footer_col3_row1_url = ColURLField(
+        label="Url of the first row of third footer column",
+    )
+
+    footer_col3_row2_text = ColTextField(
+        label="Text of the second row of the third footer column",
+    )
+
+    footer_col3_row2_url = ColURLField(
+        label="Url of the second row of third footer column",
+    )
+
+    footer_col3_row3_text = ColTextField(
+        label="Text of the third row of the third footer column",
+    )
+
+    footer_col3_row3_url = ColURLField(
+        label="Url of the third row of third footer column",
+    )
+
+    footer_col3_row4_text = ColTextField(
+        label="Text of the fourth row of the third footer column",
+    )
+
+    footer_col3_row4_url = ColURLField(
+        label="Url of the fourth row of third footer column",
+    )
+
+    footer_col3_row5_text = ColTextField(
+        label="Text of the fifth row of the third footer column",
+    )
+
+    footer_col3_row5_url = ColURLField(
+        label="Url of the fifth row of third footer column",
+    )
+
+
+    # Fourth column
+    footer_col4_title = ColTextField(
+        label="Title of the fourth footer column",
+    )
+
+    footer_col4_row1_text = ColTextField(
+        label="Text of the first row of the fourth footer column",
+    )
+
+    footer_col4_row1_url = ColURLField(
+        label="Url of the first row of fourth footer column",
+    )
+
+    footer_col4_row2_text = ColTextField(
+        label="Text of the second row of the fourth footer column",
+    )
+
+    footer_col4_row2_url = ColURLField(
+        label="Url of the second row of fourth footer column",
+    )
+
+    footer_col4_row3_text = ColTextField(
+        label="Text of the third row of the fourth footer column",
+    )
+
+    footer_col4_row3_url = ColURLField(
+        label="Url of the third row of fourth footer column",
+    )
+
+    footer_col4_row4_text = ColTextField(
+        label="Text of the fourth row of the fourth footer column",
+    )
+
+    footer_col4_row4_url = ColURLField(
+        label="Url of the fourth row of fourth footer column",
+    )
+
+    footer_col4_row5_text = ColTextField(
+        label="Text of the fifth row of the fourth footer column",
+    )
+
+    footer_col4_row5_url = ColURLField(
+        label="Url of the fifth row of fourth footer column",
+    )
+
+    def get_column(self, ncol):
+        """
+        Return the texts and urls in the column 'ncol'.
+        """
+        
+        COLS = [
+            [
+                (self.cleaned_data["footer_col1_row1_text"],
+                 self.cleaned_data["footer_col1_row1_url"]),
+                
+                (self.cleaned_data["footer_col1_row2_text"],
+                 self.cleaned_data["footer_col1_row2_url"]),
+                
+                (self.cleaned_data["footer_col1_row3_text"],
+                 self.cleaned_data["footer_col1_row3_url"]),
+                
+                (self.cleaned_data["footer_col1_row4_text"],
+                 self.cleaned_data["footer_col1_row4_url"]),
+                
+                (self.cleaned_data["footer_col1_row5_text"],
+                 self.cleaned_data["footer_col1_row5_url"]),
+            ],
+            [
+                (self.cleaned_data["footer_col2_row1_text"],
+                 self.cleaned_data["footer_col2_row1_url"]),
+                
+                (self.cleaned_data["footer_col2_row2_text"],
+                 self.cleaned_data["footer_col2_row2_url"]),
+                
+                (self.cleaned_data["footer_col2_row3_text"],
+                 self.cleaned_data["footer_col2_row3_url"]),
+                
+                (self.cleaned_data["footer_col2_row4_text"],
+                 self.cleaned_data["footer_col2_row4_url"]),
+                
+                (self.cleaned_data["footer_col2_row5_text"],
+                 self.cleaned_data["footer_col2_row5_url"]),
+            ],
+            [
+                (self.cleaned_data["footer_col3_row1_text"],
+                 self.cleaned_data["footer_col3_row1_url"]),
+                
+                (self.cleaned_data["footer_col3_row2_text"],
+                 self.cleaned_data["footer_col3_row2_url"]),
+                
+                (self.cleaned_data["footer_col3_row3_text"],
+                 self.cleaned_data["footer_col3_row3_url"]),
+                
+                (self.cleaned_data["footer_col3_row4_text"],
+                 self.cleaned_data["footer_col3_row4_url"]),
+                
+                (self.cleaned_data["footer_col3_row5_text"],
+                 self.cleaned_data["footer_col3_row5_url"]),
+            ],
+            [
+                (self.cleaned_data["footer_col4_row1_text"],
+                 self.cleaned_data["footer_col4_row1_url"]),
+                
+                (self.cleaned_data["footer_col4_row2_text"],
+                 self.cleaned_data["footer_col4_row2_url"]),
+                
+                (self.cleaned_data["footer_col4_row3_text"],
+                 self.cleaned_data["footer_col4_row3_url"]),
+                
+                (self.cleaned_data["footer_col4_row4_text"],
+                 self.cleaned_data["footer_col4_row4_url"]),
+                
+                (self.cleaned_data["footer_col4_row5_text"],
+                 self.cleaned_data["footer_col4_row5_url"]),
+            ],
+        ]
+
+        if ncol not in range(len(COLS)):
+            return None
+
+        return COLS[ncol]
+
+    def has_footer_col(self, ncol):
+        """
+        Check if there are any non-null or non-empty text items in the
+        column 'ncol'.
+        """
+        
+        col = self.get_column(ncol)
+        return any([row[0] for row in col])
+
+    def has_footer(self):
+        """Check if there are data in any of the columns."""
+        return any([self.has_footer_col(ncol) for ncol in range(4)])
+
+    def get_non_empty_cols(self):
+        return [(self.get_title(ncol), self.get_non_empty_rows(ncol)) for ncol in range(4) if self.has_footer_col(ncol)]
+    
+    def get_non_empty_rows(self, ncol):
+        """Return the non-null or non-empty items of column 'ncol'."""
+        col = self.get_column(ncol)
+        return [row for row in col if row[0]]
+
+    def get_title(self, ncol):
+        """Return the title of the column 'ncol'."""
+        TITLES = [
+            self.cleaned_data["footer_col1_title"],
+            self.cleaned_data["footer_col2_title"],
+            self.cleaned_data["footer_col3_title"],
+            self.cleaned_data["footer_col4_title"],
+        ]
+
+        if ncol not in range(len(TITLES)):
+            return None
+        return TITLES[ncol]

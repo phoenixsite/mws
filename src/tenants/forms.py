@@ -28,4 +28,3 @@ class AdminForm(UserCreationForm):
                   'last_name',
                   'email',
                   ]
-        
