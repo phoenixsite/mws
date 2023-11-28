@@ -78,7 +78,9 @@ WSGI_APPLICATION = 'mws.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql', 
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': 'localhost',
+        'PORT': '5432',
         'NAME': 'mwsdb',
         'USER': 'mws_user',
     },
