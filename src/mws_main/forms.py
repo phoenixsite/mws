@@ -3,18 +3,22 @@ from django.db.models import Q
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import authenticate
 from mws_main import models
-from tenants.models import Tenant, User
 
+class AdminForm(auth_forms.UserCreationForm):
+
+    class Meta:
+        model = models.TenantAdmin
+        fields = ['username',
+                  'first_name',
+                  'last_name',
+                  'email',
+                  ]
 
 class ClientAdminForm(forms.ModelForm):
-
-    tenant = forms.ModelChoiceField(
-        queryset=Tenant.objects.all(),
-    )
     
     class Meta:
         model = models.Client
-        exclude = ['services_acq', 'tenant']
+        exclude = ['services_acq']
 
 
 class URLNotValidError(Exception):
@@ -27,27 +31,12 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
     store.
     """
 
-    def __init__(self, request=None, *args, **kwargs):
-
-        super().__init__(request, *args, **kwargs)
-
-        try:
-            store_url = request.path.split('/')[2]
-        except KeyError:
-            raise URLNotValidError("The URL provided does not"
-                                   "include the tenant info")
-            
-        tenant = Tenant.objects.get(store_url=store_url)
-        self.tenant_pk = str(tenant.pk)
-
     def clean(self):
 
         username = self.cleaned_data.get("username")
         password = self.cleaned_data.get("password")
 
         if username is not None and password:
-
-            username = f"{self.tenant_pk}:{username}"
             
             self.user_cache = authenticate(
                 self.request,
@@ -62,17 +51,12 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
         return self.cleaned_data
 
 
-class TenantUserCreationForm(auth_forms.UserCreationForm):
+class UserCreationForm(auth_forms.UserCreationForm):
 
-    store_url = forms.CharField(widget=forms.HiddenInput,
-                                disabled=True)
-    
     def save(self, commit=True):
 
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        user.tenant = Tenant.objects.get(
-            store_url=self.cleaned_data["store_url"])
 
         if commit:
             user.save()
@@ -86,19 +70,18 @@ class TenantUserCreationForm(auth_forms.UserCreationForm):
                   "first_name",
                   "last_name",
                   "email",]
-        exclude = ['tenant']
         
 
-class ClientCreationForm(TenantUserCreationForm):
+class ClientCreationForm(UserCreationForm):
     
-    class Meta(TenantUserCreationForm.Meta):
+    class Meta(UserCreationForm.Meta):
         model = models.Client
         exclude = ['services_acq']
 
 
-class DeveloperCreationForm(TenantUserCreationForm):
+class DeveloperCreationForm(UserCreationForm):
 
-    class Meta(TenantUserCreationForm.Meta):
+    class Meta(UserCreationForm.Meta):
         model = models.Developer
         exclude = ['assigned_services']
 
@@ -122,13 +105,13 @@ class ServiceBasicInfoForm(forms.ModelForm):
 
     creator = forms.ModelChoiceField(
         widget=forms.HiddenInput,
-        queryset=None,
+        queryset=models.Developer.objects.all(),
         disabled=True,
         required=False,
     )
 
     developers = forms.ModelMultipleChoiceField(
-        queryset=None,
+        queryset=models.Developer.objects.all(),
         help_text="The selected developers can acces, "
         "modify and upload new versions to the service's packages.",
         required=False,
@@ -136,7 +119,7 @@ class ServiceBasicInfoForm(forms.ModelForm):
 
     class Meta:
         model = models.Service
-        exclude = ["icon", "datetime_published", "tenant", "n_downloads"]
+        exclude = ["icon", "datetime_published", "n_downloads"]
         widgets = {
             "brief_descrp": forms.Textarea(attrs={"cols": 80, "rows": 10}),
             "descrp": forms.Textarea(attrs={"cols": 80, "rows": 20}),
@@ -155,12 +138,7 @@ class ServiceBasicInfoForm(forms.ModelForm):
         """
 
         super().__init__(*args, **kwargs)
-        self.fields["creator"].queryset = models.Developer.objects.filter(
-            tenant__store_url=self.initial["store_url"])
-        
-        self.fields["developers"].queryset = models.Developer.objects.filter(
-            tenant__store_url=self.initial["store_url"])
-
+     
         # The service is being created by a developer
         if self.initial["creator"]:
             self.fields["creator"].queryset = self.fields["creator"].queryset.filter(
@@ -201,7 +179,7 @@ class UserUpdateForm(forms.ModelForm):
 
     
     class Meta:
-        model = User
+        model = models.User
         fields = [
             "first_name",
             "last_name",

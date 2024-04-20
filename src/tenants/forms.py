@@ -1,8 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from tenants.models import (
-    Tenant, TenantAdmin,
-    )
+from tenants.models import Tenant
+from mws_main.models import TenantAdmin
 
 
 class TenantForm(forms.ModelForm):
@@ -15,16 +13,6 @@ class TenantForm(forms.ModelForm):
         model = Tenant
         fields = [
             "name",
-            "store_url",
+            "subdomain_prefix",
+            "email",
         ]
-
-
-class AdminForm(UserCreationForm):
-
-    class Meta:
-        model = TenantAdmin
-        fields = ['username',
-                  'first_name',
-                  'last_name',
-                  'email',
-                  ]

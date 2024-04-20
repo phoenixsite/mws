@@ -3,14 +3,14 @@
 
 {% block actions %}
 <section class="actions-section">
-  <a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:signup' tenant.store_url %}">Sign up as client</a>
+  <a class="action {{ metadata.main_theme_color }}-action" href="{% url 'mws_main:signup' %}">Sign up as client</a>
 </section>
 {% endblock %}
 
 {% block content %}
 
 <section class="login-section">
-  <form class="login-form" method="post" action="{% url 'mws_main:login' tenant.store_url %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+  <form class="login-form" method="post" action="{% url 'mws_main:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
     <h1>Log in</h1>
     {% csrf_token %}
     {{ form.as_ul }}

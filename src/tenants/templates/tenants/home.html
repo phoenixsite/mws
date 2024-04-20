@@ -24,7 +24,7 @@
       {% for store in stores %}
       <li>
 	<h3>
-	  <a href="{% url 'mws_main:store_home' store.store_url %}">
+	  <a href="http://{{ store.subdomain_prefix}}.mws.local:8000/store/">
 	    {{ store.name }}
 	  </a>
 	</h3>

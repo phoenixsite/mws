@@ -13,7 +13,7 @@
   <ul class="service-listing profile-services-listing">
     {% for service in object.get_services %}
     <li class="service-item">
-      <a class="service-header small-entry" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+      <a class="service-header small-entry" href="{% url 'mws_main:service_detail' service.pk %}">
 	  {% if service.icon %}
 	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	  {% endif %}
@@ -26,7 +26,7 @@
   </ul>
   {% else %}
   <p>
-    No software has been acquired yet. Start using the <a href="{% url 'mws_main:store_home' tenant.store_url %}">store</a>!
+    No software has been acquired yet. Start using the <a href="{% url 'mws_main:store_home' %}">store</a>!
   </p>
   {% endif %}
 </section>

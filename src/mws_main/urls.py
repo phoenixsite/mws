@@ -4,7 +4,7 @@ from . import views
 
 app_name = "mws_main"
 urlpatterns = [
-    path("store/<str:store_url>/",
+    path("store/",
          include(
              [
                  path("",

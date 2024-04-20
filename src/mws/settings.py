@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-f&ac!zqw^5!resz(tjs9$@*700y1&!l@)m+ot_es-n-vhrs)vh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'mws.local', '.mws.local']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'tenants.middlewares.TenantMiddleware',
     'mws_main.stats_middleware.StatsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -72,23 +73,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mws.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# The default database must not be empty. The application
+# connects to it to create the tenants' databases. 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'localhost',
-        'PORT': '5432',
         'NAME': 'mwsdb',
         'USER': 'mws_user',
+        'PORT': 5432,
+        'HOST': 'localhost',
     },
 }
 
 with open("mws/mwsdb_passwd.txt") as f:
-    DATABASES['default']['PASSWORD'] = f.read().strip()
+    password = f.read().strip()
+    DATABASES['default']['PASSWORD'] = password
 
+DATABASE_ROUTERS = [
+    'tenants.router.TenantSpecRouter',
+    'tenants.router.GeneralMWSRouter',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -138,6 +142,17 @@ INTERNAL_IPS = [
     
 MEDIA_ROOT = "media/"
 MEDIA_URL = "/media/"
-AUTH_USER_MODEL = "tenants.User"
+AUTH_USER_MODEL = "mws_main.User"
 LOGIN_REDIRECT_URL = None
 LOGIN_URL = None
+
+# Dynamic DB creation
+import os
+
+dir_settings = "tenants/database_settings/"
+for fname in os.listdir(dir_settings):
+    full_path = os.path.join(dir_settings, fname)
+
+    with open(full_path, "r") as setting_file:
+        content = setting_file.read()
+        exec(content)

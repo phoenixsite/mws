@@ -12,7 +12,7 @@
       <h2>Basic information</h2>
     </nav>
 
-    <form method="post" action="{% url 'mws_main:update_profile' tenant.store_url %}">
+    <form method="post" action="{% url 'mws_main:update_profile' %}">
       {% csrf_token %}
       {{ form.as_ul }}
       <input class="main-button {{ metadata.main_theme_color }}-hover {{ metadata.main_theme_color }}-background" type="submit" value="Save">

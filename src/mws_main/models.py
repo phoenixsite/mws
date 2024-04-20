@@ -1,12 +1,15 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import timezone
 from django.core.files.storage import default_storage
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+import django.contrib.auth.models as auth_models
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 import mws_main.utils as utils
-from tenants.models import TenantAwareModel, Tenant, get_user_group, User
 
 import os
 
@@ -128,7 +131,7 @@ class PackageNotFoundError(Exception):
     pass
 
         
-class Service(TenantAwareModel):
+class Service(models.Model):
     """
     Represent a software component that offer grouped functionalities.
 
@@ -196,23 +199,23 @@ class Service(TenantAwareModel):
             self.save(update_fields=["n_downloads"])
 
 
-def get_nupdates(tenant):
+def get_nupdates():
     """
     Return the number of packages updates that has been made in a store.
     """
-    return VersionEntry.objects.filter(package__service__tenant=tenant).count()
+    return VersionEntry.objects.all().count()
 
 
-def get_monthly_nupdates(tenant):
+def get_monthly_nupdates():
     """
     Return the number of packages updates that has been made in the
     current month.
     """
     
-    return VersionEntry.objects.filter(package__service__tenant=tenant).filter(update_date__month=timezone.now().month).count()
+    return VersionEntry.objects.filter(update_date__month=timezone.now().month).count()
     
 
-def create_service(name, brief_descrp, descrp, packages, tenant, creator, developers):
+def create_service(name, brief_descrp, descrp, packages, creator, developers):
 
     packages_objs = []
     icon = None
@@ -221,7 +224,6 @@ def create_service(name, brief_descrp, descrp, packages, tenant, creator, develo
         name=name,
         brief_descrp=brief_descrp,
         descrp=descrp,
-        tenant=tenant,
     )
 
     for package in packages:
@@ -252,6 +254,173 @@ def create_service(name, brief_descrp, descrp, packages, tenant, creator, develo
         developer.assigned_services.add(service)
 
     return service
+
+
+class UserManager(BaseUserManager):
+
+    use_in_migrations = True
+    
+    def create_user(self, username, email, password=None, **extra_fields):
+
+        if not username:
+            raise ValueError("The given username must be set")
+    
+        email = self.normalize_email(email)
+
+        # Inspired by the original Django UserManager
+        GlobalUserModel = apps.get_model(
+            self.model._meta.app_label, self.model._meta.object_name
+        )
+        username = GlobalUserModel.normalize_username(username)
+        user = self.model(
+            username=username,
+            email=email,
+            **extra_fields
+        )
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser():
+        """Superusers has not been established in the app."""
+        pass
+
+
+class User(AbstractBaseUser, auth_models.PermissionsMixin):
+    """
+    Represents a user that is associated with one and
+    only one tenant. Its username is composed of the 
+    tenant id and a typical username separated by two dots (:).
+
+    With this approach, users with the
+    same username can exist if they are in different tenants,
+    ensuring tenant isolation.
+    """
+
+    username_validator = UnicodeUsernameValidator()
+
+    username = models.CharField(
+        _("username"),
+        max_length=150,
+        unique=True,
+        help_text=_(
+            "Required. 75 characteres or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[username_validator],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
+
+    first_name = models.CharField(_("first name"), max_length=150, blank=True)
+    last_name = models.CharField(_("last_name"), max_length=150, blank=True)
+    email = models.EmailField(_("email address"), blank=True)
+    is_active = models.BooleanField(
+        _("active"),
+        default=True,
+        help_text=_(
+            "Designates whether this user should be treated as active."
+            "Unselect this instead of deleting accounts."
+        ),
+    )
+    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+
+    objects = UserManager()
+
+    EMAIL_FIELD = "email"
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
+
+    class Meta:
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
+
+    def get_full_name(self):
+        """
+        Return the first name plus the last_name, with a space in between.
+        """
+        full_name = f"{self.first_name} {self.last_name}"
+        return full_name.strip()
+
+    def get_short_name(self):
+        """Return the short name for the user."""
+        return self.first_name
+        
+    def get_username(self):
+        return self.username
+
+    def __str__(self):
+        return f"{self.get_full_name()} ({self.get_username()})"
+
+
+def get_user_group(group_name, codenames=None):
+    """
+    Return the group of the users whose model is given.
+
+    If it doesn't exist, it is created.
+
+    :param str group_name: Name of the group.
+    :param list codenames: Permission codenames which will be
+    included in the permissions group. It is ignored if the
+    group is already created.
+    """
+
+    try:
+        group = auth_models.Group.objects.get_by_natural_key(group_name)
+    except auth_models.Group.DoesNotExist:
+
+        permissions = auth_models.Permission.objects.filter(
+            codename__in=codenames)
+
+        group = auth_models.Group.objects.create(name=group_name
+)
+        group.permissions.add(*permissions)
+        group.save()
+
+    return group
+
+
+ADMIN_GROUP = "admin"
+
+def get_admin_group():
+    """
+    Return the group of the administrators. If doesn't exist, 
+    it is created.
+    """
+
+    codenames = ["add_service",
+                 "view_service",
+                 "view_admin_service",
+                 "change_service",
+                 "delete_service",
+                 "add_developer",
+                 "view_developer",
+                 "view_admin_developer",
+                 "change_developer",
+                 "delete_developer",
+                 "add_client",
+                 "view_client",
+                 "view_admin_client",
+                 "change_client",
+                 "delete_client",
+                 "view_tenant",
+                 "change_tenant",]
+    return get_user_group(ADMIN_GROUP, codenames)
+
+
+class TenantAdmin(User):
+    """
+    Administrator of a tenant. It's the only user who can manage
+    the core information of its tenant. 
+    """
+
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
+        group = get_admin_group()
+
+        if not self.groups.filter(name=group.name).exists():
+            self.groups.add(group)
 
 def get_developer_group():
     """
@@ -329,3 +498,44 @@ class Client(User):
             return list()
 
         return list(self.services_acq.get_queryset())
+
+
+class Metadata(models.Model):
+
+    # The value on this field should have this structure:
+    #{
+    #    "main_theme_color":,
+    #	"footer": [
+    #		{
+    #               "title": "Title1",
+    #		    "rows": [
+    #                   {
+    #			    "text": "This is row1",
+    #			    "url": ,
+    #			},
+    #			{
+    #			    "text": "This is row2",
+    #			    "url": ,
+    #			},
+    #			...
+    #		    ]
+    #		},
+    #		{
+    #		    "title": "Title1",
+    #		    "rows": [
+    #			{
+    #			    "text": "This is row1",
+    #			    "url": ,
+    #			},
+    #			{
+    #			    "text": "This is row2",
+    #			    "url": ,
+    #			},
+    #			...
+    #		    ]
+    #		},
+    #		...		
+    #	]
+    #}
+    #
+    appearance_metadata = models.JSONField()
