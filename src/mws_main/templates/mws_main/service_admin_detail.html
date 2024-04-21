@@ -6,7 +6,7 @@
 {% block title %}{{ service.name }} | {{ tenant.name }}{% endblock %}
 
 {% block service-actions %}
-<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_service' tenant.store_url service.pk %}">Update service</a>
+<a class="action {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_service' service.pk %}">Update service</a>
 {% endblock %}
 
 {% block specific_content %}
@@ -48,8 +48,8 @@
 	    <h5 class="package-name">
 	      Package<!-- {{ package.n_package | add:1 }}-->
 	    </h5>
-	    <a class="update-button {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_package' tenant.store_url service.pk package.pk %}">Update</a>
-	    <a class="download-admin-button" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.pk %}">Download</a>
+	    <a class="update-button {{ metadata.main_theme_color }}-spec-action" href="{% url 'mws_main:update_package' service.pk package.pk %}">Update</a>
+	    <a class="download-admin-button" href="{% url 'mws_main:download_service' service.pk package.pk %}">Download</a>
 	  </nav>
 	  
 	  {% if package.descrp %}

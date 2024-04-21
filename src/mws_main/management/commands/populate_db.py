@@ -1,8 +1,8 @@
 import random
 import names
-import loremipsum
 import os
 
+from django.utils import lorem_ipsum
 from django.core.management.base import BaseCommand
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.core.files.temp import NamedTemporaryFile
@@ -15,9 +15,9 @@ import tenants.forms as tforms
 import mws_main.models as mmodels
 import mws_main.forms as mforms
 
-
+NSTORES = 5
+possible_subdomains = [f"tenant{nstore}" for nstore in range(1, NSTORES+1)]
 BOUNDS = {
-    "store": (7, 10),
     "service": (10, 13),
     "client": (9, 20),
     "developer": (4, 8),
@@ -29,12 +29,8 @@ BOUNDS = {
 PREFIX_STORE = ["", "mega", "super", "my", "the", "a"]
 STORE_MAIN_NAMES = ["repo", "store", "app store", "play store", "tech app"]
 
-store_names = []
-
 # Generate store names
-for prefix in PREFIX_STORE:
-    for name in STORE_MAIN_NAMES:
-        store_names.append(" ".join([prefix, name]))
+store_names = [" ".join([prefix, name]) for prefix in PREFIX_STORE for name in STORE_MAIN_NAMES]
 
 PASSWD = "Ab12345678"
 PACKAGES_DIR = os.path.dirname(__file__) + "/_packages/"
@@ -61,6 +57,7 @@ SERVICE_NAMES = [
     "Mis gastos",
     "Jellyfin"
 ]
+ADMIN_EMAIL = "admin@test.com"
 
 def generate_user():
 
@@ -81,32 +78,21 @@ def get_number(bound_t):
 def populate():
 
     # Generate stores (tenants)
-    nstores = get_number("store")
-
+    nstores = NSTORES
     generated_snames = random.sample(store_names, nstores)
 
-    for i, store_name in enumerate(generated_snames):
+    for i in range(nstores):
 
+        store_name = generated_snames[i]
         print(f"Creating store {i}: {store_name}...")
 
-        url = store_name.lower().replace(" ", "-") + str(random.randint(1, 100000))
+        
+        subdomain = possible_subdomains[i]
         tenant = tmodels.register_tenant(
             name=store_name.title(),
-            url=url
+            subdomain_prefix=subdomain,
+            email=ADMIN_EMAIL,
         )
-
-        # Generate admins
-        print("\tCreating admin...")
-        user = generate_user()
-        user["username"] = "admin"
-        admin_form = tforms.AdminForm(user)
-
-        if admin_form.is_valid():
-            admin = admin_form.save(commit=False)
-            admin.tenant = tenant
-            admin.save()
-        else:
-            print(f"\tError: {admin_form.errors}")
 
         # Generate developers
         print("\tCreating developers...")
@@ -116,8 +102,7 @@ def populate():
         for i_dev in range(ndevs):
             print(f"\t\tCreating developer {i_dev}...")
             user = generate_user()
-            initial = {'store_url': tenant.store_url}
-            developer_form = mforms.DeveloperCreationForm(user, initial=initial)
+            developer_form = mforms.DeveloperCreationForm(user)
 
             if developer_form.is_valid():
                 developer = developer_form.save()
@@ -134,8 +119,7 @@ def populate():
         for i_client in range(nclients):
             print(f"\t\tCreating client {i_client}...")
             user = generate_user()
-            initial = {"store_url": tenant.store_url}
-            client_form = mforms.ClientCreationForm(user, initial=initial)
+            client_form = mforms.ClientCreationForm(user)
 
             if client_form.is_valid():
                 client = client_form.save()
@@ -157,12 +141,12 @@ def populate():
             
             packages = [{
                 "package": package,
-                "descrp": loremipsum.generate(1, loremipsum.ParagraphLength.SHORT)}
+                "descrp": lorem_ipsum.sentence()}
                 for package in packages]
 
             # Generate service info
-            brief_descrp = loremipsum.generate(1, loremipsum.ParagraphLength.SHORT)
-            descrp = loremipsum.generate(1, loremipsum.ParagraphLength.MEDIUM)
+            brief_descrp = lorem_ipsum.sentence()
+            descrp = lorem_ipsum.paragraph()
             # Randomly select the developers assigned to this service
             nselected_devs = get_number("assigned_services")
             selected_devs = random.sample(developers, min(ndevs, nselected_devs))
@@ -172,13 +156,14 @@ def populate():
                 brief_descrp,
                 descrp,
                 packages,
-                tenant,
                 None,
                 selected_devs
             )
 
 
 class Command(BaseCommand):
+
+    help = "Populate the application with sample data"
 
     def handle(self, *args, **options):
         populate()

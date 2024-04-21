@@ -3,7 +3,6 @@ from django.db import models, connections
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
-from django.apps import apps
 from django import forms
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -34,7 +33,7 @@ def migrate_new_db(new_db_name, id):
     from django.db import connection
     
     set_db_for_router(id)
-    call_command("migrate", database=id, interactive=False, settings=settings)
+    call_command("migrate", database=id, verbosity=0, interactive=False, settings=settings)
 
 
 def create_tenant_db(name):
@@ -89,7 +88,7 @@ def register_tenant(name, subdomain_prefix, email):
     this behaviour can be easily extended to more complex configurations.
     """
 
-    tenant_db = create_tenant_db(name)
+    tenant_db = create_tenant_db(subdomain_prefix)
     new_db = {
         "NAME": tenant_db,
         "ENGINE": "django.db.backends.postgresql",
@@ -142,5 +141,11 @@ def register_tenant(name, subdomain_prefix, email):
     metadata = {"main_theme_color": "purple"}
     mmodels.Metadata.objects.create(
         appearance_metadata=metadata
+    )
+
+    mmodels.TenantAdmin.objects.create_user(
+        username="admin",
+        email=email,
+        password="Ab12345678",
     )
     return tenant

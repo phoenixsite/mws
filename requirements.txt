@@ -4,5 +4,4 @@ pyaxmlparser
 biplist
 markdown
 names
-py-loremipsum
 psycopg

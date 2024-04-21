@@ -24,18 +24,19 @@ import datetime
 
 import mws_main.models as models
 import mws_main.forms as forms
-import tenants.models as tenant_models
+import tenants.models as tmodels
+from tenants.middlewares import get_current_db_name
 
 class ThemeMixin(ContextMixin):
 
     def setup(self, request, *args, **kwargs):
-
         super().setup(request, *args, **kwargs)
+        self.metadata = models.Metadata.objects.all().first()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["metadata"] = models.Metadata.objects.all().first().appearance_metadata
-        context["tenant"] = tenant_models.Tenant
+        context["tenant"] = tmodels.Tenant.objects.get(subdomain_prefix=get_current_db_name())
+        context["metadata"] = self.metadata.appearance_metadata
         return context
 
 
@@ -229,9 +230,7 @@ class DeveloperCreateView(PermissionRequiredMixin, UserMixin, CreateView):
     def setup(self, request, *args, **kwargs):
 
         super().setup(request, *args, **kwargs)
-        self.initial = {'store_url': self.kwargs['store_url']}
-        self.success_url = reverse("mws_main:store_home",
-                                 args=[self.tenant.store_url])
+        self.success_url = reverse("mws_main:store_home")
 
     def get_success_url(self):
         return self.success_url
@@ -251,11 +250,9 @@ class ServiceCreateView(PermissionRequiredMixin, UserMixin, TemplateView):
         # The service could be created by the tenant admin,
         # so the service should not be added to it.
         if self.is_developer:
-            creator_key = {"creator": self.user.pk}
+            self.initial = {"creator": self.user.pk}
         else:
-            creator_key = {"creator": None}
-
-        self.initial.update(creator_key)
+            self.initial = {"creator": None}
 
         self.basic_form = None
         self.platform_formset = None
@@ -427,14 +424,14 @@ class UpdateStoreInfo(PermissionRequiredMixin, UserMixin, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.success_url = "/store/"
+        self.success_url = reverse("mws_main:store_home")
 
     def get(self, request, *args, **kwargs):
         
-        self.initial["main_theme_color"] = self.tenant.metadata["main_theme_color"]
+        self.initial["main_theme_color"] = self.metadata.appearance_metadata["main_theme_color"]
 
-        if "footer" in self.tenant.metadata:
-            metadata_foot = self.tenant.metadata["footer"]
+        if "footer" in self.metadata.appearance_metadata:
+            metadata_foot = self.metadata["footer"]
         
             for ncol, col in enumerate(metadata_foot):
                 
@@ -448,16 +445,16 @@ class UpdateStoreInfo(PermissionRequiredMixin, UserMixin, FormView):
         
     def form_valid(self, form):
         
-        self.tenant.metadata["main_theme_color"] = form.cleaned_data["main_theme_color"]
+        self.metadata.appearance_metadata["main_theme_color"] = form.cleaned_data["main_theme_color"]
 
         if form.has_footer():
-            self.tenant.metadata["footer"] = []
+            self.metadata.appearance_metadata["footer"] = []
 
             for col in form.get_non_empty_cols():
                 col_dict = {"title": col[0]}
                 col_dict["rows"] = [{'text': row[0], 'url': row[1]} for row in col[1]]
 
-                self.tenant.metadata["footer"].append(col_dict)
+                self.metadata.appearance_metadata["footer"].append(col_dict)
 
-        self.tenant.save(update_fields=["metadata"])
+        self.metadata.save(update_fields=["appearance_metadata"])
         return super().form_valid(form)

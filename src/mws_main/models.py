@@ -1,3 +1,6 @@
+import os
+
+from django.apps import apps
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -8,13 +11,11 @@ from django.core.files.storage import default_storage
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 import django.contrib.auth.models as auth_models
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.hashers import make_password
 
 import mws_main.utils as utils
+from tenants.middlewares import get_current_db_name
 
-import os
-
-DEV_GROUP = "developers"
-CLIENT_GROUP = "clients"
 
 class DescriptionField(models.TextField):
     """
@@ -41,14 +42,12 @@ class VersionEntry(models.Model):
 
 def store_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    store_url = Tenant.objects.get(pk=instance.service.tenant.pk).store_url
     filename = os.path.split(filename)[-1]
-    return f"{store_url}/{instance.service.name}/{filename}"
+    return f"{get_current_db_name()}/{instance.service.name}/{filename}"
 
 def image_dir_path(instance, filename):
     """Return the path for a uploaded file within a service"""
-    store_url = Tenant.objects.get(pk=instance.tenant.pk).store_url
-    return f"{store_url}/{instance.name}/image/{filename}"
+    return f"{get_current_db_name()}/{instance.name}/image/{filename}"
 
 
 class Package(models.Model):
@@ -255,6 +254,9 @@ def create_service(name, brief_descrp, descrp, packages, creator, developers):
 
     return service
 
+
+DEV_GROUP = "developers"
+CLIENT_GROUP = "clients"
 
 class UserManager(BaseUserManager):
 

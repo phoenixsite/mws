@@ -39,7 +39,7 @@ def get_tenant_db(subdomain_prefix):
         with conn.cursor() as cur:
             cur.execute(
                 sql.SQL("""
-                SELECT subdomain_prefix, db_name
+                SELECT subdomain_prefix
                 FROM {}
                 WHERE subdomain_prefix = %s;
                 """).format(sql.Identifier(TENANTS_TABLE)),
@@ -50,7 +50,7 @@ def get_tenant_db(subdomain_prefix):
     conn.close()
 
     if db_name:
-        db_name = db_name[1]
+        db_name = db_name[0]
     
     return db_name
 

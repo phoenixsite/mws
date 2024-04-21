@@ -1,1 +1,0 @@
-DATABASES['tenant1_domain'] = {'NAME': 'mws_tenant1_db', 'ENGINE': 'django.db.backends.postgresql', 'USER': 'mws_user', 'PASSWORD': 'Xcp813rc', 'HOST': 'localhost', 'PORT': 5432, 'TIME_ZONE': None, 'CONN_MAX_AGE': 0, 'AUTOCOMMIT': True, 'ATOMIC_REQUESTS': False, 'CONN_HEALTH_CHECKS': False, 'OPTIONS': {}, 'DISABLE_SERVER_SIDE_CURSORS': False, 'TEST': {}}
