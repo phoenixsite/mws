@@ -1,6 +1,5 @@
 from django.core.management import call_command
 from django.db import models, connections
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 from django import forms
@@ -57,18 +56,14 @@ def save_cached_db_settings(db_settings, id):
 
 def save_db_settings_to_file(db_settings, id):
 
-    path = "tenants/database_settings/"
     new_db_string = f"DATABASES['{id}'] = {str(db_settings)}"
-    file_to_store_settings = os.path.join(path, id + ".py")
+    file_to_store_settings = os.path.join(settings.PATH_DB_SETTINGS, id + ".py")
     
     with open(file_to_store_settings, "w") as file:
         file.write(new_db_string)
 
 
 def migrate_new_db(new_db_name, id):
-
-    from django.core.management import call_command
-    from django.db import connection
     
     set_db_for_router(id)
     call_command("migrate",

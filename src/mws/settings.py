@@ -95,8 +95,6 @@ DATABASE_ROUTERS = [
 ]
 
 # Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
 
     {
@@ -115,8 +113,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Europe/Madrid'
@@ -127,13 +123,9 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = [
@@ -145,12 +137,14 @@ MEDIA_URL = "/media/"
 LOGIN_REDIRECT_URL = None
 LOGIN_URL = None
 
-# Dynamic DB creation
+# Path to database settings dir
+PATH_DB_SETTINGS = Path(BASE_DIR, "tenants/database_settings")
+
+# Fetch dynamically the tenants databases information
 import os
 
-dir_settings = "tenants/database_settings/"
-for fname in os.listdir(dir_settings):
-    full_path = os.path.join(dir_settings, fname)
+for fname in os.listdir(PATH_DB_SETTINGS):
+    full_path = os.path.join(PATH_DB_SETTINGS, fname)
 
     with open(full_path, "r") as setting_file:
         content = setting_file.read()

@@ -1,7 +1,7 @@
 from django.db import migrations
 
 ADMIN_GROUP = "admins"
-CLIENT_GROUP = "client"
+CLIENT_GROUP = "clients"
 DEV_GROUP = "developers"
 
 def create_groups(apps, schema_editor):
