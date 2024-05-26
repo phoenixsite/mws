@@ -14,6 +14,7 @@ The following list shows the software required to execute the platform:
  Also it is required to install all the Python packages in the requirements.txt file.
 
 ## Installation instructions for a local set-up
+The maximum number of tenants in this scenario is limited to five.
 
 ### Database set up
 
@@ -32,7 +33,34 @@ project and write the `mws_user` password on the previous file.
 on the project root folder and activate it.
 9. Install the required packages using `pip install -r requirements.txt`.
 11. If you want some sample data to appear on the platform, you can execute in the
-'src/' directory the command `python manage.py populate_db <ntenants>`. 
+'src/' directory the command `python manage.py populate_db <ntenants>`.
+12. This step needs to be made carefully. In order to make the web server to accept
+requests to some subdomains, which is the way the tenants are redirected to their
+respective stores, we need to modify the host file of the operative system. Back it
+up before proceeding.
+   - If you are setting up the platform on Windows, you need to add the following
+   lines to the file `C:\Windows\System32\drivers\etc\hosts`:
+   ``
+   127.0.0.1 mws.local
+   127.0.0.1 tenant1.mws.local
+   127.0.0.1 tenant2.mws.local
+   127.0.0.1 tenant3.mws.local
+   127.0.0.1 tenant4.mws.local
+   127.0.0.1 tenant5.mws.local
+   ``
+   - If you are on an UNIX-based OS, you need to modify the file `/etc/hosts` by
+   adding the following lines:
+   ``
+   127.0.0.1    mws.local
+   127.0.0.1    tenant1.mws.local
+   127.0.0.1    tenant2.mws.local
+   127.0.0.1    tenant3.mws.local
+   127.0.0.1    tenant4.mws.local
+   127.0.0.1    tenant5.mws.local
+   ``
+   This is the reason why the number of tenants is limited to five, because
+   we would need to modify the host file to add more tenants, something not yet
+   implemented.
 
 ## Running MWS
 
