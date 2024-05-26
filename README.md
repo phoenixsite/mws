@@ -62,6 +62,7 @@ up before proceeding.
    This is the reason why the number of tenants is limited to five, because
    we would need to modify the host file to add more tenants, something not yet
    implemented.
+
 13. Finally, the last step is to migrate the models to the database created with
 ``python manage.py migrate``.
 
