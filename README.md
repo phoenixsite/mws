@@ -38,26 +38,27 @@ on the project root folder and activate it.
 requests to some subdomains, which is the way the tenants are redirected to their
 respective stores, we need to modify the host file of the operative system. Back it
 up before proceeding.
+
    - If you are setting up the platform on Windows, you need to add the following
    lines to the file `C:\Windows\System32\drivers\etc\hosts`:
-   ``
+   ```
    127.0.0.1 mws.local
    127.0.0.1 tenant1.mws.local
    127.0.0.1 tenant2.mws.local
    127.0.0.1 tenant3.mws.local
    127.0.0.1 tenant4.mws.local
    127.0.0.1 tenant5.mws.local
-   ``
+   ```
    - If you are on an UNIX-based OS, you need to modify the file `/etc/hosts` by
    adding the following lines:
-   ``
+   ```
    127.0.0.1    mws.local
    127.0.0.1    tenant1.mws.local
    127.0.0.1    tenant2.mws.local
    127.0.0.1    tenant3.mws.local
    127.0.0.1    tenant4.mws.local
    127.0.0.1    tenant5.mws.local
-   ``
+   ```
    This is the reason why the number of tenants is limited to five, because
    we would need to modify the host file to add more tenants, something not yet
    implemented.
