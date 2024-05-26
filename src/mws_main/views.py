@@ -350,10 +350,7 @@ class UpdateServiceView(UserMixin, UpdateView):
 
 class PackageMixin(UserMixin):
     """
-    View whose functionality depends on a service package.
-
-    Due to the abstract feature of the `package model, some previous
-    steps are required to get a package.
+    Fetch the selected package and service.
     """
 
     def setup(self, request, *args, **kwargs):
@@ -382,6 +379,10 @@ class DownloadServiceView(PackageMixin, View):
         
         package_url = self.package.package_file.url
         self.service.new_acquirement(self.user)
+
+        if self.is_client:
+            self.metadata.download_bandwidth
+            
         return redirect(package_url)
 
 
@@ -427,20 +428,26 @@ class UpdateStoreInfo(PermissionRequiredMixin, UserMixin, FormView):
         self.success_url = reverse("mws_main:store_home")
 
     def get(self, request, *args, **kwargs):
-        
-        self.initial["main_theme_color"] = self.metadata.appearance_metadata["main_theme_color"]
+        """
+        Fetch all the personalization metadata and put them
+        available to the update form.
+        """
 
-        if "footer" in self.metadata.appearance_metadata:
-            metadata_foot = self.metadata["footer"]
+        self.initial[self.metadata.MAIN_THEME_FIELD] = self.metadata.appearance_metadata[self.metadata.MAIN_THEME_FIELD]
+
+        if self.metadata.FOOT_FIELD in self.metadata.appearance_metadata:
+            metadata_foot = self.metadata.appearance_metadata[self.metadata.FOOT_FIELD]
         
             for ncol, col in enumerate(metadata_foot):
                 
-                self.initial[f"footer_col{ncol + 1}_title"] = col["title"]
+                self.initial[f"footer_col{ncol + 1}_title"] = col[self.metadata.TITLE_FIELD]
                 
-                for nrow, row in enumerate(col["rows"]):
+                for nrow, row in enumerate(col[self.metadata.ROWS_FIELD]):
 
-                    self.initial[f"footer_col{ncol + 1}_row{nrow + 1}_text"] = row["text"]
-                    self.initial[f"footer_col{ncol + 1}_row{nrow + 1}_url"] = row["url"]
+                    field = f"footer_col{ncol + 1}_row{nrow + 1}"
+
+                    self.initial[f"{field}_text"] = row[self.metadata.TEXT_FIELD]
+                    self.initial[f"{field}_url"] = row[self.metadata.URL_FIELD]
         return super().get(request, *args, **kwargs)
         
     def form_valid(self, form):

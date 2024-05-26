@@ -1,5 +1,6 @@
 import django.forms as forms
 from django.db.models import Q
+import django.contrib.auth.models as auth_models
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth import authenticate
 from mws_main import models
@@ -179,7 +180,7 @@ class UserUpdateForm(forms.ModelForm):
 
     
     class Meta:
-        model = models.User
+        model = auth_models.User
         fields = [
             "first_name",
             "last_name",

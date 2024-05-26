@@ -15,30 +15,6 @@ import os
 from tenants.middlewares import set_db_for_router
 import mws_main.models as mmodels
 
-def save_cached_db_settings(db_settings, id):
-    connections.databases[id] = db_settings
-
-def save_db_settings_to_file(db_settings, id):
-
-    path = "tenants/database_settings/"
-    new_db_string = f"DATABASES['{id}'] = {str(db_settings)}"
-    file_to_store_settings = os.path.join(path, id + ".py")
-    
-    with open(file_to_store_settings, "w") as file:
-        file.write(new_db_string)
-
-def migrate_new_db(new_db_name, id):
-
-    from django.core.management import call_command
-    from django.db import connection
-    
-    set_db_for_router(id)
-    call_command("migrate", database=id, verbosity=0, interactive=False, settings=settings)
-
-
-def create_tenant_db(name):
-    return f"mws_{name}_db"
-
 
 class Tenant(models.Model):
     """
@@ -73,6 +49,37 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
+
+
+def save_cached_db_settings(db_settings, id):
+    connections.databases[id] = db_settings
+
+
+def save_db_settings_to_file(db_settings, id):
+
+    path = "tenants/database_settings/"
+    new_db_string = f"DATABASES['{id}'] = {str(db_settings)}"
+    file_to_store_settings = os.path.join(path, id + ".py")
+    
+    with open(file_to_store_settings, "w") as file:
+        file.write(new_db_string)
+
+
+def migrate_new_db(new_db_name, id):
+
+    from django.core.management import call_command
+    from django.db import connection
+    
+    set_db_for_router(id)
+    call_command("migrate",
+                 database=id,
+                 verbosity=0,
+                 interactive=False,
+                 settings=settings)
+
+
+def create_tenant_db(name):
+    return f"mws_{name}_db"
 
 
 def register_tenant(name, subdomain_prefix, email):
@@ -116,7 +123,7 @@ def register_tenant(name, subdomain_prefix, email):
         autocommit=True
     )
     
-    with  conn:
+    with conn:
 
         with conn.cursor() as cur:
             cur.execute(
@@ -134,13 +141,14 @@ def register_tenant(name, subdomain_prefix, email):
     tenant = Tenant.objects.create(
         name=name,
         subdomain_prefix=subdomain_prefix,
-        db_name=name,
+        db_name=tenant_db,
         email=email,
     )
 
     metadata = {"main_theme_color": "purple"}
     mmodels.Metadata.objects.create(
-        appearance_metadata=metadata
+        appearance_metadata=metadata,
+        download_bandwidth={},
     )
 
     mmodels.TenantAdmin.objects.create_user(

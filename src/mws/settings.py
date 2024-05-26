@@ -139,10 +139,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-    
+
 MEDIA_ROOT = "media/"
 MEDIA_URL = "/media/"
-AUTH_USER_MODEL = "mws_main.User"
 LOGIN_REDIRECT_URL = None
 LOGIN_URL = None
 
