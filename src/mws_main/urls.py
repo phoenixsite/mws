@@ -59,7 +59,7 @@ urlpatterns = [
                       views.DeveloperCreateView.as_view(),
                       name="add_developer"),
 
-                 path("services/<str:pk>/",
+                 path("services/<int:pk>/",
                       views.ServiceDetailView.as_view(),
                       name="service_detail"),
 
@@ -83,7 +83,7 @@ urlpatterns = [
                       views.UpdatePackageView.as_view(),
                       name="update_package"),
 
-                 path("update_service/<str:pk>/",
+                 path("update-service/<str:pk>/",
                       views.UpdateServiceView.as_view(),
                       name="update_service"),
 

@@ -26,7 +26,7 @@ must be wrote on a file in the Django folder structure.
 
 ### Platform set up
 
-4. Clone the MWS source code with `git clone` or download the zip file from Github.
+4. Clone the MWS source code with `git clone`.
 5. Create a file called `mwsdb_password.txt` in the folder `src/mws/` of the Django
 project and write the `mws_user` password on the previous file.
 7. (Optional) Create a [virtual environment](https://docs.python.org/3/library/venv.html)

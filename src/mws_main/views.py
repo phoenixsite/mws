@@ -1,3 +1,7 @@
+import os
+from urllib.parse import unquote
+import datetime
+
 from django.views import View
 from django.views.generic import (
     TemplateView,
@@ -18,10 +22,6 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.forms import formset_factory
 from django.utils import timezone
 
-import os
-from urllib.parse import unquote
-import datetime
-
 import mws_main.models as models
 import mws_main.forms as forms
 import tenants.models as tmodels
@@ -35,44 +35,24 @@ class ThemeMixin(ContextMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tenant"] = tmodels.Tenant.objects.get(subdomain_prefix=get_current_db_name())
+        context["tenant"] = tmodels.Tenant.objects.get(
+            subdomain_prefix=get_current_db_name()
+        )
         context["metadata"] = self.metadata.appearance_metadata
         return context
 
 
 class UserMixin(LoginRequiredMixin, ThemeMixin):
-    """
-    Represent a view contained in a tenant store and
-    its access is restricted to authenticated tenant users.
-    
-    The contents provided by the view may depend on the
-    the user permissions.
-    """
 
-    login_url = "/store/login"
-    
     def setup(self, request, *args, **kwargs):
 
         super().setup(request, *args, **kwargs)
+        self.is_client = request.is_client
+        self.is_developer = request.is_developer
+        self.is_admin = request.is_admin
+        self.user = request.user
+    
 
-        self.user = self.request.user
-        self.is_client = False
-        self.is_developer = False
-        self.is_admin = False
-        
-        if self.user.groups.filter(name=models.CLIENT_GROUP).exists():
-            self.user = self.user.client
-            self.is_client = True
-            
-        elif self.user.groups.filter(name=models.DEV_GROUP).exists():
-            self.user = self.user.developer
-            self.is_developer = True
-            
-        elif self.user.groups.filter(name=models.ADMIN_GROUP).exists():
-            self.user = self.user.tenantadmin
-            self.is_admin = True
-
-        
 class LoginView(auth_views.LoginView, ThemeMixin):
     """
     Login view. It lets client, developers and tenant
@@ -112,14 +92,11 @@ class SignupSuccessView(TemplateView, ThemeMixin):
 class PasswordResetView(UserMixin, auth_views.PasswordResetView):
     pass
 
-
 class PasswordResetDoneView(UserMixin, auth_views.PasswordResetDoneView):
     pass
 
-
 class PasswordResetConfirmView(UserMixin, auth_views.PasswordResetConfirmView):
     pass
-
 
 class PasswordResetCompleteView(UserMixin, auth_views.PasswordResetCompleteView):
     pass
@@ -345,7 +322,7 @@ class UpdateServiceView(UserMixin, UpdateView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.queryset = models.Service.objects.all()
-        self.success_url = reverse("mws_main:service_admin_detail", self.get_object().pk)
+        self.success_url = reverse("mws_main:service_admin_detail", args=[self.get_object().pk])
     
 
 class PackageMixin(UserMixin):
@@ -378,7 +355,7 @@ class DownloadServiceView(PackageMixin, View):
     def get(self, request, *args, **kwargs):
         
         package_url = self.package.package_file.url
-        self.service.new_acquirement(self.user)
+        self.service.new_acquirement(self.user, self.is_client)
 
         if self.is_client:
             self.metadata.download_bandwidth

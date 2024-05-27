@@ -14,6 +14,9 @@ import mws_main.models as mmodels
 import mws_main.forms as mforms
 
 MAX_TENANTS = 5
+# Dummy password and email
+PASSWD = "Ab12345678"
+ADMIN_EMAIL = "admin@test.com"
 
 def generate_user():
 
@@ -90,10 +93,6 @@ class Command(BaseCommand):
             "Jellyfin"
         ]
         
-        # Dummy password and email
-        PASSWD = "Ab12345678"
-        ADMIN_EMAIL = "admin@test.com"
-
         # Generate tenants
         ntenants = options["ntenants"]
         generated_snames = random.sample(store_names, ntenants)

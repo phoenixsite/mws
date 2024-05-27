@@ -7,7 +7,7 @@
 
   <h1>Update service {{ service.name }}</h1>
   
-  <form class="registration-form" method="post" action="{% url 'mws_main:update_service' tenant.store_url service.pk %}">
+  <form class="registration-form" method="post" action="{% url 'mws_main:update_service' service.pk %}">
     {% csrf_token %}
     {{ form.as_ul }}
     

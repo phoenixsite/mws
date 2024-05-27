@@ -10,6 +10,7 @@ import psycopg.sql as sql
 
 import datetime
 import os
+import time
 
 from tenants.middlewares import set_db_for_router
 import mws_main.models as mmodels
@@ -72,6 +73,14 @@ def migrate_new_db(new_db_name, id):
                  interactive=False,
                  settings=settings)
 
+def load_permissions(id):
+
+    call_command("loaddata",
+                 [settings.PERMISSIONS_FIXTURE],
+                 database=id,
+                 verbosity=0,
+                 settings=settings)
+
 
 def create_tenant_db(name):
     return f"mws_{name}_db"
@@ -132,6 +141,7 @@ def register_tenant(name, subdomain_prefix, email):
     save_cached_db_settings(new_db, subdomain_prefix)
     save_db_settings_to_file(new_db, subdomain_prefix)
     migrate_new_db(tenant_db, subdomain_prefix)
+    load_permissions(subdomain_prefix)
     
     tenant = Tenant.objects.create(
         name=name,

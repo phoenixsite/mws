@@ -176,7 +176,7 @@ class Service(models.Model):
     def __str__(self):
         return f"{self.name} ({self.pk})"
     
-    def new_acquirement(self, user):
+    def new_acquirement(self, user, is_client):
         """
         Update the number of acquirements and downloads if a client has
         acquired the service and assign the client to this instance.
@@ -185,7 +185,7 @@ class Service(models.Model):
         :type user: tenants.models.User
         """
 
-        if user.groups.filter(name=CLIENT_GROUP).exists():
+        if is_client:
 
             self.n_downloads = models.F("n_downloads") + 1
             
@@ -258,15 +258,17 @@ class TenantAdmin(auth_models.User):
     the core information of its tenant. 
     """
 
+    
+    # Must be synchronised with the admin group
+    # name 003_auto migration file
+    group_name = "admins"
+
     def save(self, *args, **kwargs):
 
         super().save(*args, **kwargs)
 
-        # Must be synchronised with the admin group
-        # name 003_auto migration file
-        group_name = "admins"
-        if not self.groups.filter(name=group_name).exists():
-            group = auth_models.Group.objects.get(name=group_name)
+        if not self.groups.filter(name=self.__class__.group_name).exists():
+            group = auth_models.Group.objects.get(name=self.__class__.group_name)
             self.groups.add(group)
 
 
@@ -277,6 +279,11 @@ class Developer(auth_models.User):
     create new services
     """
 
+    
+    # Must be synchronised with the admin group
+    # name 003_auto migration file
+    group_name = "developers"
+    
     assigned_services = models.ManyToManyField(Service)
 
     class Meta:
@@ -288,11 +295,8 @@ class Developer(auth_models.User):
 
         super().save(*args, **kwargs)
 
-        # Must be synchronised with the admin group
-        # name 003_auto migration file
-        group_name = "developers"
-        if not self.groups.filter(name=group_name).exists():
-            group = auth_models.Group.objects.get(name=group_name)
+        if not self.groups.filter(name=self.__class__.group_name).exists():
+            group = auth_models.Group.objects.get(name=self.__class__.group_name)
             self.groups.add(group)
 
 
@@ -302,6 +306,10 @@ class Client(auth_models.User):
     them. Once acquired, they can download it whenever they want.
     """
 
+    # Must be synchronised with the admin group
+    # name 003_auto migration file
+    group_name = "clients"
+    
     services_acq = models.ManyToManyField(Service)
 
     class Meta:
@@ -313,11 +321,8 @@ class Client(auth_models.User):
 
         super().save(*args, **kwargs)
 
-        # Must be synchronised with the admin group
-        # name 003_auto migration file
-        group_name = "clients"
-        if not self.groups.filter(name=group_name).exists():
-            group = auth_models.Group.objects.get(name=group_name)
+        if not self.groups.filter(name=self.__class__.group_name).exists():
+            group = auth_models.Group.objects.get(name=self.__class__.group_name)
             self.groups.add(group)
 
     def has_services(self):
