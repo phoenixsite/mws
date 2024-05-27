@@ -72,7 +72,6 @@ def save_cached_db_settings(db_settings, id):
 
 def migrate_new_db(new_db_name, id):
     
-    set_db_for_router(id)
     call_command("migrate",
                  database=id,
                  verbosity=0,
@@ -145,6 +144,7 @@ def register_tenant(name, subdomain_prefix, email):
 
     settings.DATABASES[subdomain_prefix] = new_db
     save_cached_db_settings(new_db, subdomain_prefix)
+    set_db_for_router(subdomain_prefix)
     migrate_new_db(tenant_db, subdomain_prefix)
     load_permissions(subdomain_prefix)
     

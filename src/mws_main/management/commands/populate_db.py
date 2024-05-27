@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.core.files.temp import NamedTemporaryFile
 from django.utils.datastructures import MultiValueDict
+from django.contrib.auth.hashers import make_password
 
 import tenants.models as tmodels
 import tenants.forms as tforms
@@ -24,7 +25,7 @@ def generate_user():
     user["last_name"] = names.get_last_name()
     user["username"] = "_".join([user["first_name"], user["last_name"]]).lower() + str(random.randint(1, 10000000))
     user["email"] = f"{user['username']}@test.com"
-    user["password1"] = user["password2"] = PASSWD
+    user["password1"] = PASSWD
 
     return user
 
@@ -117,11 +118,16 @@ class Command(BaseCommand):
             for i_dev in range(ndevs):
                 self.stdout.write(f"\t\tCreating developer {i_dev}...")
                 user = generate_user()
-                developer_form = mforms.DeveloperCreationForm(user)
+                
+                dev = mmodels.Developer.objects.create(
+                    first_name=user["first_name"],
+                    last_name=user["last_name"],
+                    username=user["username"],
+                    password=make_password(user["password1"]),
+                    email=user["email"]
+                )
 
-                if developer_form.is_valid():
-                    developer = developer_form.save()
-                    developers.append(developer)
+                developers.append(dev)
 
             # Generate clients
             self.stdout.write("\tCreating clients...")
@@ -130,11 +136,15 @@ class Command(BaseCommand):
             for i_client in range(nclients):
                 self.stdout.write(f"\t\tCreating client {i_client}...")
                 user = generate_user()
-                client_form = mforms.ClientCreationForm(user)
 
-                if client_form.is_valid():
-                    client = client_form.save()
-
+                mmodels.Client.objects.create(
+                    first_name=user["first_name"],
+                    last_name=user["last_name"],
+                    username=user["username"],
+                    password=make_password(user["password1"]),
+                    email=user["email"]
+                )
+                
             # Generate services
             self.stdout.write("\tCreating services...")
             nservices = get_number("service")
