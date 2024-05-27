@@ -138,17 +138,47 @@ MEDIA_URL = "/media/"
 LOGIN_REDIRECT_URL = None
 LOGIN_URL = "/store/login"
 
+import psycopg
+import psycopg.sql as sql
+
 # Path to database settings dir
 PATH_DB_SETTINGS = Path(BASE_DIR, "tenants/database_settings")
 
-# Fetch dynamically the tenants databases information
-import os
+conn = psycopg.connect(
+    host=DATABASES["default"]["HOST"],
+    port=DATABASES["default"]["PORT"],
+    user=DATABASES["default"]["USER"],
+    password=DATABASES["default"]["PASSWORD"],
+    dbname=DATABASES["default"]["NAME"],
+    autocommit=True
+)
 
-for fname in os.listdir(PATH_DB_SETTINGS):
-    full_path = os.path.join(PATH_DB_SETTINGS, fname)
 
-    with open(full_path, "r") as setting_file:
-        content = setting_file.read()
-        exec(content)
+# Carefull with this. Hard-coded table of the model
+# where the tenant information is stored
+
+try:
+    with conn.cursor() as cur:
+        cur.execute("SELECT subdomain_prefix, db_name, db_user, db_password, db_port, db_host FROM tenants_tenant")
+    
+        for record in cur:
+            DATABASES[record[0]] = {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': record[1],
+                'USER': record[2],
+                'PASSWORD': record[3],
+                'PORT': record[4],
+                'HOST': record[5],
+                'CONN_MAX_AGE': 120,
+                'OPTIONS': {
+                    'client_encoding': 'UTF8',
+                    'isolation_level': IsolationLevel.SERIALIZABLE,
+                },
+            }
+
+except psycopg.errors.UndefinedTable:
+    pass
+finally:
+    conn.close()
 
 PERMISSIONS_FIXTURE = "permissions.json"

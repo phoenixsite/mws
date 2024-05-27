@@ -1,3 +1,7 @@
+import datetime
+import os
+import time
+
 from django.core.management import call_command
 from django.db import models, connections
 from django.conf import settings
@@ -7,10 +11,6 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 import psycopg
 import psycopg.sql as sql
-
-import datetime
-import os
-import time
 
 from tenants.middlewares import set_db_for_router
 import mws_main.models as mmodels
@@ -29,22 +29,37 @@ class Tenant(models.Model):
     name = models.CharField(
         "store name",
         max_length=25,
-        blank=False,
     )
 
     subdomain_prefix = models.CharField(
         max_length=25,
-        blank=False,
         unique=True,
         help_text="Subdomain address to the tenant store.",
     )
 
     db_name = models.CharField(
         max_length=25,
-        blank=False,
         unique=True,
     )
 
+    db_host = models.CharField(
+        max_length=45,
+    )
+
+    db_port = models.CharField(
+        max_length=6,
+    )
+
+    # Careful, this should change.
+    # Plain password on database
+    db_password = models.CharField(
+        max_length=35,
+    )
+
+    db_user = models.CharField(
+        max_length=30,
+    )
+    
     email = models.EmailField()
 
     def __str__(self):
@@ -53,15 +68,6 @@ class Tenant(models.Model):
 
 def save_cached_db_settings(db_settings, id):
     connections.databases[id] = db_settings
-
-
-def save_db_settings_to_file(db_settings, id):
-
-    new_db_string = f"DATABASES['{id}'] = {str(db_settings)}"
-    file_to_store_settings = os.path.join(settings.PATH_DB_SETTINGS, id + ".py")
-    
-    with open(file_to_store_settings, "w") as file:
-        file.write(new_db_string)
 
 
 def migrate_new_db(new_db_name, id):
@@ -82,7 +88,7 @@ def load_permissions(id):
                  settings=settings)
 
 
-def create_tenant_db(name):
+def generate_tenant_db(name):
     return f"mws_{name}_db"
 
 
@@ -99,7 +105,7 @@ def register_tenant(name, subdomain_prefix, email):
     this behaviour can be easily extended to more complex configurations.
     """
 
-    tenant_db = create_tenant_db(subdomain_prefix)
+    tenant_db = generate_tenant_db(subdomain_prefix)
     new_db = {
         "NAME": tenant_db,
         "ENGINE": "django.db.backends.postgresql",
@@ -139,7 +145,6 @@ def register_tenant(name, subdomain_prefix, email):
 
     settings.DATABASES[subdomain_prefix] = new_db
     save_cached_db_settings(new_db, subdomain_prefix)
-    save_db_settings_to_file(new_db, subdomain_prefix)
     migrate_new_db(tenant_db, subdomain_prefix)
     load_permissions(subdomain_prefix)
     
@@ -147,6 +152,10 @@ def register_tenant(name, subdomain_prefix, email):
         name=name,
         subdomain_prefix=subdomain_prefix,
         db_name=tenant_db,
+        db_user=new_db["USER"],
+        db_host=new_db["HOST"],
+        db_port=new_db["PORT"],
+        db_password=new_db["PASSWORD"],
         email=email,
     )
 
