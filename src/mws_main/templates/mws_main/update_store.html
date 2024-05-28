@@ -271,6 +271,30 @@
     
   </fieldset>
 </form>
+{% endblock %}
 
+{% block final_js_scripts %}
+<script type="text/javascript">
+  var oldvalue = ""
+  document.getElementById("id_main_theme_color").addEventListener("focus", function() {
+      console.log("old value: " + this.value)
+      oldvalue = this.value;
+  })
 
+  document.getElementById("id_main_theme_color").addEventListener("change", function() {
+
+      const suffixes = ["-background", "-action", "-hover"]
+
+      for (let i = 0; i < suffixes.length; i++) {
+
+	  const collection = document.getElementsByClassName(oldvalue.concat(suffixes[i]));
+	  while(collection.length > 0) {
+	      collection[0].classList.replace(oldvalue.concat(suffixes[i]), this.value.concat(suffixes[i]));
+	  }
+      }
+      
+      oldvalue = this.value
+      console.log("New old value: " + oldvalue)
+  })
+</script>
 {% endblock %}
