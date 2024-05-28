@@ -93,8 +93,14 @@ class Package(models.Model):
         """
         Upload a new version of the current package.
 
+        If the package hasn't been updated yet, it creates a version `
+        entry for the initial package and another for the current
+        update. 
+
         :param package_file: File-like object containing the file.
-        :param changes: Description of the included changes in the package.
+        :param changes: Description of the included changes in the
+        package.
+        :type changes: str
         """
 
         if not self.versionentry_set.all().exists():
@@ -162,10 +168,6 @@ class Service(models.Model):
         help_text="Date and time when the service was firstly published."
     )
 
-    # This field is in Service and not in Package because as Package is an abstract
-    # model we cannot avoid race conditions when incrementing the number of downloads
-    # of a Package instance and updating the whole packages array of a Service is
-    # too expensive
     n_downloads = models.PositiveIntegerField("number of downloads", default=0)
 
     class Meta:
@@ -178,11 +180,16 @@ class Service(models.Model):
     
     def new_acquirement(self, user, is_client):
         """
-        Update the number of acquirements and downloads if a client has
-        acquired the service and assign the client to this instance.
+        Increase the number of acquirements and assign the service to
+        the client.
+
+        If `user` is not a client, the number of downloads isn't
+        increased nor assigned.
 
         :param user: client who acquired the service.
-        :type user: tenants.models.User
+        :type user: Client
+        :param is_client: Indicate if `user` is a client.
+        :type is_client: boolean
         """
 
         if is_client:
@@ -258,7 +265,6 @@ class TenantAdmin(auth_models.User):
     the core information of its tenant. 
     """
 
-    
     # Must be synchronised with the admin group
     # name 003_auto migration file
     group_name = "admins"
@@ -278,7 +284,6 @@ class Developer(auth_models.User):
     modify their information, upload new versions and
     create new services
     """
-
     
     # Must be synchronised with the admin group
     # name 003_auto migration file
@@ -288,7 +293,8 @@ class Developer(auth_models.User):
 
     class Meta:
         permissions = [
-            ("view_admin_developer", "Can view detailed information of a developer"),
+            ("view_admin_developer",
+             "Can view detailed information of a developer"),
         ]
     
     def save(self, *args, **kwargs):
@@ -314,7 +320,8 @@ class Client(auth_models.User):
 
     class Meta:
         permissions = [
-            ("view_admin_client", "Can view detailed information of a client"),
+            ("view_admin_client",
+             "Can view detailed information of a client"),
         ]
 
     def save(self, *args, **kwargs):

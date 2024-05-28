@@ -14,7 +14,7 @@
     <ul class="service-listing">
       {% for service in services %}
       <li class="service-item">
-	<a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	<a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
 	  {% if service.icon %}
 	  <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	  {% endif %}
@@ -37,7 +37,7 @@
       <ul class="service-listing">
 	{% for service in last_uploaded_services %}
 	<li class="service-item">
-	  <a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
 	    {% if service.icon %}
 	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	    {% endif %}
@@ -55,7 +55,7 @@
       <ul class="service-listing">
 	{% for service in last_updated_services %}
 	<li class="service-item">
-	  <a class="service-header" href="{% url 'mws_main:service_detail' tenant.store_url service.pk %}">
+	  <a class="service-header" href="{% url 'mws_main:service_detail' service.pk %}">
 	    {% if service.icon %}
 	    <img class="service-icon" src="{{ service.icon.url  }}" width="50" height="50">
 	    {% endif %}

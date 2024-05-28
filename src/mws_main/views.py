@@ -123,7 +123,6 @@ class StoreHomeView(UserMixin, TemplateView):
         elif self.is_admin:
             return template_name.format("admin")
 
-
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
@@ -296,6 +295,15 @@ class UserDetailView(UserMixin, DetailView):
             self.template_name = "mws_main/tenantadmin_detail.html"
             self.model = models.TenantAdmin
 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.is_developer:
+            context["assigned_services"] = self.object.assigned_services.all()
+
+        return context
+    
     def get_object(self, queryset=None):
         return self.user
 
@@ -387,7 +395,7 @@ class UpdatePackageView(PackageMixin, FormView):
 class StoreInfoView(PermissionRequiredMixin, UserMixin, TemplateView):
 
     template_name = "mws_main/store_detail.html"
-    permission_required = "tenants.view_tenant"
+    permission_required = "mws_main.view_metadata"
 
     def get_context_data(self, **kwargs):
 
@@ -396,7 +404,7 @@ class StoreInfoView(PermissionRequiredMixin, UserMixin, TemplateView):
 
 class UpdateStoreInfo(PermissionRequiredMixin, UserMixin, FormView):
     template_name = "mws_main/update_store.html"
-    permission_required = "tenants.change_tenant"
+    permission_required = "mws_main.change_metadata"
     form_class = forms.StoreMetadataForm
     success_url = "mws_main:store_home"
 

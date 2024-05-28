@@ -33,7 +33,7 @@
 	    <h5 class="package-name">
 	      Package <!--{{ package.n_package | add:1 }}-->
 	    </h5>
-	    <a class="download-button {{ metadata.main_theme_color }}-background" href="{% url 'mws_main:download_service' tenant.store_url service.pk package.pk %}">Download</a>
+	    <a class="download-button {{ metadata.main_theme_color }}-background" href="{% url 'mws_main:download_service' service.pk package.pk %}">Download</a>
 	  </nav>
 	  
 	  {% if package.descrp %}

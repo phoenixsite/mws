@@ -18,12 +18,11 @@ import mws_main.models as mmodels
 
 class Tenant(models.Model):
     """
-    Represent the core data of those whose services
-    are hosted in the platform. 
+    Represent the core data of those whose services are hosted in the
+    platform. 
 
-    A tenant are the users of their part of the platform,
-    the resources used by them and thier clients (not
-    implemented yet).
+    A tenant are the users of their part of the platform, the resources
+    used by them and thier clients.
     """
     
     name = models.CharField(
@@ -140,8 +139,6 @@ def register_tenant(name, subdomain_prefix, email):
                 .format(sql.Identifier(tenant_db))
             )
 
-    conn.close()
-
     settings.DATABASES[subdomain_prefix] = new_db
     save_cached_db_settings(new_db, subdomain_prefix)
     set_db_for_router(subdomain_prefix)
@@ -158,6 +155,8 @@ def register_tenant(name, subdomain_prefix, email):
         db_password=new_db["PASSWORD"],
         email=email,
     )
+
+    conn.close()
 
     metadata = {"main_theme_color": "purple"}
     mmodels.Metadata.objects.create(
