@@ -6,7 +6,7 @@ THREAD_LOCAL = threading.local()
 def get_current_db_name():
     return getattr(THREAD_LOCAL, "DB", None)
     
-def set_db_for_router(db):
+def set_db_for_router(db=None):
     setattr(THREAD_LOCAL, "DB", db)
 
 class TenantMiddleware:

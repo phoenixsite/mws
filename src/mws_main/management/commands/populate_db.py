@@ -106,7 +106,7 @@ class Command(BaseCommand):
             subdomain = possible_subdomains[i]
             tenant = tmodels.register_tenant(
                 name=store_name.title(),
-                subdomain_prefix=subdomain,
+                subdomain=subdomain,
                 email=ADMIN_EMAIL,
             )
 

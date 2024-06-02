@@ -30,6 +30,7 @@ class RegistrationView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["tenant_form"] = self.tenant_form_class()
+        context["reg_error"] = None
         return context
     
     def post(self, request, *args, **kwargs):
@@ -38,11 +39,22 @@ class RegistrationView(TemplateView):
         
         if tenant_form.is_valid():
 
-            tenant = models.register_tenant(
-                tenant_form.cleaned_data['name'],
-                tenant_form.cleaned_data['subdomain_prefix'],
-                tenant_form.cleaned_data['email'],
-            )
+            try:
+                tenant = models.register_tenant(
+                    tenant_form.cleaned_data['name'],
+                    tenant_form.cleaned_data['subdomain_prefix'],
+                    tenant_form.cleaned_data['email'],
+                )
+            except exceptions.TenantRegistrationError as error:
+                
+                return render(
+                    request,
+                    self.template_name,
+                    {
+                        "tenant_form": tenant_form,
+                        "reg_error": str(error),
+                    },
+                )
             
             store_url = f"http://{tenant.subdomain_prefix}.mws.local:8000/store/"
             messages.success(
@@ -57,7 +69,9 @@ class RegistrationView(TemplateView):
             self.template_name,
             {
                 "tenant_form": tenant_form,
-            })
+            },
+            status=422,
+        )
 
 
 class PlansView(TemplateView):

@@ -16,26 +16,16 @@
 	a store name and a URL for it must be
 	provided. We recommend that, at least, the
 	address should be easy to remember and write.
-	Once created, the store can be accessed
-	in the URL (host)/repo/your-address.
       </p>
       <legend>Basic information</legend>
       {{ tenant_form.as_ul }}
     </fieldset>
+    {% if reg_error %}
+    <p class="errorlist">
+      {{ reg_error }}
+    </p>
+    {% endif %}
 
-    <!--
-    <fieldset>
-      <p>
-	A Tenant Administrator is the only user who can manage
-	the store basic information, the creation and access
-	of the developers and so on... For each store (tenant)
-	there must be an administrator. 
-      </p>
-      <legend>Store administrator</legend>
-      {{ admin_form.as_ul }}
-    </fieldset>
-    -->
-  
     <input type="submit" value="Submit">
   </form>
 </section>

@@ -1,7 +1,5 @@
 from django import forms
 from tenants.models import Tenant
-from mws_main.models import TenantAdmin
-
 
 class TenantForm(forms.ModelForm):
 
@@ -16,3 +14,9 @@ class TenantForm(forms.ModelForm):
             "subdomain_prefix",
             "email",
         ]
+
+        error_messages = {
+            "subdomain_prefix": {
+                "unique": "There is already a store with that subdomain."
+            }
+        }

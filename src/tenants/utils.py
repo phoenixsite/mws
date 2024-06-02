@@ -1,6 +1,3 @@
-import psycopg
-import psycopg.sql as sql
-from django.conf import settings
 
 # We cannot access the model Tenant from the tenants app
 # because there would be a circular import, so the explicit name
@@ -11,13 +8,12 @@ def subdomain_from_request(request):
     "Extract the subdomain from the request address"
     return request.get_host().split(':')[0].lower().split('.')[0]
 
-def get_tenant_db(subdomain_prefix):
+def get_tenant_db(subdomain):
     """
     Get the Django' id of the database related to the given subdomain.
 
-    It creates a new connection to the default Django's database,
-    where the registered
-    tenants are. Onced the db name is retrieved, it closes the connection.
+    Currently, the database id is the same as the subdomain of the
+    tenant.
 
     :param subdomain_prefix: Request address subdomain.
     :type subdomain_prefix: str
@@ -25,33 +21,7 @@ def get_tenant_db(subdomain_prefix):
     :rtype: str
     """
 
-    conn =  psycopg.connect(
-        host=settings.DATABASES["default"]["HOST"],
-        port=settings.DATABASES["default"]["PORT"],
-        user=settings.DATABASES["default"]["USER"],
-        password=settings.DATABASES["default"]["PASSWORD"],
-        dbname=settings.DATABASES["default"]["NAME"],
-        autocommit=True
-    )
-
-    with conn:
-
-        with conn.cursor() as cur:
-            cur.execute(
-                sql.SQL("""
-                SELECT subdomain_prefix
-                FROM {}
-                WHERE subdomain_prefix = %s;
-                """).format(sql.Identifier(TENANTS_TABLE)),
-                (subdomain_prefix,)
-            )
-            db_name = cur.fetchone()
-
-    conn.close()
-
-    if db_name:
-        db_name = db_name[0]
-    
+    db_name = subdomain
     return db_name
 
 def tenant_db_from_request(request):
