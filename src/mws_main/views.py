@@ -267,7 +267,6 @@ class ServiceCreateView(PermissionRequiredMixin, UserMixin, TemplateView):
                 self.basic_form.cleaned_data["brief_descrp"],
                 self.basic_form.cleaned_data["descrp"],
                 [form.cleaned_data for form in self.platform_formset if form.cleaned_data and form.cleaned_data["package"] is not None],
-                self.tenant,
                 self.basic_form.cleaned_data["creator"],
                 self.basic_form.cleaned_data["developers"]
             )
