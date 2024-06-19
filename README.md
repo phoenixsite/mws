@@ -94,8 +94,12 @@ two 2.3 GHz cores and 16 MB of cache. All experiments were tested with such a vi
 
 We have designed four experiments to test the system in different situations. 
 
+Measures of each tenant for each number of users in the first experiment:
 ![Evolution plot of the first experiment](https://github.com/phoenixsite/mws/blob/main/1_agg_average_page-0001.jpg)
+Average and 99 percentile latency evoluation in the second experiment:
 ![Evolution plot of the second experiment](https://github.com/phoenixsite/mws/blob/main/2_ev_plot_page-0001.jpg)
+Throughput evolution of each tenant in the third experiment: 
 ![Throughput evolution plot of the third experiment](https://github.com/phoenixsite/mws/blob/main/3_throughput_plot_page-0001.jpg)
+Throughput and 99 percentile latency per tenant in the fourth experiment:
 ![Throughput evolution plot of the first experiment](https://github.com/phoenixsite/mws/blob/main/4_plots_page-0001.jpg)
 
