@@ -94,3 +94,5 @@ two 2.3 GHz cores and 16 MB of cache. All experiments were tested with such a vi
 
 We have designed four experiments to test the system in different situations. 
 
+![Evolution plot of the first experiment](https://github.com/phoenixsite/mws/blob/main/1_agg_average.pdf)
+
