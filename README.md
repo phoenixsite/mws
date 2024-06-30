@@ -81,25 +81,3 @@ up before proceeding.
 Once in the `src/` directory, to run the server on the localhost is just necessary to
 execute `python manage.py runserver` and the IP address and port of the web application
 will appear on screen. 
-
-## Performance testing and benchmarking
-For testing the hypothetical performance of the platform, including its elasticity and scalability, 
-we have used  [MuTeBench](https://github.com/MuTeBench/MuTeBench), a benchmarking 
-framework for multi-tenant database systems. 
-
-We have used a  virtual machine from the Department of Software Enginnering of the University of
-Granada tp host the PostgreSQL 16 DBMS. This machine is configured with a Debian 11 "bullseye"
-OS with 896.5 MB of RAM, 16 GB of storage and an Intel Core i7 9xx (Nehalem Class Core i7) with 
-two 2.3 GHz cores and 16 MB of cache. All experiments were tested with such a virtual machine remotely.
-
-We have designed four experiments to test the system in different situations. 
-
-Measures of each tenant for each number of users in the first experiment:
-![Evolution plot of the first experiment](https://github.com/phoenixsite/mws/blob/main/1_agg_average_page-0001.jpg)
-Average and 99 percentile latency evoluation in the second experiment:
-![Evolution plot of the second experiment](https://github.com/phoenixsite/mws/blob/main/2_ev_plot_page-0001.jpg)
-Throughput evolution of each tenant in the third experiment: 
-![Throughput evolution plot of the third experiment](https://github.com/phoenixsite/mws/blob/main/3_throughput_plot_page-0001.jpg)
-Throughput and 99 percentile latency per tenant in the fourth experiment:
-![Throughput evolution plot of the first experiment](https://github.com/phoenixsite/mws/blob/main/4_plots_page-0001.jpg)
-
